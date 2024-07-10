@@ -1,0 +1,597 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */; };
+		E860ACE42C3EFBE5007E65DE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE32C3EFBE5007E65DE /* ContentView.swift */; };
+		E860ACE62C3EFBE5007E65DE /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE52C3EFBE5007E65DE /* Item.swift */; };
+		E860ACE82C3EFBE8007E65DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACE72C3EFBE8007E65DE /* Assets.xcassets */; };
+		E860ACEB2C3EFBE8007E65DE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */; };
+		E860ACF52C3EFBE9007E65DE /* PersephoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACF42C3EFBE9007E65DE /* PersephoneTests.swift */; };
+		E860ACFF2C3EFBE9007E65DE /* PersephoneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */; };
+		E860AD012C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E860ACF12C3EFBE9007E65DE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E860ACD62C3EFBE5007E65DE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E860ACDD2C3EFBE5007E65DE;
+			remoteInfo = Persephone;
+		};
+		E860ACFB2C3EFBE9007E65DE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E860ACD62C3EFBE5007E65DE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E860ACDD2C3EFBE5007E65DE;
+			remoteInfo = Persephone;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		E860ACDE2C3EFBE5007E65DE /* Persephone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persephone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneApp.swift; sourceTree = "<group>"; };
+		E860ACE32C3EFBE5007E65DE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E860ACE52C3EFBE5007E65DE /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		E860ACE72C3EFBE8007E65DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E860ACF02C3EFBE9007E65DE /* PersephoneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PersephoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E860ACF42C3EFBE9007E65DE /* PersephoneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneTests.swift; sourceTree = "<group>"; };
+		E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PersephoneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITests.swift; sourceTree = "<group>"; };
+		E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E860ACDB2C3EFBE5007E65DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E860ACED2C3EFBE9007E65DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E860ACF72C3EFBE9007E65DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E860ACD52C3EFBE5007E65DE = {
+			isa = PBXGroup;
+			children = (
+				E860ACE02C3EFBE5007E65DE /* Persephone */,
+				E860ACF32C3EFBE9007E65DE /* PersephoneTests */,
+				E860ACFD2C3EFBE9007E65DE /* PersephoneUITests */,
+				E860ACDF2C3EFBE5007E65DE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E860ACDF2C3EFBE5007E65DE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E860ACDE2C3EFBE5007E65DE /* Persephone.app */,
+				E860ACF02C3EFBE9007E65DE /* PersephoneTests.xctest */,
+				E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E860ACE02C3EFBE5007E65DE /* Persephone */ = {
+			isa = PBXGroup;
+			children = (
+				E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */,
+				E860ACE32C3EFBE5007E65DE /* ContentView.swift */,
+				E860ACE52C3EFBE5007E65DE /* Item.swift */,
+				E860ACE72C3EFBE8007E65DE /* Assets.xcassets */,
+				E860ACE92C3EFBE8007E65DE /* Preview Content */,
+			);
+			path = Persephone;
+			sourceTree = "<group>";
+		};
+		E860ACE92C3EFBE8007E65DE /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		E860ACF32C3EFBE9007E65DE /* PersephoneTests */ = {
+			isa = PBXGroup;
+			children = (
+				E860ACF42C3EFBE9007E65DE /* PersephoneTests.swift */,
+			);
+			path = PersephoneTests;
+			sourceTree = "<group>";
+		};
+		E860ACFD2C3EFBE9007E65DE /* PersephoneUITests */ = {
+			isa = PBXGroup;
+			children = (
+				E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */,
+				E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */,
+			);
+			path = PersephoneUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E860ACDD2C3EFBE5007E65DE /* Persephone */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E860AD042C3EFBE9007E65DE /* Build configuration list for PBXNativeTarget "Persephone" */;
+			buildPhases = (
+				E860ACDA2C3EFBE5007E65DE /* Sources */,
+				E860ACDB2C3EFBE5007E65DE /* Frameworks */,
+				E860ACDC2C3EFBE5007E65DE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Persephone;
+			productName = Persephone;
+			productReference = E860ACDE2C3EFBE5007E65DE /* Persephone.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E860ACEF2C3EFBE9007E65DE /* PersephoneTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E860AD072C3EFBE9007E65DE /* Build configuration list for PBXNativeTarget "PersephoneTests" */;
+			buildPhases = (
+				E860ACEC2C3EFBE9007E65DE /* Sources */,
+				E860ACED2C3EFBE9007E65DE /* Frameworks */,
+				E860ACEE2C3EFBE9007E65DE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E860ACF22C3EFBE9007E65DE /* PBXTargetDependency */,
+			);
+			name = PersephoneTests;
+			productName = PersephoneTests;
+			productReference = E860ACF02C3EFBE9007E65DE /* PersephoneTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E860ACF92C3EFBE9007E65DE /* PersephoneUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E860AD0A2C3EFBE9007E65DE /* Build configuration list for PBXNativeTarget "PersephoneUITests" */;
+			buildPhases = (
+				E860ACF62C3EFBE9007E65DE /* Sources */,
+				E860ACF72C3EFBE9007E65DE /* Frameworks */,
+				E860ACF82C3EFBE9007E65DE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E860ACFC2C3EFBE9007E65DE /* PBXTargetDependency */,
+			);
+			name = PersephoneUITests;
+			productName = PersephoneUITests;
+			productReference = E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E860ACD62C3EFBE5007E65DE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					E860ACDD2C3EFBE5007E65DE = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					E860ACEF2C3EFBE9007E65DE = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = E860ACDD2C3EFBE5007E65DE;
+					};
+					E860ACF92C3EFBE9007E65DE = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = E860ACDD2C3EFBE5007E65DE;
+					};
+				};
+			};
+			buildConfigurationList = E860ACD92C3EFBE5007E65DE /* Build configuration list for PBXProject "Persephone" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E860ACD52C3EFBE5007E65DE;
+			productRefGroup = E860ACDF2C3EFBE5007E65DE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E860ACDD2C3EFBE5007E65DE /* Persephone */,
+				E860ACEF2C3EFBE9007E65DE /* PersephoneTests */,
+				E860ACF92C3EFBE9007E65DE /* PersephoneUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E860ACDC2C3EFBE5007E65DE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E860ACEB2C3EFBE8007E65DE /* Preview Assets.xcassets in Resources */,
+				E860ACE82C3EFBE8007E65DE /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E860ACEE2C3EFBE9007E65DE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E860ACF82C3EFBE9007E65DE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E860ACDA2C3EFBE5007E65DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E860ACE42C3EFBE5007E65DE /* ContentView.swift in Sources */,
+				E860ACE62C3EFBE5007E65DE /* Item.swift in Sources */,
+				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E860ACEC2C3EFBE9007E65DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E860ACF52C3EFBE9007E65DE /* PersephoneTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E860ACF62C3EFBE9007E65DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E860ACFF2C3EFBE9007E65DE /* PersephoneUITests.swift in Sources */,
+				E860AD012C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E860ACF22C3EFBE9007E65DE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E860ACDD2C3EFBE5007E65DE /* Persephone */;
+			targetProxy = E860ACF12C3EFBE9007E65DE /* PBXContainerItemProxy */;
+		};
+		E860ACFC2C3EFBE9007E65DE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E860ACDD2C3EFBE5007E65DE /* Persephone */;
+			targetProxy = E860ACFB2C3EFBE9007E65DE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E860AD022C3EFBE9007E65DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E860AD032C3EFBE9007E65DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E860AD052C3EFBE9007E65DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Persephone/Preview Content\"";
+				DEVELOPMENT_TEAM = FU2B76F7PF;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E860AD062C3EFBE9007E65DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Persephone/Preview Content\"";
+				DEVELOPMENT_TEAM = FU2B76F7PF;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E860AD082C3EFBE9007E65DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FU2B76F7PF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.PersephoneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Persephone.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Persephone";
+			};
+			name = Debug;
+		};
+		E860AD092C3EFBE9007E65DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FU2B76F7PF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.PersephoneTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Persephone.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Persephone";
+			};
+			name = Release;
+		};
+		E860AD0B2C3EFBE9007E65DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FU2B76F7PF;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.PersephoneUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Persephone;
+			};
+			name = Debug;
+		};
+		E860AD0C2C3EFBE9007E65DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FU2B76F7PF;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.PersephoneUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Persephone;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E860ACD92C3EFBE5007E65DE /* Build configuration list for PBXProject "Persephone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E860AD022C3EFBE9007E65DE /* Debug */,
+				E860AD032C3EFBE9007E65DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E860AD042C3EFBE9007E65DE /* Build configuration list for PBXNativeTarget "Persephone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E860AD052C3EFBE9007E65DE /* Debug */,
+				E860AD062C3EFBE9007E65DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E860AD072C3EFBE9007E65DE /* Build configuration list for PBXNativeTarget "PersephoneTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E860AD082C3EFBE9007E65DE /* Debug */,
+				E860AD092C3EFBE9007E65DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E860AD0A2C3EFBE9007E65DE /* Build configuration list for PBXNativeTarget "PersephoneUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E860AD0B2C3EFBE9007E65DE /* Debug */,
+				E860AD0C2C3EFBE9007E65DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E860ACD62C3EFBE5007E65DE /* Project object */;
+}

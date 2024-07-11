@@ -11,9 +11,7 @@ import SwiftData
 @main
 struct PersephoneApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            FoodItem.self,
-        ])
+        let schema = Schema(CurrentSchema.models)
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {

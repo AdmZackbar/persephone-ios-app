@@ -7,14 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E80E2C3D2C3F22FC00D35BE7 /* FoodItemEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C3C2C3F22FC00D35BE7 /* FoodItemEditor.swift */; };
 		E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C3F2C3F6C9000D35BE7 /* CurrencyUITextField.swift */; };
 		E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C412C3F6CCF00D35BE7 /* CurrencyTextField.swift */; };
 		E80E2C442C3F6D5300D35BE7 /* NumberFormatterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C432C3F6D5300D35BE7 /* NumberFormatterProtocol.swift */; };
+		E80E2C462C400B0800D35BE7 /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C452C400B0800D35BE7 /* Schema.swift */; };
+		E80E2C482C400BC400D35BE7 /* FoodItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C472C400BC400D35BE7 /* FoodItem.swift */; };
+		E80E2C4A2C40157A00D35BE7 /* FoodItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C492C40157A00D35BE7 /* FoodItemView.swift */; };
+		E80E2C4C2C401AF300D35BE7 /* FoodItemEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */; };
 		E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBD92C3F078D0055C6B2 /* MainView.swift */; };
 		E82CFBDC2C3F0D990055C6B2 /* DbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBDB2C3F0D990055C6B2 /* DbView.swift */; };
-		E82CFBE02C3F0E440055C6B2 /* FoodItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBDF2C3F0E440055C6B2 /* FoodItem.swift */; };
-		E82CFBE22C3F17650055C6B2 /* FoodItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBE12C3F17650055C6B2 /* FoodItemView.swift */; };
 		E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */; };
 		E860ACE82C3EFBE8007E65DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACE72C3EFBE8007E65DE /* Assets.xcassets */; };
 		E860ACEB2C3EFBE8007E65DE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */; };
@@ -41,14 +42,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		E80E2C3C2C3F22FC00D35BE7 /* FoodItemEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemEditor.swift; sourceTree = "<group>"; };
 		E80E2C3F2C3F6C9000D35BE7 /* CurrencyUITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyUITextField.swift; sourceTree = "<group>"; };
 		E80E2C412C3F6CCF00D35BE7 /* CurrencyTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyTextField.swift; sourceTree = "<group>"; };
 		E80E2C432C3F6D5300D35BE7 /* NumberFormatterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatterProtocol.swift; sourceTree = "<group>"; };
+		E80E2C452C400B0800D35BE7 /* Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
+		E80E2C472C400BC400D35BE7 /* FoodItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItem.swift; sourceTree = "<group>"; };
+		E80E2C492C40157A00D35BE7 /* FoodItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemView.swift; sourceTree = "<group>"; };
+		E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemEditor.swift; sourceTree = "<group>"; };
 		E82CFBD92C3F078D0055C6B2 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		E82CFBDB2C3F0D990055C6B2 /* DbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DbView.swift; sourceTree = "<group>"; };
-		E82CFBDF2C3F0E440055C6B2 /* FoodItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItem.swift; sourceTree = "<group>"; };
-		E82CFBE12C3F17650055C6B2 /* FoodItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemView.swift; sourceTree = "<group>"; };
 		E860ACDE2C3EFBE5007E65DE /* Persephone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persephone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneApp.swift; sourceTree = "<group>"; };
 		E860ACE72C3EFBE8007E65DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -98,7 +100,8 @@
 		E82CFBDD2C3F0E150055C6B2 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				E82CFBDF2C3F0E440055C6B2 /* FoodItem.swift */,
+				E80E2C452C400B0800D35BE7 /* Schema.swift */,
+				E80E2C472C400BC400D35BE7 /* FoodItem.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -108,8 +111,8 @@
 			children = (
 				E82CFBD92C3F078D0055C6B2 /* MainView.swift */,
 				E82CFBDB2C3F0D990055C6B2 /* DbView.swift */,
-				E82CFBE12C3F17650055C6B2 /* FoodItemView.swift */,
-				E80E2C3C2C3F22FC00D35BE7 /* FoodItemEditor.swift */,
+				E80E2C492C40157A00D35BE7 /* FoodItemView.swift */,
+				E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -303,10 +306,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */,
-				E80E2C3D2C3F22FC00D35BE7 /* FoodItemEditor.swift in Sources */,
+				E80E2C4C2C401AF300D35BE7 /* FoodItemEditor.swift in Sources */,
 				E82CFBDC2C3F0D990055C6B2 /* DbView.swift in Sources */,
-				E82CFBE22C3F17650055C6B2 /* FoodItemView.swift in Sources */,
-				E82CFBE02C3F0E440055C6B2 /* FoodItem.swift in Sources */,
+				E80E2C462C400B0800D35BE7 /* Schema.swift in Sources */,
+				E80E2C4A2C40157A00D35BE7 /* FoodItemView.swift in Sources */,
+				E80E2C482C400BC400D35BE7 /* FoodItem.swift in Sources */,
 				E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */,
 				E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,

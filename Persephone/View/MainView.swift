@@ -34,7 +34,8 @@ struct MainView: View {
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: FoodItem.self, configurations: config)
-    container.mainContext.insert(FoodItem(timestamp: Date(), name: "Lightly Breaded Chicken Chunks", brand: "Kirkland", details: "Costco's chicken nuggets", price: 1399, store: "Costco", numServings: 16, servingSize: "4 oz", totalSize: 1814, sizeType: .Mass))
+    let item = FoodItem(name: "Lightly Breaded Chicken Chunks", metaData: FoodMetaData(brand: "Kirkland", details: "Costco's chicken nuggets"), composition: FoodComposition(nutrients: [.Calorie: 120, .Protein: 13]), sizeInfo: FoodSizeInfo(numServings: 16, servingSize: "4 oz", totalAmount: 1814, servingAmount: 63, sizeType: .Mass), storeInfo: StoreInfo(name: "Costco", price: 1399))
+    container.mainContext.insert(item)
     return MainView()
         .modelContainer(container)
 }

@@ -14,6 +14,7 @@ typealias FoodMetaData = SchemaV1.FoodMetaData
 typealias FoodSizeInfo = SchemaV1.FoodSizeInfo
 typealias StoreInfo = SchemaV1.StoreInfo
 typealias SizeType = SchemaV1.SizeType
+typealias Nutrient = SchemaV1.Nutrient
 
 extension SchemaV1 {
     @Model
@@ -101,14 +102,17 @@ extension SchemaV1 {
     }
     
     struct FoodComposition: Codable {
-        // Stores the amount of each nutrient
+        // Stores the amount of calories per serving
+        var calories: Double
+        // Stores the amount of each nutrient per serving (in mg)
         var nutrients: [Nutrient: Double]
         // The full list of ingredients that make up the item
         var ingredients: [String] = []
         // The full list of known allergens for the item
         var allergens: [String] = []
         
-        init(nutrients: [Nutrient : Double], ingredients: [String] = [], allergens: [String] = []) {
+        init(calories: Double, nutrients: [Nutrient : Double], ingredients: [String] = [], allergens: [String] = []) {
+            self.calories = calories
             self.nutrients = nutrients
             self.ingredients = ingredients
             self.allergens = allergens
@@ -116,6 +120,24 @@ extension SchemaV1 {
     }
     
     enum Nutrient: Codable, Hashable {
-        case Calorie, TotalCarbs, TotalFat, Protein
+        // Carbs
+        case TotalCarbs,
+             DietaryFiber,
+             TotalSugars,
+             AddedSugars
+        // Fats
+        case TotalFat,
+             SaturatedFat,
+             TransFat,
+             PolyunsaturatedFat,
+             MonounsaturatedFat
+        // Other
+        case Protein,
+             Cholesterol,
+             Sodium,
+             Calcium,
+             VitaminD,
+             Iron,
+             Potassium
     }
 }

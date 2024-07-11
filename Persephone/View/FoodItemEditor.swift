@@ -105,7 +105,25 @@ struct FoodItemEditor: View {
             item.storeInfo = StoreInfo(name: store, price: price)
             item.sizeInfo = FoodSizeInfo(numServings: numServings, servingSize: servingSize, totalAmount: totalAmount, servingAmount: round(totalAmount / numServings), sizeType: sizeType)
         } else {
-            let newItem = FoodItem(name: name, metaData: FoodMetaData(barcode: barcode, brand: brand, details: details), composition: FoodComposition(nutrients: [:]),sizeInfo: FoodSizeInfo(numServings: numServings, servingSize: servingSize, totalAmount: totalAmount, servingAmount: round(totalAmount / numServings), sizeType: sizeType), storeInfo: StoreInfo(name: store, price: price))
+            let metaData = FoodMetaData(barcode: barcode, brand: brand, details: details)
+            let composition = FoodComposition(
+                calories: 0,
+                nutrients: [:],
+                ingredients: [],
+                allergens: [])
+            let sizeInfo = FoodSizeInfo(
+                numServings: numServings,
+                servingSize: servingSize,
+                totalAmount: totalAmount,
+                servingAmount: round(totalAmount / numServings),
+                sizeType: sizeType)
+            let storeInfo = StoreInfo(name: store, price: price)
+            let newItem = FoodItem(name: name,
+                                   metaData: metaData,
+                                   // TODO
+                                   composition: composition,
+                                   sizeInfo: sizeInfo,
+                                   storeInfo: storeInfo)
             modelContext.insert(newItem)
         }
     }

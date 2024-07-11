@@ -7,9 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E80E2C3D2C3F22FC00D35BE7 /* FoodItemEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C3C2C3F22FC00D35BE7 /* FoodItemEditor.swift */; };
+		E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C3F2C3F6C9000D35BE7 /* CurrencyUITextField.swift */; };
+		E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C412C3F6CCF00D35BE7 /* CurrencyTextField.swift */; };
+		E80E2C442C3F6D5300D35BE7 /* NumberFormatterProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C432C3F6D5300D35BE7 /* NumberFormatterProtocol.swift */; };
+		E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBD92C3F078D0055C6B2 /* MainView.swift */; };
+		E82CFBDC2C3F0D990055C6B2 /* DbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBDB2C3F0D990055C6B2 /* DbView.swift */; };
+		E82CFBE02C3F0E440055C6B2 /* FoodItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBDF2C3F0E440055C6B2 /* FoodItem.swift */; };
+		E82CFBE22C3F17650055C6B2 /* FoodItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBE12C3F17650055C6B2 /* FoodItemView.swift */; };
 		E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */; };
-		E860ACE42C3EFBE5007E65DE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE32C3EFBE5007E65DE /* ContentView.swift */; };
-		E860ACE62C3EFBE5007E65DE /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE52C3EFBE5007E65DE /* Item.swift */; };
 		E860ACE82C3EFBE8007E65DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACE72C3EFBE8007E65DE /* Assets.xcassets */; };
 		E860ACEB2C3EFBE8007E65DE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */; };
 		E860ACF52C3EFBE9007E65DE /* PersephoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACF42C3EFBE9007E65DE /* PersephoneTests.swift */; };
@@ -35,10 +41,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E80E2C3C2C3F22FC00D35BE7 /* FoodItemEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemEditor.swift; sourceTree = "<group>"; };
+		E80E2C3F2C3F6C9000D35BE7 /* CurrencyUITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyUITextField.swift; sourceTree = "<group>"; };
+		E80E2C412C3F6CCF00D35BE7 /* CurrencyTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyTextField.swift; sourceTree = "<group>"; };
+		E80E2C432C3F6D5300D35BE7 /* NumberFormatterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFormatterProtocol.swift; sourceTree = "<group>"; };
+		E82CFBD92C3F078D0055C6B2 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		E82CFBDB2C3F0D990055C6B2 /* DbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DbView.swift; sourceTree = "<group>"; };
+		E82CFBDF2C3F0E440055C6B2 /* FoodItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItem.swift; sourceTree = "<group>"; };
+		E82CFBE12C3F17650055C6B2 /* FoodItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemView.swift; sourceTree = "<group>"; };
 		E860ACDE2C3EFBE5007E65DE /* Persephone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persephone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneApp.swift; sourceTree = "<group>"; };
-		E860ACE32C3EFBE5007E65DE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		E860ACE52C3EFBE5007E65DE /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		E860ACE72C3EFBE8007E65DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		E860ACF02C3EFBE9007E65DE /* PersephoneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PersephoneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,6 +85,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E80E2C3E2C3F6C6700D35BE7 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				E80E2C432C3F6D5300D35BE7 /* NumberFormatterProtocol.swift */,
+				E80E2C412C3F6CCF00D35BE7 /* CurrencyTextField.swift */,
+				E80E2C3F2C3F6C9000D35BE7 /* CurrencyUITextField.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		E82CFBDD2C3F0E150055C6B2 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E82CFBDF2C3F0E440055C6B2 /* FoodItem.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		E82CFBDE2C3F0E1F0055C6B2 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				E82CFBD92C3F078D0055C6B2 /* MainView.swift */,
+				E82CFBDB2C3F0D990055C6B2 /* DbView.swift */,
+				E82CFBE12C3F17650055C6B2 /* FoodItemView.swift */,
+				E80E2C3C2C3F22FC00D35BE7 /* FoodItemEditor.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		E860ACD52C3EFBE5007E65DE = {
 			isa = PBXGroup;
 			children = (
@@ -97,8 +138,9 @@
 			isa = PBXGroup;
 			children = (
 				E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */,
-				E860ACE32C3EFBE5007E65DE /* ContentView.swift */,
-				E860ACE52C3EFBE5007E65DE /* Item.swift */,
+				E82CFBDD2C3F0E150055C6B2 /* Model */,
+				E82CFBDE2C3F0E1F0055C6B2 /* View */,
+				E80E2C3E2C3F6C6700D35BE7 /* UI */,
 				E860ACE72C3EFBE8007E65DE /* Assets.xcassets */,
 				E860ACE92C3EFBE8007E65DE /* Preview Content */,
 			);
@@ -260,9 +302,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E860ACE42C3EFBE5007E65DE /* ContentView.swift in Sources */,
-				E860ACE62C3EFBE5007E65DE /* Item.swift in Sources */,
+				E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */,
+				E80E2C3D2C3F22FC00D35BE7 /* FoodItemEditor.swift in Sources */,
+				E82CFBDC2C3F0D990055C6B2 /* DbView.swift in Sources */,
+				E82CFBE22C3F17650055C6B2 /* FoodItemView.swift in Sources */,
+				E82CFBE02C3F0E440055C6B2 /* FoodItem.swift in Sources */,
+				E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */,
+				E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
+				E80E2C442C3F6D5300D35BE7 /* NumberFormatterProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,16 +477,19 @@
 				DEVELOPMENT_TEAM = FU2B76F7PF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Persephone;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -458,16 +509,19 @@
 				DEVELOPMENT_TEAM = FU2B76F7PF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Persephone;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

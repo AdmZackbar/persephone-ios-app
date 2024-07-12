@@ -14,6 +14,19 @@ struct FoodItemEditor: View {
     
     let item: FoodItem?
     
+    private let defaultBrands: [String] = [
+        "Kirkland",
+        "Publix"
+    ]
+    private let defaultStores: [String] = [
+        "Costco",
+        "Publix",
+        "Target",
+        "Kroger",
+        "Trader Joe's",
+        "Amazon"
+    ]
+    
     // Main Info
     @State private var name: String = ""
     
@@ -26,6 +39,14 @@ struct FoodItemEditor: View {
     @State private var numServings: Double = 0.0
     @State private var servingSize: String = ""
     @State private var totalAmount: Double = 0.0
+    private var servingAmount: Double? {
+        get {
+            if (totalAmount <= 0 || numServings <= 0) {
+                return nil
+            }
+            return totalAmount / numServings
+        }
+    }
     @State private var sizeType: SizeType = .Mass
     
     // Store Info
@@ -69,32 +90,82 @@ struct FoodItemEditor: View {
         return formatter
     }()
     
+    let intFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 1
+        formatter.zeroSymbol = ""
+        return formatter
+    }()
+    
     var body: some View {
         Form {
             Section("Name") {
                 TextField("Name", text: $name)
-                TextField("Brand", text: $brand)
+                HStack {
+                    TextField("Brand", text: $brand)
+                    Menu {
+                        ForEach(defaultBrands, id: \.self) { b in
+                            Button(b) {
+                                brand = b
+                            }
+                        }
+                    } label: {
+                        Label("Set Brand", systemImage: "chevron.right").labelStyle(.iconOnly)
+                    }
+                }
             }
             Section("Store") {
                 Toggle("Store-Bought", isOn: $storeExpanded)
                 if (storeExpanded) {
-                    TextField("Store Name", text: $store)
+                    HStack {
+                        TextField("Store Name", text: $store)
+                        Menu {
+                            ForEach(defaultStores, id: \.self) { s in
+                                Button(s) {
+                                    store = s
+                                }
+                            }
+                        } label: {
+                            Label("Set Store", systemImage: "chevron.right").labelStyle(.iconOnly)
+                        }
+                    }
                     CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
                 }
             }
             Section("Size") {
-                Picker("Type", selection: $sizeType) {
+                Picker(selection: $sizeType) {
                     Text("Weight (g)").tag(SizeType.Mass)
                     Text("Volume (mL)").tag(SizeType.Volume)
+                } label: {
+                    HStack {
+                        Text("Net \(sizeType == .Mass ? "Weight" : "Volume"):")
+                        TextField("required", value: $totalAmount, formatter: gramFormatter)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                    }
                 }
-                TextField("Net \(sizeType == .Mass ? "Weight" : "Volume")", value: $totalAmount, formatter: gramFormatter)
-                    .keyboardType(.decimalPad)
-                TextField("Number of Servings", value: $numServings, formatter: gramFormatter)
-                    .keyboardType(.decimalPad)
-                TextField("Serving Size", text: $servingSize)
+                HStack {
+                    Text("Num. Servings:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                    TextField("required", value: $numServings, formatter: gramFormatter)
+                        .multilineTextAlignment(.trailing)
+                        .keyboardType(.decimalPad)
+                    if (numServings > 0) {
+                        Text("servings").font(.subheadline).fontWeight(.thin)
+                    }
+                }
+                HStack {
+                    Text("Serving Size:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                    TextField("required", text: $servingSize)
+                        .multilineTextAlignment(.trailing)
+                        .keyboardType(.decimalPad)
+                    if (servingAmount != nil) {
+                        Text("(\(intFormatter.string(for: servingAmount)!)\(sizeType == .Mass ? "g" : "mL"))").font(.subheadline).fontWeight(.thin)
+                    }
+                }
             }
             Section("Nutrients") {
-                createNutrientEntry(field: "Calories:", value: $calories)
+                createNutrientEntry(field: "Calories:", unit: "", value: $calories)
                 DisclosureGroup(
                     isExpanded: $carbsExpanded,
                     content: {
@@ -106,7 +177,7 @@ struct FoodItemEditor: View {
                             createNutrientSubEntry(field: "Added Sugars:", value: $addedSugars)
                         }
                     },
-                    label: { createNutrientEntry(field: "Total Carbs (g):", value: $totalCarbs) }
+                    label: { createNutrientEntry(field: "Total Carbs:", value: $totalCarbs) }
                 )
                 DisclosureGroup(
                     isExpanded: $fatExpanded,
@@ -121,14 +192,14 @@ struct FoodItemEditor: View {
                             createNutrientSubEntry(field: "Mono. Fat:", value: $monoFat)
                         }
                     },
-                    label: { createNutrientEntry(field: "Total Fat (g):", value: $totalFat) }
+                    label: { createNutrientEntry(field: "Total Fat:", value: $totalFat) }
                 )
                 Grid {
-                    createNutrientEntry(field: "Protein (g):", value: $protein)
+                    createNutrientEntry(field: "Protein:", value: $protein)
                     Divider()
-                    createNutrientEntry(field: "Sodium (mg):", value: $sodium)
+                    createNutrientEntry(field: "Sodium:", unit: "mg", value: $sodium)
                     Divider()
-                    createNutrientEntry(field: "Cholesterol (mg):", value: $cholesterol)
+                    createNutrientEntry(field: "Cholesterol:", unit: "mg", value: $cholesterol)
                 }
             }
             Section("Ingredients") {
@@ -217,17 +288,27 @@ struct FoodItemEditor: View {
         return calories < 0
     }
     
-    private func createNutrientEntry(field: String, value: Binding<Double>) -> some View {
+    private func createNutrientEntry(field: String, unit: String = "g", value: Binding<Double>) -> some View {
         HStack(spacing: 8.0) {
             Text(field)
             TextField("", value: value, formatter: gramFormatter)
+                .multilineTextAlignment(.trailing)
+                .keyboardType(.decimalPad)
+            if (!unit.isEmpty && value.wrappedValue > 0) {
+                Text(unit)
+            }
         }
     }
     
-    private func createNutrientSubEntry(field: String, value: Binding<Double>) -> some View {
+    private func createNutrientSubEntry(field: String, unit: String = "g", value: Binding<Double>) -> some View {
         GridRow {
             Text(field).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
             TextField("", value: value, formatter: gramFormatter)
+                .multilineTextAlignment(.trailing)
+                .keyboardType(.decimalPad)
+            if (!unit.isEmpty && value.wrappedValue > 0) {
+                Text(unit)
+            }
         }
     }
     

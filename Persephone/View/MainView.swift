@@ -13,7 +13,7 @@ struct MainView: View {
         TabView {
             DbView()
                 .tabItem {
-                    Label("DB", systemImage: "tablecells")
+                    Label("Database", systemImage: "tablecells")
                 }
             Text("Cookbook")
                 .tabItem {

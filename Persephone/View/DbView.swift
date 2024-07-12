@@ -22,19 +22,20 @@ struct DbView: View {
                 } label: {
                     Text(item.name)
                 }
-                .swipeActions {
-                    Button {
-                        showDeleteDialog = true
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                            .tint(.red)
-                    }
+                .contextMenu {
                     NavigationLink {
-                        FoodItemEditor(item: item)
+                        FoodItemView(item: item)
                     } label: {
-                        Label("Edit", systemImage: "pencil.circle")
-                            .tint(.blue)
+                        Label("View", systemImage: "magnifyingglass")
                     }
+                    editLink(item: item)
+                    deleteButton()
+                } preview: {
+                    NutritionView(item: item)
+                }
+                .swipeActions {
+                    deleteButton()
+                    editLink(item: item)
                 }
                 .confirmationDialog("Are you sure?", isPresented: $showDeleteDialog) {
                     Button("Delete", role: .destructive) {
@@ -57,6 +58,98 @@ struct DbView: View {
                 }
             }
         }
+    }
+    
+    private func editLink(item: FoodItem) -> some View {
+        NavigationLink {
+            FoodItemEditor(item: item)
+        } label: {
+            Label("Edit", systemImage: "pencil.circle").tint(.blue)
+        }
+    }
+    
+    private func deleteButton() -> some View {
+        Button(action: delete) {
+            Label("Delete", systemImage: "trash").tint(.red)
+        }
+    }
+    
+    private func delete() {
+        showDeleteDialog = true
+    }
+}
+
+private let formatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    formatter.minimumFractionDigits = 0
+    formatter.maximumFractionDigits = 1
+    formatter.alwaysShowsDecimalSeparator = false
+    return formatter
+}()
+
+private let currencyFormatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.maximumFractionDigits = 2
+    return formatter
+}()
+
+private struct NutritionView: View {
+    let item: FoodItem
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(item.name).font(.title2).fontWeight(.semibold)
+            if (item.metaData.brand != nil || item.storeInfo != nil) {
+                HStack {
+                    Text(item.metaData.brand ?? "").font(.subheadline).italic()
+                    Spacer()
+                    Text(item.storeInfo?.name ?? "").font(.subheadline).italic()
+                }
+            }
+            Divider()
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("\(format(item.composition.calories)) Calories")
+                        .font(.title2).bold()
+                    Text("\(formatG(item.composition.nutrients[.TotalCarbs]))g Carbs")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Text("\(formatG(item.composition.nutrients[.TotalFat]))g Fat")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Text("\(formatG(item.composition.nutrients[.Protein]))g Protein")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Spacer()
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text("\(currencyFormatter.string(for: Double(item.storeInfo?.price ?? 0) / 100.0)!)")
+                        .font(.title2).bold()
+                    Text("Net Weight: \(format(item.sizeInfo.totalAmount))g")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Text("\(format(item.sizeInfo.numServings)) Servings")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Text("Serving: \(item.sizeInfo.servingSize) (\(format(item.sizeInfo.servingAmount))g)")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Spacer()
+                }
+            }
+        }
+        .padding()
+    }
+    
+    private func format(_ value: Double?) -> String {
+        formatter.string(for: value ?? 0.0)!
+    }
+    
+    private func formatG(_ value: Double?) -> String {
+        formatter.string(for: (value ?? 0.0) / 1000.0)!
     }
 }
 

@@ -362,7 +362,6 @@ struct FoodItemEditor: View {
     }
 }
 
-
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: FoodItem.self, configurations: config)

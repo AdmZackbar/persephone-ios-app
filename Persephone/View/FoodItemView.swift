@@ -62,7 +62,7 @@ struct FoodItemView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12.0))
                     HStack {
                         VStack(alignment: .leading) {
-                            Text("Per Serving:")
+                            Text("Per Serving")
                             Text("\(numberFormatter.string(for: item.composition.calories)!) Cal")
                                 .font(.title).bold()
                             Text("\(formatNutrient(nutrient: .TotalCarbs))g Carbs")

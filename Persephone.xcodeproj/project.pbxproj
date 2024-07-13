@@ -14,6 +14,7 @@
 		E80E2C482C400BC400D35BE7 /* FoodItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C472C400BC400D35BE7 /* FoodItem.swift */; };
 		E80E2C4A2C40157A00D35BE7 /* FoodItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C492C40157A00D35BE7 /* FoodItemView.swift */; };
 		E80E2C4C2C401AF300D35BE7 /* FoodItemEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */; };
+		E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C502C41C23200D35BE7 /* ScannerView.swift */; };
 		E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBD92C3F078D0055C6B2 /* MainView.swift */; };
 		E82CFBDC2C3F0D990055C6B2 /* DbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBDB2C3F0D990055C6B2 /* DbView.swift */; };
 		E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */; };
@@ -49,6 +50,8 @@
 		E80E2C472C400BC400D35BE7 /* FoodItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItem.swift; sourceTree = "<group>"; };
 		E80E2C492C40157A00D35BE7 /* FoodItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemView.swift; sourceTree = "<group>"; };
 		E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemEditor.swift; sourceTree = "<group>"; };
+		E80E2C4F2C41C00600D35BE7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E80E2C502C41C23200D35BE7 /* ScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerView.swift; sourceTree = "<group>"; };
 		E82CFBD92C3F078D0055C6B2 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		E82CFBDB2C3F0D990055C6B2 /* DbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DbView.swift; sourceTree = "<group>"; };
 		E860ACDE2C3EFBE5007E65DE /* Persephone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persephone.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,6 +116,7 @@
 				E82CFBDB2C3F0D990055C6B2 /* DbView.swift */,
 				E80E2C492C40157A00D35BE7 /* FoodItemView.swift */,
 				E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */,
+				E80E2C502C41C23200D35BE7 /* ScannerView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -145,6 +149,7 @@
 				E82CFBDE2C3F0E1F0055C6B2 /* View */,
 				E80E2C3E2C3F6C6700D35BE7 /* UI */,
 				E860ACE72C3EFBE8007E65DE /* Assets.xcassets */,
+				E80E2C4F2C41C00600D35BE7 /* Info.plist */,
 				E860ACE92C3EFBE8007E65DE /* Preview Content */,
 			);
 			path = Persephone;
@@ -314,6 +319,7 @@
 				E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */,
 				E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
+				E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */,
 				E80E2C442C3F6D5300D35BE7 /* NumberFormatterProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -481,8 +487,10 @@
 				DEVELOPMENT_TEAM = FU2B76F7PF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Persephone/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Persephone;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Used to scan barcodes of items.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -513,8 +521,10 @@
 				DEVELOPMENT_TEAM = FU2B76F7PF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Persephone/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Persephone;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Used to scan barcodes of items.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

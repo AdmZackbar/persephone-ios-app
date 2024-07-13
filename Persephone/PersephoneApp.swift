@@ -12,7 +12,8 @@ import SwiftData
 struct PersephoneApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema(CurrentSchema.models)
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: isPreview)
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])

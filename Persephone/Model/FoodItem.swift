@@ -41,18 +41,15 @@ extension SchemaV1 {
         var barcode: String?
         // The name of the brand that makes the item
         var brand: String?
-        // Describes this item in more detail
-        var details: String?
         // The icon representing this item
         var icon: String?
         // Set of tags that describe this item
         var tags: [String]
         
-        init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, details: String? = nil, icon: String? = nil, tags: [String] = []) {
+        init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, tags: [String] = []) {
             self.timestamp = timestamp
             self.barcode = barcode
             self.brand = brand
-            self.details = details
             self.icon = icon
             self.tags = tags
         }
@@ -102,17 +99,14 @@ extension SchemaV1 {
     }
     
     struct FoodComposition: Codable {
-        // Stores the amount of calories per serving
-        var calories: Double
         // Stores the amount of each nutrient per serving (in mg)
         var nutrients: [Nutrient: Double]
         // The full list of ingredients that make up the item
-        var ingredients: [String] = []
+        var ingredients: String?
         // The full list of known allergens for the item
-        var allergens: [String] = []
+        var allergens: String?
         
-        init(calories: Double, nutrients: [Nutrient : Double], ingredients: [String] = [], allergens: [String] = []) {
-            self.calories = calories
+        init(nutrients: [Nutrient : Double], ingredients: String? = nil, allergens: String? = nil) {
             self.nutrients = nutrients
             self.ingredients = ingredients
             self.allergens = allergens
@@ -120,24 +114,48 @@ extension SchemaV1 {
     }
     
     enum Nutrient: Codable, Hashable {
-        // Carbs
+        // Energy (Calories)
+        case Energy
+        // Carbs (g)
         case TotalCarbs,
              DietaryFiber,
              TotalSugars,
              AddedSugars
-        // Fats
+        // Fats (g)
         case TotalFat,
              SaturatedFat,
              TransFat,
              PolyunsaturatedFat,
              MonounsaturatedFat
-        // Other
+        // Other (g)
         case Protein,
-             Cholesterol,
-             Sodium,
+             Cholesterol
+        // Other (mg)
+        case Sodium,
              Calcium,
              VitaminD,
              Iron,
              Potassium
+        
+        func getUnit() -> String {
+            switch self {
+            case .Energy:
+                return "Calories"
+            case .TotalCarbs,
+                    .DietaryFiber,
+                    .TotalSugars,
+                    .AddedSugars,
+                    .TotalFat,
+                    .SaturatedFat,
+                    .TransFat,
+                    .PolyunsaturatedFat,
+                    .MonounsaturatedFat,
+                    .Protein,
+                    .Cholesterol:
+                return "g"
+            default:
+                return "mg"
+            }
+        }
     }
 }

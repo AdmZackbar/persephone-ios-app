@@ -33,7 +33,6 @@ struct FoodItemEditor: View {
     // Metadata
     @State private var barcode: String?
     @State private var brand: String = ""
-    @State private var details: String = ""
     
     // Size Info
     @State private var numServings: Double = 0.0
@@ -167,19 +166,6 @@ struct FoodItemEditor: View {
             Section("Nutrients") {
                 createNutrientEntry(field: "Calories:", unit: "", value: $calories)
                 DisclosureGroup(
-                    isExpanded: $carbsExpanded,
-                    content: {
-                        Grid {
-                            createNutrientSubEntry(field: "Dietary Fiber:", value: $dietaryFiber)
-                            Divider()
-                            createNutrientSubEntry(field: "Total Sugars:", value: $totalSugars)
-                            Divider()
-                            createNutrientSubEntry(field: "Added Sugars:", value: $addedSugars)
-                        }
-                    },
-                    label: { createNutrientEntry(field: "Total Carbs:", value: $totalCarbs) }
-                )
-                DisclosureGroup(
                     isExpanded: $fatExpanded,
                     content: {
                         Grid {
@@ -194,24 +180,33 @@ struct FoodItemEditor: View {
                     },
                     label: { createNutrientEntry(field: "Total Fat:", value: $totalFat) }
                 )
+                DisclosureGroup(
+                    isExpanded: $carbsExpanded,
+                    content: {
+                        Grid {
+                            createNutrientSubEntry(field: "Dietary Fiber:", value: $dietaryFiber)
+                            Divider()
+                            createNutrientSubEntry(field: "Total Sugars:", value: $totalSugars)
+                            Divider()
+                            createNutrientSubEntry(field: "Added Sugars:", value: $addedSugars)
+                        }
+                    },
+                    label: { createNutrientEntry(field: "Total Carbs:", value: $totalCarbs) }
+                )
                 Grid {
-                    createNutrientEntry(field: "Protein:", value: $protein)
-                    Divider()
                     createNutrientEntry(field: "Sodium:", unit: "mg", value: $sodium)
                     Divider()
                     createNutrientEntry(field: "Cholesterol:", unit: "mg", value: $cholesterol)
+                    Divider()
+                    createNutrientEntry(field: "Protein:", value: $protein)
                 }
             }
             Section("Ingredients") {
                 TextEditor(text: $ingredients)
-                    .frame(height: 70)
+                    .frame(height: 100)
             }
             Section("Allergens") {
                 TextField("Optional", text: $allergens)
-            }
-            Section("Description") {
-                TextEditor(text: $details)
-                    .frame(height: 70)
             }
         }
         .onAppear {
@@ -220,7 +215,6 @@ struct FoodItemEditor: View {
                 // Metadata
                 barcode = item.metaData.barcode
                 brand = item.metaData.brand ?? ""
-                details = item.metaData.details ?? ""
                 // Store Info
                 storeExpanded = item.storeInfo != nil
                 store = item.storeInfo?.name ?? ""
@@ -231,21 +225,21 @@ struct FoodItemEditor: View {
                 totalAmount = item.sizeInfo.totalAmount
                 sizeType = item.sizeInfo.sizeType
                 // Composition
-                calories = item.composition.calories
-                totalCarbs = getNutrientInG(.TotalCarbs)
-                dietaryFiber = getNutrientInG(.DietaryFiber)
-                totalSugars = getNutrientInG(.TotalSugars)
-                addedSugars = getNutrientInG(.AddedSugars)
-                totalFat = getNutrientInG(.TotalFat)
-                satFat = getNutrientInG(.SaturatedFat)
-                transFat = getNutrientInG(.TransFat)
-                polyFat = getNutrientInG(.PolyunsaturatedFat)
-                monoFat = getNutrientInG(.MonounsaturatedFat)
-                protein = getNutrientInG(.Protein)
-                sodium = item.composition.nutrients[.Sodium] ?? 0.0
-                cholesterol = item.composition.nutrients[.Cholesterol] ?? 0.0
-                ingredients = item.composition.ingredients.joined(separator: ",")
-                allergens = item.composition.allergens.joined(separator: ",")
+                calories = getNutrient(.Energy)
+                totalCarbs = getNutrient(.TotalCarbs)
+                dietaryFiber = getNutrient(.DietaryFiber)
+                totalSugars = getNutrient(.TotalSugars)
+                addedSugars = getNutrient(.AddedSugars)
+                totalFat = getNutrient(.TotalFat)
+                satFat = getNutrient(.SaturatedFat)
+                transFat = getNutrient(.TransFat)
+                polyFat = getNutrient(.PolyunsaturatedFat)
+                monoFat = getNutrient(.MonounsaturatedFat)
+                protein = getNutrient(.Protein)
+                sodium = getNutrient(.Sodium)
+                cholesterol = getNutrient(.Cholesterol)
+                ingredients = item.composition.ingredients ?? ""
+                allergens = item.composition.allergens ?? ""
             }
         }
         .navigationTitle("\(item == nil ? "Add" : "Edit") Food Entry")
@@ -259,6 +253,15 @@ struct FoodItemEditor: View {
                 }
                 .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isStoreInfoInvalid() || isCompInvalid())
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    ScannerView(barcodeHandler: lookupBarcode)
+                        .navigationTitle("Scan Barcode")
+                        .navigationBarTitleDisplayMode(.inline)
+                } label: {
+                    Label("Scan Barcode", systemImage: "barcode.viewfinder")
+                }
+            }
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel", role: .cancel) {
                     dismiss()
@@ -268,8 +271,8 @@ struct FoodItemEditor: View {
         .navigationBarBackButtonHidden()
     }
     
-    private func getNutrientInG(_ nutrient: Nutrient) -> Double {
-        return item == nil || item!.composition.nutrients[nutrient] == nil ? 0.0 : item!.composition.nutrients[nutrient]! / 1000.0
+    private func getNutrient(_ nutrient: Nutrient) -> Double {
+        return item!.composition.nutrients[nutrient] ?? 0.0
     }
     
     private func isMainInfoInvalid() -> Bool {
@@ -312,6 +315,73 @@ struct FoodItemEditor: View {
         }
     }
     
+    private func lookupBarcode(barcode: String) {
+        var code = barcode
+        if (code.count == 13) {
+            // Barcode is in EAN13 format, we want UPC-A which has
+            // just 12 digits instead of 13
+            code.removeFirst()
+        }
+        self.barcode = code
+        
+        guard let url = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(code)&pageSize=1&dataType=Branded&sortBy=publishedDate&sortOrder=desc") else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.addValue("KqxXU5h1uiwyHv300gSqczUVtSKmjkAm1w7mD48k", forHTTPHeaderField: "X-Api-Key")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            guard error == nil else { print(error!.localizedDescription); return }
+            guard let data = data else { print("Empty data"); return }
+            parseFoodDataResult(data: data)
+        }.resume()
+    }
+    
+    private func parseFoodDataResult(data: Data) {
+        let decoder = JSONDecoder()
+        if let jsonData = try? decoder.decode(SearchResult.self, from: data) {
+            if let food = jsonData.foods?.count ?? 0 > 0 ? jsonData.foods?[0] : nil {
+                name = food.description ?? name
+                brand = food.brandName ?? brand
+                servingSize = food.householdServingFullText ?? servingSize
+                ingredients = food.ingredients ?? ingredients
+                let gramPattern = /([\d.]+)\s*[gG]/
+                let kgPattern = /([\d.]+)\s*[kK][gG]/
+                if let match = try? gramPattern.firstMatch(in: food.packageWeight ?? "") {
+                    totalAmount = Double(match.1)!
+                } else if let match = try? kgPattern.firstMatch(in: food.packageWeight ?? "") {
+                    totalAmount = Double(match.1)! * 1000.0
+                }
+                if (totalAmount > 0 && food.servingSize != nil && food.servingSizeUnit == "g") {
+                    numServings = totalAmount / food.servingSize!
+                }
+                var ratio = 1.0
+                if (food.servingSize != nil && food.servingSizeUnit == "g") {
+                    ratio = food.servingSize! / 100.0
+                }
+                var nutrientMap: [String : Double] = [:]
+                food.foodNutrients?.forEach({ nutrient in
+                    let adjValue = nutrient.value * ratio
+                    // Round to nearest half
+                    nutrientMap[nutrient.nutrientName] = round(adjValue * 2.0) / 2.0
+                })
+                calories = nutrientMap["Energy"] ?? calories
+                totalFat = nutrientMap["Total lipid (fat)"] ?? totalFat
+                satFat = nutrientMap["Fatty acids, total saturated"] ?? satFat
+                transFat = nutrientMap["Fatty acids, total trans"] ?? transFat
+                totalCarbs = nutrientMap["Carbohydrate, by difference"] ?? totalCarbs
+                totalSugars = nutrientMap["Total Sugars"] ?? totalSugars
+                dietaryFiber = nutrientMap["Fiber, total dietary"] ?? dietaryFiber
+                protein = nutrientMap["Protein"] ?? protein
+                sodium = nutrientMap["Sodium, Na"] ?? sodium
+                cholesterol = nutrientMap["Cholesterol"] ?? cholesterol
+            }
+        }
+    }
+    
     private func save() {
         let storeInfo = storeExpanded ? StoreInfo(name: store, price: price) : nil
         let sizeInfo = FoodSizeInfo(
@@ -321,23 +391,23 @@ struct FoodItemEditor: View {
             servingAmount: round(totalAmount / numServings),
             sizeType: sizeType)
         var composition = FoodComposition(
-            calories: calories,
             nutrients: [
-                .TotalCarbs: totalCarbs * 1000.0,
-                .DietaryFiber: dietaryFiber * 1000.0,
-                .TotalSugars: totalSugars * 1000.0,
-                .AddedSugars: addedSugars * 1000.0,
-                .TotalFat: totalFat * 1000.0,
-                .SaturatedFat: satFat * 1000.0,
-                .TransFat: transFat * 1000.0,
-                .PolyunsaturatedFat: polyFat * 1000.0,
-                .MonounsaturatedFat: monoFat * 1000.0,
-                .Protein: protein * 1000.0,
+                .Energy: calories,
+                .TotalCarbs: totalCarbs,
+                .DietaryFiber: dietaryFiber,
+                .TotalSugars: totalSugars,
+                .AddedSugars: addedSugars,
+                .TotalFat: totalFat,
+                .SaturatedFat: satFat,
+                .TransFat: transFat,
+                .PolyunsaturatedFat: polyFat,
+                .MonounsaturatedFat: monoFat,
+                .Protein: protein,
                 .Sodium: sodium,
                 .Cholesterol: cholesterol
             ],
-            ingredients: ingredients.components(separatedBy: ","),
-            allergens: allergens.components(separatedBy: ","))
+            ingredients: ingredients,
+            allergens: allergens)
         composition.nutrients.keys.forEach { key in
             if composition.nutrients[key]! <= 0 {
                 composition.nutrients.removeValue(forKey: key)
@@ -346,12 +416,11 @@ struct FoodItemEditor: View {
         if let item {
             item.name = name
             item.metaData.brand = brand
-            item.metaData.details = details
             item.storeInfo = storeInfo
             item.sizeInfo = sizeInfo
             item.composition = composition
         } else {
-            let metaData = FoodMetaData(barcode: barcode, brand: brand, details: details)
+            let metaData = FoodMetaData(barcode: barcode, brand: brand)
             let newItem = FoodItem(name: name,
                                    metaData: metaData,
                                    composition: composition,
@@ -360,6 +429,65 @@ struct FoodItemEditor: View {
             modelContext.insert(newItem)
         }
     }
+}
+
+private struct SearchResult: Codable {
+    let totalHits: Int?
+    let currentPage: Int?
+    let totalPages: Int?
+    let foodSearchCriteria: FoodSearchCriteria?
+    let foods: [BrandedFoodItem]?
+}
+
+private struct FoodSearchCriteria: Codable {
+    let query: String?
+    let dataType: [String]?
+    let generalSearchInput: String?
+    let numberOfResultsPerPage: Int?
+    let pageSize: Int?
+    let pageNumber: Int?
+    let sortBy: String?
+    let sortOrder: String?
+}
+
+private struct BrandedFoodItem: Codable {
+    let fdcId: Int
+    let description: String?
+    let dataType: String
+    let gtinUpc: String?
+    let publishedDate: String?
+    let brandOwner: String?
+    let brandName: String?
+    let ingredients: String?
+    let marketCountry: String?
+    let foodCategory: String?
+    let modifiedDate: String?
+    let dataSource: String?
+    let packageWeight: String?
+    let servingSizeUnit: String?
+    let servingSize: Double?
+    let householdServingFullText: String?
+    let tradeChannels: [String]?
+    let allHighlightFields: String?
+    let score: Double?
+    let foodNutrients: [FoodNutrient]?
+}
+
+private struct FoodNutrient: Codable {
+    let nutrientId: Int
+    let nutrientName: String
+    let nutrientNumber: String
+    let unitName: String
+    let derivationCode: String
+    let derivationDescription: String
+    let derivationId: Int
+    let value: Double
+    let foodNutrientSourceId: Int
+    let foodNutrientSourceCode: String
+    let foodNutrientSourceDescription: String
+    let rank: Int
+    let indentLevel: Int
+    let foodNutrientId: Int
 }
 
 #Preview {

@@ -111,15 +111,15 @@ private struct NutritionView: View {
             Divider()
             HStack {
                 VStack(alignment: .leading) {
-                    Text("\(format(item.composition.calories)) Calories")
+                    Text("\(format(item.composition.nutrients[.Energy])) Calories")
                         .font(.title2).bold()
-                    Text("\(formatG(item.composition.nutrients[.TotalCarbs]))g Carbs")
+                    Text("\(format(item.composition.nutrients[.TotalFat]))g Fat")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Text("\(formatG(item.composition.nutrients[.TotalFat]))g Fat")
+                    Text("\(format(item.composition.nutrients[.TotalCarbs]))g Carbs")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Text("\(formatG(item.composition.nutrients[.Protein]))g Protein")
+                    Text("\(format(item.composition.nutrients[.Protein]))g Protein")
                         .font(.subheadline)
                         .fontWeight(.light)
                     Spacer()
@@ -147,10 +147,6 @@ private struct NutritionView: View {
     private func format(_ value: Double?) -> String {
         formatter.string(for: value ?? 0.0)!
     }
-    
-    private func formatG(_ value: Double?) -> String {
-        formatter.string(for: (value ?? 0.0) / 1000.0)!
-    }
 }
 
 #Preview {
@@ -158,21 +154,20 @@ private struct NutritionView: View {
     let container = try! ModelContainer(for: FoodItem.self, configurations: config)
     let item = FoodItem(name: "Lightly Breaded Chicken Chunks",
                         metaData: FoodMetaData(
-                            brand: "Kirkland",
-                            details: "Costco's chicken nuggets"),
+                            brand: "Kirkland"),
                         composition: FoodComposition(
-                            calories: 120,
                             nutrients: [
-                                .TotalCarbs: 4000,
-                                .TotalSugars: 1500,
-                                .TotalFat: 3000,
-                                .SaturatedFat: 1250,
-                                .Protein: 13000,
+                                .Energy: 120,
+                                .TotalCarbs: 4,
+                                .TotalSugars: 1.5,
+                                .TotalFat: 3,
+                                .SaturatedFat: 1.25,
+                                .Protein: 13,
                                 .Sodium: 530,
                                 .Cholesterol: 25,
                             ],
-                            ingredients: ["Salt", "Chicken", "Dunno"],
-                        allergens: ["Meat"]),
+                            ingredients: "Salt, Chicken, Other stuff",
+                        allergens: "Meat"),
                         sizeInfo: FoodSizeInfo(
                             numServings: 16,
                             servingSize: "4 oz",

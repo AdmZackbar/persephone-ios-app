@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 private enum ViewType {
-    case AllNutrients, Ingredients, Description
+    case AllNutrients, Ingredients
 }
 
 private let currencyFormatter: NumberFormatter = {
@@ -28,12 +28,8 @@ private let gramFormatter: NumberFormatter = {
     return formatter
 }()
 
-private func formatMg(item: FoodItem, nutrient: Nutrient) -> String {
+private func format(item: FoodItem, nutrient: Nutrient) -> String {
     gramFormatter.string(for: item.composition.nutrients[nutrient] ?? 0)!
-}
-
-private func formatG(item: FoodItem, nutrient: Nutrient) -> String {
-    gramFormatter.string(for: (item.composition.nutrients[nutrient] ?? 0) / 1000.0)!
 }
 
 struct FoodItemView: View {
@@ -54,8 +50,6 @@ struct FoodItemView: View {
                 Picker("Test", selection: $viewType) {
                     Text("All Nutrients")
                         .tag(ViewType.AllNutrients)
-                    Text("Description")
-                        .tag(ViewType.Description)
                     Text("Ingredients")
                         .tag(ViewType.Ingredients)
                 }.padding(EdgeInsets(top: 12.0, leading: 0.0, bottom: 0.0, trailing: 0.0)).pickerStyle(.segmented)
@@ -64,15 +58,15 @@ struct FoodItemView: View {
                     NutrientTable(item: item)
                 case .Ingredients:
                     VStack(alignment: .leading, spacing: 8.0) {
-                        if (item.composition.ingredients.isEmpty && item.composition.allergens.isEmpty) {
+                        if (item.composition.ingredients == nil || item.composition.allergens == nil) {
                             Text("No ingredients recorded for this food.").padding()
                         } else {
-                            if (!item.composition.ingredients.isEmpty) {
-                                Text(item.composition.ingredients.joined(separator: ", "))
+                            if (item.composition.ingredients != nil) {
+                                Text(item.composition.ingredients!)
                                     .multilineTextAlignment(.leading)
                             }
-                            if (!item.composition.allergens.isEmpty) {
-                                Text("Allergens: \(item.composition.allergens.joined(separator: ", "))")
+                            if (item.composition.allergens != nil) {
+                                Text("Allergens: \(item.composition.allergens!)")
                                     .multilineTextAlignment(.leading)
                                     .bold()
                             }
@@ -81,12 +75,6 @@ struct FoodItemView: View {
                         .padding()
                         .background(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 12.0))
-                case .Description:
-                    Text(item.metaData.details ?? "No description for this food.")
-                        .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 12.0))
                 }
                 Spacer()
             }
@@ -143,15 +131,15 @@ private struct NutritionView: View {
         HStack {
             VStack(alignment: .leading) {
                 Text("Per Serving")
-                Text("\(gramFormatter.string(for: item.composition.calories)!) Cal")
+                Text("\(gramFormatter.string(for: item.composition.nutrients[.Energy] ?? 0)!) Cal")
                     .font(.title).bold()
-                Text("\(formatG(item: item, nutrient: .TotalCarbs))g Carbs")
+                Text("\(format(item: item, nutrient: .TotalFat))g Fat")
                     .font(.subheadline)
                     .fontWeight(.light)
-                Text("\(formatG(item: item, nutrient: .TotalFat))g Fat")
+                Text("\(format(item: item, nutrient: .TotalCarbs))g Carbs")
                     .font(.subheadline)
                     .fontWeight(.light)
-                Text("\(formatG(item: item, nutrient: .Protein))g Protein")
+                Text("\(format(item: item, nutrient: .Protein))g Protein")
                     .font(.subheadline)
                     .fontWeight(.light)
                 Spacer()
@@ -170,18 +158,6 @@ private struct NutrientTable: View {
     var body: some View {
         VStack {
             Grid {
-                createRow(name: "Total Carbohydrates", nutrient: .TotalCarbs)
-                    .bold()
-                Divider()
-                createRow(name: "Dietary Fiber", nutrient: .DietaryFiber, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Total Sugars", nutrient: .TotalSugars, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Added Sugars", nutrient: .AddedSugars, indented: true)
-                    .font(.subheadline)
-                Divider()
                 createRow(name: "Total Fat", nutrient: .TotalFat)
                     .bold()
                 Divider()
@@ -197,23 +173,47 @@ private struct NutrientTable: View {
                 createRow(name: "Monounsaturated Fat", nutrient: .MonounsaturatedFat, indented: true)
                     .font(.subheadline)
                 Divider()
+                createRow(name: "Cholesterol", nutrient: .Cholesterol)
+                    .bold()
+                Divider()
+                createRow(name: "Sodium", nutrient: .Sodium)
+                    .bold()
+                Divider()
+                createRow(name: "Total Carbohydrates", nutrient: .TotalCarbs)
+                    .bold()
+                Divider()
+                createRow(name: "Dietary Fiber", nutrient: .DietaryFiber, indented: true)
+                    .font(.subheadline)
+                Divider()
+                createRow(name: "Total Sugars", nutrient: .TotalSugars, indented: true)
+                    .font(.subheadline)
+                Divider()
+                createRow(name: "Added Sugars", nutrient: .AddedSugars, indented: true)
+                    .font(.subheadline)
+                Divider()
                 createRow(name: "Protein", nutrient: .Protein)
                     .bold()
+            }.padding()
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 12.0))
+            Grid {
+                createRow(name: "Vitamin D", nutrient: .VitaminD)
                 Divider()
-                createRow(name: "Sodium", nutrient: .Sodium, useMg: true)
-                    .bold()
+                createRow(name: "Calcium", nutrient: .Calcium)
                 Divider()
-                createRow(name: "Cholesterol", nutrient: .Cholesterol, useMg: true)
-            }
-        }.padding()
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 12.0))
+                createRow(name: "Iron", nutrient: .Iron)
+                Divider()
+                createRow(name: "Potassium", nutrient: .Potassium)
+            }.padding()
+                .background(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 12.0))
+        }
     }
     
-    private func createRow(name: String, nutrient: Nutrient, indented: Bool = false, useMg: Bool = false) -> some View {
+    private func createRow(name: String, nutrient: Nutrient, indented: Bool = false) -> some View {
         GridRow {
             Text(name).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
-            Text("\(useMg ? formatMg(item: item, nutrient: nutrient) : formatG(item: item, nutrient: nutrient)) \(useMg ? "mg" : "g")")
+            Text("\(format(item: item, nutrient: nutrient)) \(nutrient.getUnit())")
                 .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
         }
         .italic(indented)
@@ -226,21 +226,20 @@ private struct NutrientTable: View {
     let container = try! ModelContainer(for: FoodItem.self, configurations: config)
     let item = FoodItem(name: "Lightly Breaded Chicken Chunks",
                         metaData: FoodMetaData(
-                            brand: "Kirkland",
-                            details: "Costco's chicken nuggets"),
+                            brand: "Kirkland"),
                         composition: FoodComposition(
-                            calories: 120,
                             nutrients: [
-                                .TotalCarbs: 4000,
-                                .TotalSugars: 1500,
-                                .TotalFat: 3000,
-                                .SaturatedFat: 1250,
-                                .Protein: 13000,
+                                .Energy: 120,
+                                .TotalCarbs: 4,
+                                .TotalSugars: 1.5,
+                                .TotalFat: 3,
+                                .SaturatedFat: 1.25,
+                                .Protein: 13,
                                 .Sodium: 530,
                                 .Cholesterol: 25,
                             ],
-                            ingredients: ["Salt", "Chicken", "Dunno"],
-                        allergens: ["Meat"]),
+                            ingredients: "Salt, Chicken, Other stuff",
+                        allergens: "Meat"),
                         sizeInfo: FoodSizeInfo(
                             numServings: 16,
                             servingSize: "4 oz",

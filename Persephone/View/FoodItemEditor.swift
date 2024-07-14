@@ -86,6 +86,10 @@ struct FoodItemEditor: View {
     @State private var protein: Double = 0.0
     @State private var sodium: Double = 0.0
     @State private var cholesterol: Double = 0.0
+    @State private var calcium: Double = 0.0
+    @State private var potassium: Double = 0.0
+    @State private var vitaminD: Double = 0.0
+    @State private var iron: Double = 0.0
     // Other
     @State private var ingredients: String = ""
     @State private var allergens: String = ""
@@ -116,9 +120,9 @@ struct FoodItemEditor: View {
     var body: some View {
         Form {
             Section("Name") {
-                TextField("Name", text: $name)
+                TextField("Name", text: $name).textInputAutocapitalization(.words)
                 HStack {
-                    TextField("Brand", text: $brand)
+                    TextField("Brand", text: $brand).textInputAutocapitalization(.words)
                     Menu {
                         ForEach(defaultBrands, id: \.self) { b in
                             Button(b) {
@@ -134,7 +138,7 @@ struct FoodItemEditor: View {
                 Toggle("Store-Bought", isOn: $storeExpanded)
                 if (storeExpanded) {
                     HStack {
-                        TextField("Store Name", text: $store)
+                        TextField("Store Name", text: $store).textInputAutocapitalization(.words)
                         Menu {
                             ForEach(defaultStores, id: \.self) { s in
                                 Button(s) {
@@ -180,49 +184,61 @@ struct FoodItemEditor: View {
                 }
             }
             Section("Nutrients") {
-                createNutrientEntry(field: "Calories:", unit: "", value: $calories)
+                createNutrientEntry(.Energy, value: $calories).bold()
                 DisclosureGroup(
                     isExpanded: $fatExpanded,
                     content: {
                         Grid {
-                            createNutrientSubEntry(field: "Sat. Fat:", value: $satFat)
+                            createNutrientSubEntry(.SaturatedFat, value: $satFat)
                             Divider()
-                            createNutrientSubEntry(field: "Trans Fat:", value: $transFat)
+                            createNutrientSubEntry(.TransFat, value: $transFat)
                             Divider()
-                            createNutrientSubEntry(field: "Poly. Fat:", value: $polyFat)
+                            createNutrientSubEntry(.PolyunsaturatedFat, value: $polyFat)
                             Divider()
-                            createNutrientSubEntry(field: "Mono. Fat:", value: $monoFat)
+                            createNutrientSubEntry(.MonounsaturatedFat, value: $monoFat)
                         }
                     },
-                    label: { createNutrientEntry(field: "Total Fat:", value: $totalFat) }
+                    label: { createNutrientEntry(.TotalFat, value: $totalFat).bold() }
                 )
+                createNutrientEntry(.Sodium, value: $sodium).bold()
+                createNutrientEntry(.Cholesterol, value: $cholesterol).bold()
                 DisclosureGroup(
                     isExpanded: $carbsExpanded,
                     content: {
                         Grid {
-                            createNutrientSubEntry(field: "Dietary Fiber:", value: $dietaryFiber)
+                            createNutrientSubEntry(.DietaryFiber, value: $dietaryFiber)
                             Divider()
-                            createNutrientSubEntry(field: "Total Sugars:", value: $totalSugars)
+                            createNutrientSubEntry(.TotalSugars, value: $totalSugars)
                             Divider()
-                            createNutrientSubEntry(field: "Added Sugars:", value: $addedSugars)
+                            createNutrientSubEntry(.AddedSugars, value: $addedSugars)
                         }
                     },
-                    label: { createNutrientEntry(field: "Total Carbs:", value: $totalCarbs) }
+                    label: { createNutrientEntry(.TotalCarbs, value: $totalCarbs).bold() }
                 )
-                Grid {
-                    createNutrientEntry(field: "Sodium:", unit: "mg", value: $sodium)
-                    Divider()
-                    createNutrientEntry(field: "Cholesterol:", unit: "mg", value: $cholesterol)
-                    Divider()
-                    createNutrientEntry(field: "Protein:", value: $protein)
-                }
+                createNutrientEntry(.Protein, value: $protein).bold()
+                createNutrientEntry(.VitaminD, value: $vitaminD)
+                createNutrientEntry(.Potassium, value: $potassium)
+                createNutrientEntry(.Calcium, value: $calcium)
+                createNutrientEntry(.Iron, value: $iron)
             }
             Section("Ingredients") {
                 TextEditor(text: $ingredients)
+                    .textInputAutocapitalization(.words)
                     .frame(height: 100)
             }
             Section("Allergens") {
-                TextField("Optional", text: $allergens)
+                TextField("Optional", text: $allergens).textInputAutocapitalization(.words)
+            }
+            if (item != nil) {
+                VStack(alignment: .leading, spacing: 8.0) {
+                    Text("Creation Date: \(item!.metaData.timestamp.formatted(date: .long, time: .shortened))")
+                        .font(.caption)
+                    if (!(item?.metaData.barcode ?? "").isEmpty) {
+                        Text("Barcode: \(item!.metaData.barcode!)")
+                            .font(.caption)
+                    }
+                }
+                .listRowBackground(Color.clear)
             }
         }
         .onAppear {
@@ -254,6 +270,10 @@ struct FoodItemEditor: View {
                 protein = getNutrient(.Protein)
                 sodium = getNutrient(.Sodium)
                 cholesterol = getNutrient(.Cholesterol)
+                vitaminD = getNutrient(.VitaminD)
+                potassium = getNutrient(.Potassium)
+                calcium = getNutrient(.Calcium)
+                iron = getNutrient(.Iron)
                 ingredients = item.composition.ingredients ?? ""
                 allergens = item.composition.allergens ?? ""
             }
@@ -317,26 +337,65 @@ struct FoodItemEditor: View {
         return calories < 0
     }
     
-    private func createNutrientEntry(field: String, unit: String = "g", value: Binding<Double>) -> some View {
-        HStack(spacing: 8.0) {
-            Text(field)
+    private func getFieldName(_ nutrient: Nutrient) -> String {
+        switch nutrient {
+        case .Energy:
+            return "Calories:"
+        case .TotalFat:
+            return "Total Fat:"
+        case .SaturatedFat:
+            return "Sat. Fat:"
+        case .TransFat:
+            return "Trans Fat:"
+        case .PolyunsaturatedFat:
+            return "Poly. Fat:"
+        case .MonounsaturatedFat:
+            return "Mono. Fat:"
+        case .Sodium:
+            return "Sodium:"
+        case .Cholesterol:
+            return "Cholesterol:"
+        case .TotalCarbs:
+            return "Total Carbs:"
+        case .DietaryFiber:
+            return "Dietary Fiber:"
+        case .TotalSugars:
+            return "Total Sugars:"
+        case .AddedSugars:
+            return "Added Sugars:"
+        case .Protein:
+            return "Protein:"
+        case .VitaminD:
+            return "Vitamin D:"
+        case .Potassium:
+            return "Potassium:"
+        case .Calcium:
+            return "Calcium:"
+        case .Iron:
+            return "Iron:"
+        }
+    }
+    
+    private func createNutrientEntry(_ nutrient: Nutrient, value: Binding<Double>) -> some View {
+        HStack(spacing: 12.0) {
+            Text(getFieldName(nutrient))
             TextField("", value: value, formatter: gramFormatter)
                 .multilineTextAlignment(.trailing)
                 .keyboardType(.decimalPad)
-            if (!unit.isEmpty && value.wrappedValue > 0) {
-                Text(unit)
+            if (nutrient != .Energy && value.wrappedValue > 0) {
+                Text(nutrient.getUnit())
             }
         }
     }
     
-    private func createNutrientSubEntry(field: String, unit: String = "g", value: Binding<Double>) -> some View {
+    private func createNutrientSubEntry(_ nutrient: Nutrient, value: Binding<Double>) -> some View {
         GridRow {
-            Text(field).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+            Text(getFieldName(nutrient)).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
             TextField("", value: value, formatter: gramFormatter)
                 .multilineTextAlignment(.trailing)
                 .keyboardType(.decimalPad)
-            if (!unit.isEmpty && value.wrappedValue > 0) {
-                Text(unit)
+            if (value.wrappedValue > 0) {
+                Text(nutrient.getUnit())
             }
         }
     }
@@ -363,7 +422,11 @@ struct FoodItemEditor: View {
                 .MonounsaturatedFat: monoFat,
                 .Protein: protein,
                 .Sodium: sodium,
-                .Cholesterol: cholesterol
+                .Cholesterol: cholesterol,
+                .VitaminD: vitaminD,
+                .Potassium: potassium,
+                .Calcium: calcium,
+                .Iron: iron
             ],
             ingredients: ingredients,
             allergens: allergens)
@@ -398,7 +461,31 @@ struct FoodItemEditor: View {
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: FoodItem.self, configurations: config)
+    let item = FoodItem(name: "Lightly Breaded Chicken Chunks",
+                        metaData: FoodMetaData(
+                            barcode: "102032120",
+                            brand: "Kirkland"),
+                        composition: FoodComposition(
+                            nutrients: [
+                                .Energy: 120,
+                                .TotalCarbs: 4,
+                                .TotalSugars: 1.5,
+                                .TotalFat: 3,
+                                .SaturatedFat: 1.25,
+                                .Protein: 13,
+                                .Sodium: 530,
+                                .Cholesterol: 25,
+                            ],
+                            ingredients: "Salt, Chicken, Other stuff",
+                        allergens: "Meat"),
+                        sizeInfo: FoodSizeInfo(
+                            numServings: 16,
+                            servingSize: "4 oz",
+                            totalAmount: 1814,
+                            servingAmount: 63,
+                            sizeType: .Mass),
+                        storeInfo: StoreInfo(name: "Costco", price: 1399))
     return NavigationStack {
-        FoodItemEditor(item: nil)
+        FoodItemEditor(item: item)
     }.modelContainer(container)
 }

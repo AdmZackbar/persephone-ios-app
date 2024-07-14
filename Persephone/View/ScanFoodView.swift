@@ -86,10 +86,23 @@ struct ScanFoodView: View {
                         nutrientMap[nutrient] = round(adjValue * 2.0) / 2.0
                     }
                 })
-                let metaData = FoodMetaData(barcode: food.gtinUpc, brand: food.brandName)
-                let sizeInfo = FoodSizeInfo(numServings: numServings ?? 0, servingSize: food.householdServingFullText ?? "", totalAmount: totalAmount ?? 0, servingAmount: food.servingSize ?? 0, sizeType: .Mass)
-                let composition = FoodComposition(nutrients: nutrientMap, ingredients: food.ingredients)
-                scannedItem = FoodItem(name: food.description ?? "", metaData: metaData, composition: composition, sizeInfo: sizeInfo)
+                let metaData = FoodMetaData(
+                    barcode: food.gtinUpc,
+                    brand: food.brandName?.capitalized)
+                let sizeInfo = FoodSizeInfo(
+                    numServings: numServings ?? 0,
+                    servingSize: food.householdServingFullText?.capitalized ?? "",
+                    totalAmount: totalAmount ?? 0,
+                    servingAmount: food.servingSize ?? 0,
+                    sizeType: .Mass)
+                let composition = FoodComposition(
+                    nutrients: nutrientMap,
+                    ingredients: food.ingredients?.capitalized)
+                scannedItem = FoodItem(
+                    name: food.description?.capitalized ?? "",
+                    metaData: metaData,
+                    composition: composition,
+                    sizeInfo: sizeInfo)
             }
         }
     }

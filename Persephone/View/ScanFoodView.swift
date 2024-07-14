@@ -12,11 +12,35 @@ struct ScanFoodView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext
     
-    @State private var scannedItem: FoodItem? = nil
+    @State private var scannedItems: [FoodItem] = []
+    @State private var selectedItem: FoodItem? = nil
     
     var body: some View {
         VStack {
-            if (scannedItem == nil) {
+            if selectedItem != nil {
+                FoodItemEditor(item: selectedItem, mode: .Confirm)
+            } else if !scannedItems.isEmpty {
+                List(scannedItems) { item in
+                    Button(item.name) {
+                        selectedItem = item
+                    }
+                }
+                    .navigationTitle("Select Scanned Item")
+                    .toolbarTitleDisplayMode(.inline)
+                    .navigationBarBackButtonHidden()
+                    .toolbar {
+                        ToolbarItem(placement: .primaryAction) {
+                            Button("Keep Scanning") {
+                                scannedItems.removeAll()
+                            }
+                        }
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                dismiss()
+                            }
+                        }
+                    }
+            } else {
                 ScannerView(barcodeHandler: lookupBarcode)
                     .navigationTitle("Scan Barcode")
                     .toolbarTitleDisplayMode(.inline)
@@ -28,8 +52,6 @@ struct ScanFoodView: View {
                             }
                         }
                     }
-            } else {
-                FoodItemEditor(item: scannedItem, mode: .Confirm)
             }
         }
     }
@@ -42,7 +64,7 @@ struct ScanFoodView: View {
             code.removeFirst()
         }
         
-        guard let url = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(code)&pageSize=1&dataType=Branded&sortBy=publishedDate&sortOrder=desc") else {
+        guard let url = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(code)&pageSize=5&dataType=Branded&sortBy=publishedDate&sortOrder=desc") else {
             return
         }
         
@@ -54,57 +76,67 @@ struct ScanFoodView: View {
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard error == nil else { print(error!.localizedDescription); return }
             guard let data = data else { print("Empty data"); return }
-            parseFoodDataResult(data: data)
+            parseFoodDataResult(data)
         }.resume()
     }
     
-    private func parseFoodDataResult(data: Data) {
+    private func parseFoodDataResult(_ data: Data) {
         let decoder = JSONDecoder()
         if let jsonData = try? decoder.decode(SearchResult.self, from: data) {
-            if let food = jsonData.foods?.count ?? 0 > 0 ? jsonData.foods?[0] : nil {
-                let gramPattern = /([\d.]+)\s*[gG]/
-                let kgPattern = /([\d.]+)\s*[kK][gG]/
-                var totalAmount: Double? = nil
-                if let match = try? gramPattern.firstMatch(in: food.packageWeight ?? "") {
-                    totalAmount = Double(match.1)!
-                } else if let match = try? kgPattern.firstMatch(in: food.packageWeight ?? "") {
-                    totalAmount = Double(match.1)! * 1000.0
-                }
-                var numServings: Double? = nil
-                if (totalAmount != nil && totalAmount! > 0 && food.servingSize != nil && food.servingSizeUnit == "g") {
-                    numServings = totalAmount! / food.servingSize!
-                }
-                var ratio = 1.0
-                if (food.servingSize != nil && food.servingSizeUnit == "g") {
-                    ratio = food.servingSize! / 100.0
-                }
-                var nutrientMap: [Nutrient : Double] = [:]
-                food.foodNutrients?.forEach({ nutrient in
-                    let adjValue = nutrient.value * ratio
-                    // Round to nearest half
-                    if let nutrient = getNutrient(nutrient.nutrientName) {
-                        nutrientMap[nutrient] = round(adjValue * 2.0) / 2.0
+            if let foods = jsonData.foods {
+                if foods.count == 1 {
+                    selectedItem = parseFood(foods.first!)
+                } else {
+                    foods.forEach { food in
+                        scannedItems.append(parseFood(food))
                     }
-                })
-                let metaData = FoodMetaData(
-                    barcode: food.gtinUpc,
-                    brand: food.brandName?.capitalized)
-                let sizeInfo = FoodSizeInfo(
-                    numServings: numServings ?? 0,
-                    servingSize: food.householdServingFullText?.capitalized ?? "",
-                    totalAmount: totalAmount ?? 0,
-                    servingAmount: food.servingSize ?? 0,
-                    sizeType: .Mass)
-                let composition = FoodComposition(
-                    nutrients: nutrientMap,
-                    ingredients: food.ingredients?.capitalized)
-                scannedItem = FoodItem(
-                    name: food.description?.capitalized ?? "",
-                    metaData: metaData,
-                    composition: composition,
-                    sizeInfo: sizeInfo)
+                }
             }
         }
+    }
+    
+    private func parseFood(_ food: BrandedFoodItem) -> FoodItem {
+        let gramPattern = /([\d.]+)\s*[gG]/
+        let kgPattern = /([\d.]+)\s*[kK][gG]/
+        var totalAmount: Double? = nil
+        if let match = try? gramPattern.firstMatch(in: food.packageWeight ?? "") {
+            totalAmount = Double(match.1)!
+        } else if let match = try? kgPattern.firstMatch(in: food.packageWeight ?? "") {
+            totalAmount = Double(match.1)! * 1000.0
+        }
+        var numServings: Double? = nil
+        if (totalAmount != nil && totalAmount! > 0 && food.servingSize != nil && food.servingSizeUnit == "g") {
+            numServings = totalAmount! / food.servingSize!
+        }
+        var ratio = 1.0
+        if (food.servingSize != nil && food.servingSizeUnit == "g") {
+            ratio = food.servingSize! / 100.0
+        }
+        var nutrientMap: [Nutrient : Double] = [:]
+        food.foodNutrients?.forEach({ nutrient in
+            let adjValue = nutrient.value * ratio
+            // Round to nearest half
+            if let nutrient = getNutrient(nutrient.nutrientName) {
+                nutrientMap[nutrient] = round(adjValue * 2.0) / 2.0
+            }
+        })
+        let metaData = FoodMetaData(
+            barcode: food.gtinUpc,
+            brand: food.brandName?.capitalized)
+        let sizeInfo = FoodSizeInfo(
+            numServings: numServings ?? 0,
+            servingSize: food.householdServingFullText?.capitalized ?? "",
+            totalAmount: totalAmount ?? 0,
+            servingAmount: food.servingSize ?? 0,
+            sizeType: .Mass)
+        let composition = FoodComposition(
+            nutrients: nutrientMap,
+            ingredients: food.ingredients?.capitalized)
+        return FoodItem(
+            name: food.description?.capitalized ?? "",
+            metaData: metaData,
+            composition: composition,
+            sizeInfo: sizeInfo)
     }
     
     private func getNutrient(_ name: String) -> Nutrient? {

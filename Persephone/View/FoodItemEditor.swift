@@ -8,11 +8,27 @@
 import SwiftData
 import SwiftUI
 
+enum EditorMode {
+    case Add, Edit, Confirm
+    
+    func getTitle() -> String {
+        switch self {
+        case .Add:
+            return "Add Food Entry"
+        case .Edit:
+            return "Edit Food Entry"
+        case .Confirm:
+            return "Confirm Food Entry"
+        }
+    }
+}
+
 struct FoodItemEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext
     
     let item: FoodItem?
+    let mode: EditorMode
     
     private let defaultBrands: [String] = [
         "Kirkland",
@@ -242,29 +258,39 @@ struct FoodItemEditor: View {
                 allergens = item.composition.allergens ?? ""
             }
         }
-        .navigationTitle("\(item == nil ? "Add" : "Edit") Food Entry")
+        .navigationTitle(mode.getTitle())
+        .toolbarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Save") {
-                    withAnimation {
-                        save()
+            if (mode == .Confirm) {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Confirm") {
+                        withAnimation {
+                            save()
+                            modelContext.insert(item!)
+                            dismiss()
+                        }
+                    }
+                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isStoreInfoInvalid() || isCompInvalid())
+                }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Discard", role: .destructive) {
                         dismiss()
                     }
                 }
-                .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isStoreInfoInvalid() || isCompInvalid())
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    ScannerView(barcodeHandler: lookupBarcode)
-                        .navigationTitle("Scan Barcode")
-                        .navigationBarTitleDisplayMode(.inline)
-                } label: {
-                    Label("Scan Barcode", systemImage: "barcode.viewfinder")
+            } else {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Save") {
+                        withAnimation {
+                            save()
+                            dismiss()
+                        }
+                    }
+                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isStoreInfoInvalid() || isCompInvalid())
                 }
-            }
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel", role: .cancel) {
-                    dismiss()
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel", role: .cancel) {
+                        dismiss()
+                    }
                 }
             }
         }
@@ -311,73 +337,6 @@ struct FoodItemEditor: View {
                 .keyboardType(.decimalPad)
             if (!unit.isEmpty && value.wrappedValue > 0) {
                 Text(unit)
-            }
-        }
-    }
-    
-    private func lookupBarcode(barcode: String) {
-        var code = barcode
-        if (code.count == 13) {
-            // Barcode is in EAN13 format, we want UPC-A which has
-            // just 12 digits instead of 13
-            code.removeFirst()
-        }
-        self.barcode = code
-        
-        guard let url = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(code)&pageSize=1&dataType=Branded&sortBy=publishedDate&sortOrder=desc") else {
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.addValue("KqxXU5h1uiwyHv300gSqczUVtSKmjkAm1w7mD48k", forHTTPHeaderField: "X-Api-Key")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard error == nil else { print(error!.localizedDescription); return }
-            guard let data = data else { print("Empty data"); return }
-            parseFoodDataResult(data: data)
-        }.resume()
-    }
-    
-    private func parseFoodDataResult(data: Data) {
-        let decoder = JSONDecoder()
-        if let jsonData = try? decoder.decode(SearchResult.self, from: data) {
-            if let food = jsonData.foods?.count ?? 0 > 0 ? jsonData.foods?[0] : nil {
-                name = food.description ?? name
-                brand = food.brandName ?? brand
-                servingSize = food.householdServingFullText ?? servingSize
-                ingredients = food.ingredients ?? ingredients
-                let gramPattern = /([\d.]+)\s*[gG]/
-                let kgPattern = /([\d.]+)\s*[kK][gG]/
-                if let match = try? gramPattern.firstMatch(in: food.packageWeight ?? "") {
-                    totalAmount = Double(match.1)!
-                } else if let match = try? kgPattern.firstMatch(in: food.packageWeight ?? "") {
-                    totalAmount = Double(match.1)! * 1000.0
-                }
-                if (totalAmount > 0 && food.servingSize != nil && food.servingSizeUnit == "g") {
-                    numServings = totalAmount / food.servingSize!
-                }
-                var ratio = 1.0
-                if (food.servingSize != nil && food.servingSizeUnit == "g") {
-                    ratio = food.servingSize! / 100.0
-                }
-                var nutrientMap: [String : Double] = [:]
-                food.foodNutrients?.forEach({ nutrient in
-                    let adjValue = nutrient.value * ratio
-                    // Round to nearest half
-                    nutrientMap[nutrient.nutrientName] = round(adjValue * 2.0) / 2.0
-                })
-                calories = nutrientMap["Energy"] ?? calories
-                totalFat = nutrientMap["Total lipid (fat)"] ?? totalFat
-                satFat = nutrientMap["Fatty acids, total saturated"] ?? satFat
-                transFat = nutrientMap["Fatty acids, total trans"] ?? transFat
-                totalCarbs = nutrientMap["Carbohydrate, by difference"] ?? totalCarbs
-                totalSugars = nutrientMap["Total Sugars"] ?? totalSugars
-                dietaryFiber = nutrientMap["Fiber, total dietary"] ?? dietaryFiber
-                protein = nutrientMap["Protein"] ?? protein
-                sodium = nutrientMap["Sodium, Na"] ?? sodium
-                cholesterol = nutrientMap["Cholesterol"] ?? cholesterol
             }
         }
     }
@@ -429,65 +388,11 @@ struct FoodItemEditor: View {
             modelContext.insert(newItem)
         }
     }
-}
-
-private struct SearchResult: Codable {
-    let totalHits: Int?
-    let currentPage: Int?
-    let totalPages: Int?
-    let foodSearchCriteria: FoodSearchCriteria?
-    let foods: [BrandedFoodItem]?
-}
-
-private struct FoodSearchCriteria: Codable {
-    let query: String?
-    let dataType: [String]?
-    let generalSearchInput: String?
-    let numberOfResultsPerPage: Int?
-    let pageSize: Int?
-    let pageNumber: Int?
-    let sortBy: String?
-    let sortOrder: String?
-}
-
-private struct BrandedFoodItem: Codable {
-    let fdcId: Int
-    let description: String?
-    let dataType: String
-    let gtinUpc: String?
-    let publishedDate: String?
-    let brandOwner: String?
-    let brandName: String?
-    let ingredients: String?
-    let marketCountry: String?
-    let foodCategory: String?
-    let modifiedDate: String?
-    let dataSource: String?
-    let packageWeight: String?
-    let servingSizeUnit: String?
-    let servingSize: Double?
-    let householdServingFullText: String?
-    let tradeChannels: [String]?
-    let allHighlightFields: String?
-    let score: Double?
-    let foodNutrients: [FoodNutrient]?
-}
-
-private struct FoodNutrient: Codable {
-    let nutrientId: Int
-    let nutrientName: String
-    let nutrientNumber: String
-    let unitName: String
-    let derivationCode: String
-    let derivationDescription: String
-    let derivationId: Int
-    let value: Double
-    let foodNutrientSourceId: Int
-    let foodNutrientSourceCode: String
-    let foodNutrientSourceDescription: String
-    let rank: Int
-    let indentLevel: Int
-    let foodNutrientId: Int
+    
+    init(item: FoodItem?, mode: EditorMode? = nil) {
+        self.item = item
+        self.mode = mode ?? (item == nil ? .Add : .Edit)
+    }
 }
 
 #Preview {

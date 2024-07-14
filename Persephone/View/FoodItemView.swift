@@ -73,7 +73,7 @@ struct FoodItemView: View {
                         }
                     }.frame(maxWidth: .infinity)
                         .padding()
-                        .background(.white)
+                        .background(Color("BackgroundColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 12.0))
                 }
                 Spacer()
@@ -119,7 +119,7 @@ private struct StoreInfoView: View {
             Spacer()
         }.padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.white)
+            .background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12.0))
     }
 }
@@ -147,7 +147,7 @@ private struct NutritionView: View {
             Spacer()
         }.padding()
             .frame(maxWidth: .infinity, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-            .background(.white)
+            .background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12.0))
     }
 }
@@ -194,7 +194,7 @@ private struct NutrientTable: View {
                 createRow(name: "Protein", nutrient: .Protein)
                     .bold()
             }.padding()
-                .background(.white)
+                .background(Color("BackgroundColor"))
                 .clipShape(RoundedRectangle(cornerRadius: 12.0))
             Grid {
                 createRow(name: "Vitamin D", nutrient: .VitaminD)
@@ -205,7 +205,7 @@ private struct NutrientTable: View {
                 Divider()
                 createRow(name: "Potassium", nutrient: .Potassium)
             }.padding()
-                .background(.white)
+                .background(Color("BackgroundColor"))
                 .clipShape(RoundedRectangle(cornerRadius: 12.0))
         }
     }

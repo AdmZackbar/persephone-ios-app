@@ -23,6 +23,7 @@
 		E860ACF52C3EFBE9007E65DE /* PersephoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACF42C3EFBE9007E65DE /* PersephoneTests.swift */; };
 		E860ACFF2C3EFBE9007E65DE /* PersephoneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */; };
 		E860AD012C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */; };
+		E8D72EED2C4381010053CA26 /* ScanFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PersephoneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITests.swift; sourceTree = "<group>"; };
 		E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanFoodView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +116,7 @@
 			children = (
 				E82CFBD92C3F078D0055C6B2 /* MainView.swift */,
 				E82CFBDB2C3F0D990055C6B2 /* DbView.swift */,
+				E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */,
 				E80E2C492C40157A00D35BE7 /* FoodItemView.swift */,
 				E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */,
 				E80E2C502C41C23200D35BE7 /* ScannerView.swift */,
@@ -319,6 +322,7 @@
 				E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */,
 				E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
+				E8D72EED2C4381010053CA26 /* ScanFoodView.swift in Sources */,
 				E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */,
 				E80E2C442C3F6D5300D35BE7 /* NumberFormatterProtocol.swift in Sources */,
 			);

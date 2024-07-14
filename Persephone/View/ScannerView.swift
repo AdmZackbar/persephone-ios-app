@@ -49,8 +49,6 @@ struct ScannerView: UIViewControllerRepresentable {
                     if (!(code.payloadStringValue ?? "").isEmpty) {
                         parent.barcodeHandler(code.payloadStringValue!)
                         parent.scannerViewController.stopScanning()
-                        parent.scannerViewController.navigationController?.popViewController(animated: true)
-                        parent.scannerViewController.dismiss(animated: true)
                     }
                     break
                 default:

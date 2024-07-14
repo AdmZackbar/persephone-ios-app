@@ -50,10 +50,19 @@ struct DbView: View {
             .navigationTitle("Food Database")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    NavigationLink {
-                        FoodItemEditor(item: nil)
+                    Menu {
+                        NavigationLink {
+                            ScanFoodView()
+                        } label: {
+                            Label("Scan Food", systemImage: "barcode.viewfinder")
+                        }
+                        NavigationLink {
+                            FoodItemEditor(item: nil)
+                        } label: {
+                            Label("Add Custom Food", systemImage: "plus")
+                        }
                     } label: {
-                        Label("Add Food...", systemImage: "plus")
+                        Label("Add", systemImage: "plus")
                     }
                 }
             }

@@ -10,13 +10,15 @@ import SwiftUI
 
 struct DbView: View {
     @Environment(\.modelContext) var modelContext
-    @Query var foodItems: [FoodItem]
+    @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
     
     @State private var showDeleteDialog = false
+    @State private var searchText = ""
     
     var body: some View {
-        NavigationStack {
-            List(foodItems) { item in
+        let filteredItems = foodItems.filter(isItemFiltered)
+        return NavigationStack {
+            List(filteredItems) { item in
                 NavigationLink {
                     FoodItemView(item: item)
                 } label: {
@@ -47,7 +49,13 @@ struct DbView: View {
                     Text("You cannot undo this action.")
                 }
             }
+            .overlay(Group {
+                if (filteredItems.isEmpty) {
+                    Text(foodItems.isEmpty ? "No food items in database." : "No food items found.")
+                }
+            })
             .navigationTitle("Food Database")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
@@ -67,6 +75,11 @@ struct DbView: View {
                 }
             }
         }
+        .searchable(text: $searchText, prompt: "Filter...")
+    }
+    
+    private func isItemFiltered(item: FoodItem) -> Bool {
+        searchText.isEmpty || item.name.localizedCaseInsensitiveContains(searchText)
     }
     
     private func editLink(item: FoodItem) -> some View {
@@ -135,7 +148,8 @@ private struct NutritionView: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
-                    Text("\(currencyFormatter.string(for: Double(item.storeInfo?.price ?? 0) / 100.0)!)")
+                    Text(item.storeInfo != nil ?
+                         "\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!)" : "No Price")
                         .font(.title2).bold()
                     Text("Net Weight: \(format(item.sizeInfo.totalAmount))g")
                         .font(.subheadline)

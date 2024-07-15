@@ -126,7 +126,7 @@ struct FoodItemEditor: View {
     let mode: EditorMode
     
     private let defaultBrands: [String] = [
-        "Kirkland",
+        "Kirkland Signature",
         "Publix"
     ]
     private let defaultStores: [String] = [

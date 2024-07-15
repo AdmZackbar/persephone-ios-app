@@ -33,7 +33,9 @@ struct DbView: View {
                     editLink(item: item)
                     deleteButton()
                 } preview: {
-                    NutritionView(item: item)
+                    NavigationStack {
+                        NutritionView(item: item)
+                    }
                 }
                 .swipeActions {
                     deleteButton()
@@ -81,11 +83,18 @@ struct DbView: View {
     private func createListItem(_ item: FoodItem) -> some View {
         VStack(alignment: .leading) {
             Text(item.name)
-            if item.metaData.brand != nil || item.storeInfo != nil {
-                Text(item.metaData.brand ?? item.storeInfo?.name ?? "")
+            HStack {
+                Text(item.metaData.brand ?? item.storeInfo?.name ?? "Custom")
                     .font(.subheadline)
                     .fontWeight(.light)
                     .italic()
+                if (item.storeInfo != nil) {
+                    Spacer()
+                    Text("\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!) @ \(item.storeInfo!.name)")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                        .italic()
+                }
             }
         }
     }
@@ -116,9 +125,7 @@ struct DbView: View {
 private let formatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
-    formatter.minimumFractionDigits = 0
-    formatter.maximumFractionDigits = 1
-    formatter.alwaysShowsDecimalSeparator = false
+    formatter.maximumFractionDigits = 2
     return formatter
 }()
 
@@ -134,7 +141,10 @@ private struct NutritionView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(item.name).font(.title2).fontWeight(.semibold)
+            Text(item.name)
+                .font(.title2)
+                .fontWeight(.semibold)
+                .fixedSize(horizontal: false, vertical: true)
             if (item.metaData.brand != nil || item.storeInfo != nil) {
                 HStack {
                     Text(item.metaData.brand ?? "").font(.subheadline).italic()
@@ -148,7 +158,7 @@ private struct NutritionView: View {
                     Text(item.storeInfo != nil ?
                          "\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!)" : "No Price")
                         .font(.title2).bold()
-                    Text("Net Weight: \(format(item.sizeInfo.totalAmount))g")
+                    Text(item.sizeInfo.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
                         .font(.subheadline)
                         .fontWeight(.light)
                     Text("\(format(item.sizeInfo.numServings)) Servings")
@@ -181,6 +191,20 @@ private struct NutritionView: View {
     
     private func format(_ value: Double?) -> String {
         formatter.string(for: value ?? 0.0)!
+    }
+    
+    private func formatVolume(_ volume: Double) -> String {
+        if (volume > 500.0) {
+            return "\(formatter.string(for: volume / 1000.0)!)L"
+        }
+        return "\(formatter.string(for: volume)!)mL"
+    }
+    
+    private func formatWeight(_ weight: Double) -> String {
+        if (weight > 500.0) {
+            return "\(formatter.string(for: weight / 1000.0)!)kg"
+        }
+        return "\(formatter.string(for: weight)!)g"
     }
 }
 

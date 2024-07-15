@@ -61,11 +61,11 @@ struct FoodItemView: View {
                         if (item.composition.ingredients == nil || item.composition.allergens == nil) {
                             Text("No ingredients recorded for this food.").padding()
                         } else {
-                            if (item.composition.ingredients != nil) {
+                            if (!(item.composition.ingredients ?? "").isEmpty) {
                                 Text(item.composition.ingredients!)
                                     .multilineTextAlignment(.leading)
                             }
-                            if (item.composition.allergens != nil) {
+                            if (!(item.composition.allergens ?? "").isEmpty) {
                                 Text("Allergens: \(item.composition.allergens!)")
                                     .multilineTextAlignment(.leading)
                                     .bold()
@@ -108,12 +108,12 @@ private struct StoreInfoView: View {
                 Text(item.storeInfo?.name ?? "Custom")
                 Text("\(currencyFormatter.string(for: Double(item.storeInfo?.price ?? 0) / 100.0)!)")
                     .font(.title).bold()
-                Text("Net Weight: \(gramFormatter.string(for: item.sizeInfo.totalAmount)!)g")
+                Text(item.sizeInfo.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
                     .font(.subheadline)
                 Text("\(gramFormatter.string(for: item.sizeInfo.numServings)!) Servings")
                     .font(.subheadline)
-                Text("Serving: \(item.sizeInfo.servingSize) (\(gramFormatter.string(for: item.sizeInfo.servingAmount)!)g)")
-                    .font(.caption)
+                Text("\(item.sizeInfo.servingSize) (\(gramFormatter.string(for: item.sizeInfo.servingAmount)!)g)")
+                    .font(.subheadline)
                 Spacer()
             }
             Spacer()
@@ -121,6 +121,20 @@ private struct StoreInfoView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12.0))
+    }
+    
+    private func formatVolume(_ volume: Double) -> String {
+        if (volume > 500.0) {
+            return "\(gramFormatter.string(for: volume / 1000.0)!)L"
+        }
+        return "\(gramFormatter.string(for: volume)!)mL"
+    }
+    
+    private func formatWeight(_ weight: Double) -> String {
+        if (weight > 500.0) {
+            return "\(gramFormatter.string(for: weight / 1000.0)!)kg"
+        }
+        return "\(gramFormatter.string(for: weight)!)g"
     }
 }
 
@@ -158,6 +172,9 @@ private struct NutrientTable: View {
     var body: some View {
         VStack {
             Grid {
+                createRow(name: "Calories", nutrient: .Energy)
+                    .bold()
+                Divider()
                 createRow(name: "Total Fat", nutrient: .TotalFat)
                     .bold()
                 Divider()
@@ -213,8 +230,13 @@ private struct NutrientTable: View {
     private func createRow(name: String, nutrient: Nutrient, indented: Bool = false) -> some View {
         GridRow {
             Text(name).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
-            Text("\(format(item: item, nutrient: nutrient)) \(nutrient.getUnit())")
-                .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
+            if (nutrient == .Energy) {
+                Text(format(item: item, nutrient: nutrient))
+                    .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
+            } else {
+                Text("\(format(item: item, nutrient: nutrient)) \(nutrient.getUnit())")
+                    .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
+            }
         }
         .italic(indented)
         .padding(EdgeInsets(top: 0.0, leading: indented ? 8.0 : 0.0, bottom: 0.0, trailing: 0.0))

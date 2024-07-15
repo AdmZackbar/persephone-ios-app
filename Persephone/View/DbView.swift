@@ -22,7 +22,7 @@ struct DbView: View {
                 NavigationLink {
                     FoodItemView(item: item)
                 } label: {
-                    Text(item.name)
+                    createListItem(item)
                 }
                 .contextMenu {
                     NavigationLink {
@@ -76,6 +76,18 @@ struct DbView: View {
             }
         }
         .searchable(text: $searchText, prompt: "Filter...")
+    }
+    
+    private func createListItem(_ item: FoodItem) -> some View {
+        VStack(alignment: .leading) {
+            Text(item.name)
+            if item.metaData.brand != nil || item.storeInfo != nil {
+                Text(item.metaData.brand ?? item.storeInfo?.name ?? "")
+                    .font(.subheadline)
+                    .fontWeight(.light)
+                    .italic()
+            }
+        }
     }
     
     private func isItemFiltered(item: FoodItem) -> Bool {
@@ -133,21 +145,6 @@ private struct NutritionView: View {
             Divider()
             HStack {
                 VStack(alignment: .leading) {
-                    Text("\(format(item.composition.nutrients[.Energy])) Calories")
-                        .font(.title2).bold()
-                    Text("\(format(item.composition.nutrients[.TotalFat]))g Fat")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Text("\(format(item.composition.nutrients[.TotalCarbs]))g Carbs")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Text("\(format(item.composition.nutrients[.Protein]))g Protein")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Spacer()
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
                     Text(item.storeInfo != nil ?
                          "\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!)" : "No Price")
                         .font(.title2).bold()
@@ -158,6 +155,21 @@ private struct NutritionView: View {
                         .font(.subheadline)
                         .fontWeight(.light)
                     Text("Serving: \(item.sizeInfo.servingSize) (\(format(item.sizeInfo.servingAmount))g)")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Spacer()
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text("\(format(item.composition.nutrients[.Energy])) Calories")
+                        .font(.title2).bold()
+                    Text("\(format(item.composition.nutrients[.TotalFat]))g Fat")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Text("\(format(item.composition.nutrients[.TotalCarbs]))g Carbs")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                    Text("\(format(item.composition.nutrients[.Protein]))g Protein")
                         .font(.subheadline)
                         .fontWeight(.light)
                     Spacer()

@@ -27,6 +27,101 @@ struct FoodItemEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext
     
+    private enum FocusableField: Hashable, CaseIterable {
+        case Name, Brand, Store, Price, TotalAmount, NumServings, ServingSize
+        case Calories, TotalFat, Sodium, Cholesterol, TotalCarbs, Protein
+        case VitaminD, Potassium, Calcium, Iron
+        case Ingredients, Allergens
+        
+        func getPrevious() -> FocusableField? {
+            switch self {
+            case .Name:
+                return nil
+            case .Brand:
+                return .Name
+            case .Store:
+                return .Brand
+            // TODO
+            case .Price:
+                return nil
+            case .TotalAmount:
+                return .Store
+            case .NumServings:
+                return .TotalAmount
+            case .ServingSize:
+                return .NumServings
+            case .Calories:
+                return .ServingSize
+            case .TotalFat:
+                return .Calories
+            case .Sodium:
+                return .TotalFat
+            case .Cholesterol:
+                return .Sodium
+            case .TotalCarbs:
+                return .Cholesterol
+            case .Protein:
+                return .TotalCarbs
+            case .VitaminD:
+                return .Protein
+            case .Potassium:
+                return .VitaminD
+            case .Calcium:
+                return .Potassium
+            case .Iron:
+                return .Calcium
+            case .Ingredients:
+                return .Iron
+            case .Allergens:
+                return .Ingredients
+            }
+        }
+        
+        func getNext() -> FocusableField? {
+            switch self {
+            case .Name:
+                return .Brand
+            case .Brand:
+                return .Store
+            case .Store:
+                return .TotalAmount
+            // TODO
+            case .Price:
+                return nil
+            case .TotalAmount:
+                return .NumServings
+            case .NumServings:
+                return .ServingSize
+            case .ServingSize:
+                return .Calories
+            case .Calories:
+                return .TotalFat
+            case .TotalFat:
+                return .Sodium
+            case .Sodium:
+                return .Cholesterol
+            case .Cholesterol:
+                return .TotalCarbs
+            case .TotalCarbs:
+                return .Protein
+            case .Protein:
+                return .VitaminD
+            case .VitaminD:
+                return .Potassium
+            case .Potassium:
+                return .Calcium
+            case .Calcium:
+                return .Iron
+            case .Iron:
+                return .Ingredients
+            case .Ingredients:
+                return .Allergens
+            case .Allergens:
+                return nil
+            }
+        }
+    }
+    
     let item: FoodItem?
     let mode: EditorMode
     
@@ -42,6 +137,8 @@ struct FoodItemEditor: View {
         "Trader Joe's",
         "Amazon"
     ]
+    
+    @FocusState private var focusedField: FocusableField?
     
     // Main Info
     @State private var name: String = ""
@@ -120,9 +217,13 @@ struct FoodItemEditor: View {
     var body: some View {
         Form {
             Section("Name") {
-                TextField("Name", text: $name).textInputAutocapitalization(.words)
+                TextField("Name", text: $name)
+                    .textInputAutocapitalization(.words)
+                    .focused($focusedField, equals: .Name)
                 HStack {
-                    TextField("Brand", text: $brand).textInputAutocapitalization(.words)
+                    TextField("Brand", text: $brand)
+                        .textInputAutocapitalization(.words)
+                        .focused($focusedField, equals: .Brand)
                     Menu {
                         ForEach(defaultBrands, id: \.self) { b in
                             Button(b) {
@@ -130,7 +231,7 @@ struct FoodItemEditor: View {
                             }
                         }
                     } label: {
-                        Label("Set Brand", systemImage: "chevron.right").labelStyle(.iconOnly)
+                        Label("Set Brand", systemImage: "list.bullet").labelStyle(.iconOnly)
                     }
                 }
             }
@@ -138,7 +239,9 @@ struct FoodItemEditor: View {
                 Toggle("Store-Bought", isOn: $storeExpanded)
                 if (storeExpanded) {
                     HStack {
-                        TextField("Store Name", text: $store).textInputAutocapitalization(.words)
+                        TextField("Store Name", text: $store)
+                            .textInputAutocapitalization(.words)
+                            .focused($focusedField, equals: .Store)
                         Menu {
                             ForEach(defaultStores, id: \.self) { s in
                                 Button(s) {
@@ -146,10 +249,11 @@ struct FoodItemEditor: View {
                                 }
                             }
                         } label: {
-                            Label("Set Store", systemImage: "chevron.right").labelStyle(.iconOnly)
+                            Label("Set Store", systemImage: "list.bullet").labelStyle(.iconOnly)
                         }
                     }
                     CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
+                        .focused($focusedField, equals: .Price)
                 }
             }
             Section("Size") {
@@ -162,6 +266,7 @@ struct FoodItemEditor: View {
                         TextField("required", value: $totalAmount, formatter: gramFormatter)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .TotalAmount)
                     }
                 }
                 HStack {
@@ -169,6 +274,7 @@ struct FoodItemEditor: View {
                     TextField("required", value: $numServings, formatter: gramFormatter)
                         .multilineTextAlignment(.trailing)
                         .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .NumServings)
                     if (numServings > 0) {
                         Text("servings").font(.subheadline).fontWeight(.thin)
                     }
@@ -177,14 +283,14 @@ struct FoodItemEditor: View {
                     Text("Serving Size:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
                     TextField("required", text: $servingSize)
                         .multilineTextAlignment(.trailing)
-                        .keyboardType(.decimalPad)
+                        .focused($focusedField, equals: .ServingSize)
                     if (servingAmount != nil) {
                         Text("(\(intFormatter.string(for: servingAmount)!)\(sizeType == .Mass ? "g" : "mL"))").font(.subheadline).fontWeight(.thin)
                     }
                 }
             }
             Section("Nutrients") {
-                createNutrientEntry(.Energy, value: $calories).bold()
+                createNutrientEntry(.Energy, value: $calories)
                 DisclosureGroup(
                     isExpanded: $fatExpanded,
                     content: {
@@ -198,10 +304,10 @@ struct FoodItemEditor: View {
                             createNutrientSubEntry(.MonounsaturatedFat, value: $monoFat)
                         }
                     },
-                    label: { createNutrientEntry(.TotalFat, value: $totalFat).bold() }
+                    label: { createNutrientEntry(.TotalFat, value: $totalFat) }
                 )
-                createNutrientEntry(.Sodium, value: $sodium).bold()
-                createNutrientEntry(.Cholesterol, value: $cholesterol).bold()
+                createNutrientEntry(.Sodium, value: $sodium)
+                createNutrientEntry(.Cholesterol, value: $cholesterol)
                 DisclosureGroup(
                     isExpanded: $carbsExpanded,
                     content: {
@@ -213,9 +319,9 @@ struct FoodItemEditor: View {
                             createNutrientSubEntry(.AddedSugars, value: $addedSugars)
                         }
                     },
-                    label: { createNutrientEntry(.TotalCarbs, value: $totalCarbs).bold() }
+                    label: { createNutrientEntry(.TotalCarbs, value: $totalCarbs) }
                 )
-                createNutrientEntry(.Protein, value: $protein).bold()
+                createNutrientEntry(.Protein, value: $protein)
                 createNutrientEntry(.VitaminD, value: $vitaminD)
                 createNutrientEntry(.Potassium, value: $potassium)
                 createNutrientEntry(.Calcium, value: $calcium)
@@ -224,10 +330,13 @@ struct FoodItemEditor: View {
             Section("Ingredients") {
                 TextEditor(text: $ingredients)
                     .textInputAutocapitalization(.words)
+                    .focused($focusedField, equals: .Ingredients)
                     .frame(height: 100)
             }
             Section("Allergens") {
-                TextField("Optional", text: $allergens).textInputAutocapitalization(.words)
+                TextField("Optional", text: $allergens)
+                    .textInputAutocapitalization(.words)
+                    .focused($focusedField, equals: .Allergens)
             }
             if (item != nil) {
                 VStack(alignment: .leading, spacing: 8.0) {
@@ -241,6 +350,7 @@ struct FoodItemEditor: View {
                 .listRowBackground(Color.clear)
             }
         }
+        .onSubmit(focusNextField)
         .onAppear {
             if let item {
                 name = item.name
@@ -281,6 +391,20 @@ struct FoodItemEditor: View {
         .navigationTitle(mode.getTitle())
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
+            // Currently causes a constraint warning, not sure how to fix
+            ToolbarItemGroup(placement: .keyboard) {
+                Button {
+                    focusPreviousField()
+                } label: {
+                    Image(systemName: "chevron.up")
+                }.disabled(focusedField == .Name)
+                Button {
+                    focusNextField()
+                } label: {
+                    Image(systemName: "chevron.down")
+                }.disabled(focusedField == .Allergens)
+                Spacer()
+            }
             if (mode == .Confirm) {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Confirm") {
@@ -382,6 +506,7 @@ struct FoodItemEditor: View {
             TextField("", value: value, formatter: gramFormatter)
                 .multilineTextAlignment(.trailing)
                 .keyboardType(.decimalPad)
+                .focused($focusedField, equals: getFocusField(nutrient)!)
             if (nutrient != .Energy && value.wrappedValue > 0) {
                 Text(nutrient.getUnit())
             }
@@ -398,6 +523,41 @@ struct FoodItemEditor: View {
                 Text(nutrient.getUnit())
             }
         }
+    }
+    
+    private func getFocusField(_ nutrient: Nutrient) -> FocusableField? {
+        switch nutrient {
+        case .Energy:
+            return .Calories
+        case .TotalFat:
+            return .TotalFat
+        case .Sodium:
+            return .Sodium
+        case .Cholesterol:
+            return .Cholesterol
+        case .TotalCarbs:
+            return .TotalCarbs
+        case .Protein:
+            return .Protein
+        case .VitaminD:
+            return .VitaminD
+        case .Potassium:
+            return .Potassium
+        case .Calcium:
+            return .Calcium
+        case .Iron:
+            return .Iron
+        default:
+            return nil
+        }
+    }
+    
+    private func focusPreviousField() {
+        focusedField = focusedField?.getPrevious()
+    }
+    
+    private func focusNextField() {
+        focusedField = focusedField?.getNext()
     }
     
     private func save() {

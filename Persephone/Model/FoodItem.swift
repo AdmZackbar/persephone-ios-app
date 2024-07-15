@@ -128,10 +128,10 @@ extension SchemaV1 {
              PolyunsaturatedFat,
              MonounsaturatedFat
         // Other (g)
-        case Protein,
-             Cholesterol
+        case Protein
         // Other (mg)
         case Sodium,
+             Cholesterol,
              Calcium,
              VitaminD,
              Iron,
@@ -150,8 +150,7 @@ extension SchemaV1 {
                     .TransFat,
                     .PolyunsaturatedFat,
                     .MonounsaturatedFat,
-                    .Protein,
-                    .Cholesterol:
+                    .Protein:
                 return "g"
             default:
                 return "mg"

@@ -306,8 +306,8 @@ struct FoodItemEditor: View {
                     },
                     label: { createNutrientEntry(.TotalFat, value: $totalFat) }
                 )
-                createNutrientEntry(.Sodium, value: $sodium)
                 createNutrientEntry(.Cholesterol, value: $cholesterol)
+                createNutrientEntry(.Sodium, value: $sodium)
                 DisclosureGroup(
                     isExpanded: $carbsExpanded,
                     content: {

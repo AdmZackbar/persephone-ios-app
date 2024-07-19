@@ -15,7 +15,7 @@ struct MainView: View {
                 .tabItem {
                     Label("Database", systemImage: "tablecells")
                 }
-            Text("Cookbook")
+            CookbookView()
                 .tabItem {
                     Label("Cookbook", systemImage: "book")
                 }
@@ -32,8 +32,9 @@ struct MainView: View {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: FoodItem.self, configurations: config)
+    let schema = Schema(CurrentSchema.models)
+    let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: schema, configurations: [configuration])
     let item = FoodItem(name: "Lightly Breaded Chicken Chunks",
                         metaData: FoodMetaData(
                             brand: "Kirkland"),

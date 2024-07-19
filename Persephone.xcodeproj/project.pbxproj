@@ -24,6 +24,10 @@
 		E860ACFF2C3EFBE9007E65DE /* PersephoneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */; };
 		E860AD012C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */; };
 		E8D72EED2C4381010053CA26 /* ScanFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */; };
+		E8D72EF12C463D3A0053CA26 /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF02C463D3A0053CA26 /* Recipe.swift */; };
+		E8D72EF32C4641840053CA26 /* CookbookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF22C4641840053CA26 /* CookbookView.swift */; };
+		E8D72EF52C470E1E0053CA26 /* RecipeEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF42C470E1E0053CA26 /* RecipeEditor.swift */; };
+		E8D72EF72C478C620053CA26 /* RecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF62C478C610053CA26 /* RecipeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +69,10 @@
 		E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITests.swift; sourceTree = "<group>"; };
 		E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanFoodView.swift; sourceTree = "<group>"; };
+		E8D72EF02C463D3A0053CA26 /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
+		E8D72EF22C4641840053CA26 /* CookbookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookbookView.swift; sourceTree = "<group>"; };
+		E8D72EF42C470E1E0053CA26 /* RecipeEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEditor.swift; sourceTree = "<group>"; };
+		E8D72EF62C478C610053CA26 /* RecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +115,7 @@
 			children = (
 				E80E2C452C400B0800D35BE7 /* Schema.swift */,
 				E80E2C472C400BC400D35BE7 /* FoodItem.swift */,
+				E8D72EF02C463D3A0053CA26 /* Recipe.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -120,6 +129,9 @@
 				E80E2C492C40157A00D35BE7 /* FoodItemView.swift */,
 				E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */,
 				E80E2C502C41C23200D35BE7 /* ScannerView.swift */,
+				E8D72EF22C4641840053CA26 /* CookbookView.swift */,
+				E8D72EF62C478C610053CA26 /* RecipeView.swift */,
+				E8D72EF42C470E1E0053CA26 /* RecipeEditor.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -316,14 +328,18 @@
 				E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */,
 				E80E2C4C2C401AF300D35BE7 /* FoodItemEditor.swift in Sources */,
 				E82CFBDC2C3F0D990055C6B2 /* DbView.swift in Sources */,
+				E8D72EF32C4641840053CA26 /* CookbookView.swift in Sources */,
 				E80E2C462C400B0800D35BE7 /* Schema.swift in Sources */,
+				E8D72EF52C470E1E0053CA26 /* RecipeEditor.swift in Sources */,
 				E80E2C4A2C40157A00D35BE7 /* FoodItemView.swift in Sources */,
 				E80E2C482C400BC400D35BE7 /* FoodItem.swift in Sources */,
 				E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */,
+				E8D72EF12C463D3A0053CA26 /* Recipe.swift in Sources */,
 				E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
 				E8D72EED2C4381010053CA26 /* ScanFoodView.swift in Sources */,
 				E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */,
+				E8D72EF72C478C620053CA26 /* RecipeView.swift in Sources */,
 				E80E2C442C3F6D5300D35BE7 /* NumberFormatterProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

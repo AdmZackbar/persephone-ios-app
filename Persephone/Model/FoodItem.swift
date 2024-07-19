@@ -25,6 +25,9 @@ extension SchemaV1 {
         var sizeInfo: FoodSizeInfo
         var storeInfo: StoreInfo?
         
+        @Relationship(deleteRule: .nullify, inverse: \RecipeFoodEntry.food)
+        var recipeEntries: [RecipeFoodEntry] = []
+        
         init(name: String, metaData: FoodMetaData, composition: FoodComposition, sizeInfo: FoodSizeInfo, storeInfo: StoreInfo? = nil) {
             self.name = name
             self.metaData = metaData

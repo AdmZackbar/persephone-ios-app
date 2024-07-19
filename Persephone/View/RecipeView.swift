@@ -33,7 +33,7 @@ struct RecipeView: View {
                         Image(systemName: "person.2.fill")
                         createStackedText(upper: "\(servingFormatter.string(for: recipe.sizeInfo.numServings)!) servings", lower: recipe.sizeInfo.servingSize.uppercased())
                     }
-                    if (!recipe.metaData.tags.isEmpty) {
+                    if !recipe.metaData.tags.isEmpty {
                         Divider()
                         Label(recipe.metaData.tags.joined(separator: ", "), systemImage: "tag.fill")
                             .font(.subheadline)
@@ -48,7 +48,7 @@ struct RecipeView: View {
                     }
                     Divider()
                     createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.prepTime)!) min", lower: "PREP")
-                    if (recipe.metaData.cookTime != nil) {
+                    if recipe.metaData.cookTime != nil {
                         Divider()
                         createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime!)!) min", lower: "COOK")
                     }
@@ -73,11 +73,22 @@ struct RecipeView: View {
                     }
                     Divider()
                 }
-                createInstructionsView(createInstructions(recipe.metaData.instructions))
-                Spacer()
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(recipe.metaData.instructions.sections, id: \.self.header) { section in
+                        if section.header != nil {
+                            Text(section.header!.uppercased()).font(.headline).fontWeight(.semibold).italic()
+                        }
+                        ForEach(section.steps, id: \.self) { step in
+                            Text(step).font(.subheadline).fontWeight(.light)
+                        }
+                        Spacer()
+                    }
+                }
+                if recipe.composition != nil {
+                    NutrientView(recipe: recipe, nutrients: recipe.composition!.nutrients)
+                }
             }.padding(24)
         }.navigationTitle(recipe.name)
-            .fontDesign(.serif)
             .toolbar {
                 ToolbarItem(placement: .secondaryAction) {
                     NavigationLink {
@@ -89,39 +100,6 @@ struct RecipeView: View {
             }
     }
     
-    private func createInstructions(_ raw: String) -> Instructions {
-        let lines = raw.split(separator: "\n")
-        var sections: [Section] = []
-        var section: Section? = nil
-        lines.forEach { line in
-            if line.starts(with: try! Regex("\\d\\.")) {
-                if section == nil {
-                    section = Section()
-                    sections.append(section!)
-                }
-                section!.steps.append(line.string)
-            } else {
-                section = Section(heading: line.string)
-                sections.append(section!)
-            }
-        }
-        return Instructions(sections: sections)
-    }
-    
-    private func createInstructionsView(_ instructions: Instructions) -> some View {
-        VStack(alignment: .leading) {
-            ForEach(instructions.sections, id: \.self.heading) { section in
-                VStack {
-                    Text(section.heading ?? "Heading").bold()
-                    ForEach(section.steps, id: \.self) { step in
-                        Text(step)
-                    }
-                }
-                Spacer()
-            }
-        }
-    }
-    
     private func createStackedText(upper: String, lower: String) -> some View {
         VStack(alignment: .leading) {
             Text(upper).font(.subheadline).bold()
@@ -130,21 +108,85 @@ struct RecipeView: View {
     }
 }
 
-private struct Instructions {
-    var sections: [Section]
+private struct NutrientView: View {
+    @State private var viewType: ViewType = .PerServing
     
-    init(sections: [Section] = []) {
-        self.sections = sections
+    let recipe: Recipe
+    let nutrients: [Nutrient : Double]
+    
+    let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 1
+        return formatter
+    }()
+    
+    var body: some View {
+        VStack(spacing: 10) {
+            Picker("", selection: $viewType) {
+                Text(recipe.sizeInfo.servingSize.capitalized).tag(ViewType.PerServing)
+                Text("\(formatter.string(for: recipe.sizeInfo.numServings)!) Servings").tag(ViewType.WholeAmount)
+            }.pickerStyle(.segmented)
+            createNutrientRow(name: "Calories", nutrient: .Energy).font(.title3).fontWeight(.semibold)
+            Divider()
+            createNutrientRow(name: "Total Fat", nutrient: .TotalFat)
+            if nutrients[.SaturatedFat] != nil {
+                createNutrientRow(name: "Saturated Fat", nutrient: .SaturatedFat).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
+            }
+            if nutrients[.TransFat] != nil {
+                createNutrientRow(name: "Trans Fat", nutrient: .TransFat).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
+            }
+            createNutrientRow(name: "Total Carbohydrates", nutrient: .TotalCarbs)
+            if nutrients[.DietaryFiber] != nil {
+                createNutrientRow(name: "Dietary Fiber", nutrient: .DietaryFiber).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
+            }
+            if nutrients[.TotalSugars] != nil {
+                createNutrientRow(name: "Total Sugars", nutrient: .TotalSugars).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
+            }
+            if nutrients[.AddedSugars] != nil {
+                createNutrientRow(name: "Added Sugars", nutrient: .AddedSugars).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
+            }
+            createNutrientRow(name: "Cholesterol", nutrient: .Cholesterol)
+            createNutrientRow(name: "Sodium", nutrient: .Sodium)
+            createNutrientRow(name: "Protein", nutrient: .Protein)
+        }.font(.subheadline).padding().overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.secondary)
+        )
     }
-}
-
-private struct Section {
-    var heading: String?
-    var steps: [String]
     
-    init(heading: String? = nil, steps: [String] = []) {
-        self.heading = heading
-        self.steps = steps
+    private func createNutrientRow(name: String, nutrient: Nutrient) -> some View {
+        HStack {
+            Text(name)
+            Spacer()
+            if nutrient == .Energy {
+                Text(formatter.string(for: modifyAmountIfNeeded(nutrients[.Energy]))!)
+            } else {
+                Text("\(formatter.string(for: modifyAmountIfNeeded(nutrients[nutrient]))!) \(nutrient.getUnit())")
+            }
+        }
+    }
+    
+    private func modifyAmountIfNeeded(_ value: Double?) -> Double {
+        if value == nil {
+            return 0
+        }
+        switch viewType {
+        case .PerServing:
+            return value!
+        case .WholeAmount:
+            return value! * recipe.sizeInfo.numServings
+        }
+    }
+    
+    enum ViewType: Identifiable {
+        var id: Int {
+            get {
+                self.hashValue
+            }
+        }
+        
+        case PerServing, WholeAmount
     }
 }
 
@@ -167,11 +209,29 @@ private struct CenterLabelStyle: LabelStyle {
                             cookedWeight: 255),
                         metaData: RecipeMetaData(
                             details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
-                            instructions: "Prep\n1. Put in the water and the mix, mix together until barely mixed.\n2. Put mix in the waffle iron.\n3. Wait until its done.",
+                            instructions: RecipeInstructions(sections: [
+                                RecipeSection(header: "Prep", steps: [
+                                    "1. Put the mix with the water",
+                                    "2. Mix until barely combined"
+                                ]), RecipeSection(header: "Cook", steps: [
+                                    "1. Put mix into the iron",
+                                    "2. Wait until iron signals completion",
+                                    "3. Remove and allow to cool"
+                                ])
+                            ]),
                             totalTime: 25,
                             prepTime: 8,
                             cookTime: 17,
-                            tags: ["Breakfast", "Bread"]))
+                            tags: ["Breakfast", "Bread"]),
+                        composition: FoodComposition(nutrients: [
+                            .Energy: 200,
+                            .TotalFat: 4.1,
+                            .SaturatedFat: 2,
+                            .TotalCarbs: 20,
+                            .DietaryFiber: 1,
+                            .TotalSugars: 3,
+                            .Protein: 13.5
+                        ]))
     container.mainContext.insert(recipe)
     container.mainContext.insert(RecipeFoodEntry(name: "Water", recipe: recipe, amount: 1.0, unit: .Liter))
     container.mainContext.insert(RecipeFoodEntry(name: "Salt", recipe: recipe, amount: 600, unit: .Milligram))

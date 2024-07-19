@@ -13,6 +13,8 @@ typealias RecipeFoodEntry = SchemaV1.RecipeFoodEntry
 typealias FoodUnit = SchemaV1.FoodUnit
 typealias RecipeSizeInfo = SchemaV1.RecipeSizeInfo
 typealias RecipeMetaData = SchemaV1.RecipeMetaData
+typealias RecipeInstructions = SchemaV1.RecipeInstructions
+typealias RecipeSection = SchemaV1.RecipeSection
 
 extension SchemaV1 {
     @Model
@@ -22,11 +24,13 @@ extension SchemaV1 {
         var foodEntries: [RecipeFoodEntry] = []
         var sizeInfo: RecipeSizeInfo
         var metaData: RecipeMetaData
+        var composition: FoodComposition?
         
-        init(name: String, sizeInfo: RecipeSizeInfo, metaData: RecipeMetaData) {
+        init(name: String, sizeInfo: RecipeSizeInfo, metaData: RecipeMetaData, composition: FoodComposition? = nil) {
             self.name = name
             self.sizeInfo = sizeInfo
             self.metaData = metaData
+            self.composition = composition
         }
     }
     
@@ -109,19 +113,37 @@ extension SchemaV1 {
     
     struct RecipeMetaData: Codable {
         var details: String
-        var instructions: String
+        var instructions: RecipeInstructions
         var totalTime: Double
         var prepTime: Double
         var cookTime: Double?
         var tags: [String]
         
-        init(details: String, instructions: String, totalTime: Double, prepTime: Double, cookTime: Double? = nil, tags: [String]) {
+        init(details: String, instructions: RecipeInstructions, totalTime: Double, prepTime: Double, cookTime: Double? = nil, tags: [String]) {
             self.details = details
             self.instructions = instructions
             self.totalTime = totalTime
             self.prepTime = prepTime
             self.cookTime = cookTime
             self.tags = tags
+        }
+    }
+    
+    struct RecipeInstructions: Codable {
+        var sections: [RecipeSection]
+        
+        init(sections: [RecipeSection]) {
+            self.sections = sections
+        }
+    }
+    
+    struct RecipeSection: Codable {
+        var header: String?
+        var steps: [String]
+        
+        init(header: String? = nil, steps: [String] = []) {
+            self.header = header
+            self.steps = steps
         }
     }
 }

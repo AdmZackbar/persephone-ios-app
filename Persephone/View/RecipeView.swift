@@ -28,19 +28,20 @@ struct RecipeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                HStack(spacing: 12) {
-                    HStack {
-                        Image(systemName: "person.2.fill")
-                        createStackedText(upper: "\(servingFormatter.string(for: recipe.sizeInfo.numServings)!) servings", lower: recipe.sizeInfo.servingSize.uppercased())
+                ScrollView([.horizontal]) {
+                    HStack(spacing: 12) {
+                        HStack {
+                            Image(systemName: "person.2.fill")
+                            createStackedText(upper: "\(servingFormatter.string(for: recipe.sizeInfo.numServings)!) servings", lower: recipe.sizeInfo.servingSize.uppercased())
+                        }
+                        if !recipe.metaData.tags.isEmpty {
+                            Divider()
+                            Label(recipe.metaData.tags.joined(separator: ", "), systemImage: "tag.fill")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
                     }
-                    if !recipe.metaData.tags.isEmpty {
-                        Divider()
-                        Label(recipe.metaData.tags.joined(separator: ", "), systemImage: "tag.fill")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .labelStyle(CenterLabelStyle())
-                    }
-                }
+                }.scrollIndicators(.hidden)
                 HStack(spacing: 12) {
                     HStack(spacing: 10) {
                         Image(systemName: "clock.fill")
@@ -187,15 +188,6 @@ private struct NutrientView: View {
         }
         
         case PerServing, WholeAmount
-    }
-}
-
-private struct CenterLabelStyle: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(alignment: .center) {
-            configuration.icon
-            configuration.title
-        }
     }
 }
 

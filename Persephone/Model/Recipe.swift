@@ -135,9 +135,9 @@ extension SchemaV1 {
     struct RecipeSizeInfo: Codable {
         var servingSize: String
         var numServings: Double
-        var cookedWeight: Double
+        var cookedWeight: Double?
         
-        init(servingSize: String, numServings: Double, cookedWeight: Double) {
+        init(servingSize: String, numServings: Double, cookedWeight: Double? = nil) {
             self.servingSize = servingSize
             self.numServings = numServings
             self.cookedWeight = cookedWeight

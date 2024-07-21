@@ -89,11 +89,11 @@ struct RecipeView: View {
             }.padding(24)
         }.navigationTitle(recipe.name)
             .toolbar {
-                ToolbarItem(placement: .secondaryAction) {
+                ToolbarItem(placement: .primaryAction) {
                     NavigationLink {
                         RecipeEditor(recipe: recipe)
                     } label: {
-                        Label("Edit", systemImage: "pencil")
+                        Label("Edit", systemImage: "pencil.line").labelStyle(.titleOnly)
                     }
                 }
             }

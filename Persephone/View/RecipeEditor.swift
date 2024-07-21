@@ -37,6 +37,9 @@ struct RecipeEditor: View {
     @State private var nextSectionDetails: String = ""
     @State private var prepTime: Double = 0.0
     @State private var cookTime: Double = 0.0
+    @State private var servingSize: String = ""
+    @State private var numServings: Double = 0.0
+    @State private var cookedWeight: Double = 0.0
     
     let durationFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -50,7 +53,7 @@ struct RecipeEditor: View {
         Form {
             Section("Name and Description") {
                 TextField("required", text: $name).textInputAutocapitalization(.words)
-                TextEditor(text: $details).frame(height: 100).textInputAutocapitalization(.sentences)
+                TextField("description", text: $details, axis: .vertical).textInputAutocapitalization(.sentences).lineLimit(3...5)
             }
             Section("Ingredients") {
                 List(ingredients.sorted(by: { x, y in
@@ -81,7 +84,7 @@ struct RecipeEditor: View {
                             TextField("minutes", value: $prepTime, formatter: durationFormatter)
                                 .multilineTextAlignment(.trailing)
                                 .keyboardType(.decimalPad)
-                            if (prepTime > 0.0) {
+                            if prepTime > 0 {
                                 Text("min").italic()
                             }
                         }.frame(minWidth: 100)
@@ -91,7 +94,7 @@ struct RecipeEditor: View {
                             TextField("minutes", value: $cookTime, formatter: durationFormatter)
                                 .multilineTextAlignment(.trailing)
                                 .keyboardType(.decimalPad)
-                            if (cookTime > 0.0) {
+                            if cookTime > 0 {
                                 Text("min").italic()
                             }
                         }
@@ -103,6 +106,32 @@ struct RecipeEditor: View {
                             Spacer()
                             Text("\(durationFormatter.string(for: prepTime + cookTime)!)  minutes")
                         }.italic().padding(EdgeInsets(top: 6, leading: 0, bottom: 10, trailing: 0)).opacity(0.5)
+                    }
+                }
+            }
+            Section("Sizing") {
+                HStack {
+                    Text("Serving Size:").fixedSize(horizontal: true, vertical: false)
+                    TextField("required", text: $servingSize)
+                        .multilineTextAlignment(.trailing)
+                        .keyboardType(.decimalPad)
+                }
+                HStack {
+                    Text("Num. Servings:").fixedSize(horizontal: true, vertical: false)
+                    TextField("required", value: $numServings, formatter: durationFormatter)
+                        .multilineTextAlignment(.trailing)
+                        .keyboardType(.decimalPad)
+                    if numServings > 0 {
+                        Text("servings").italic()
+                    }
+                }
+                HStack {
+                    Text("Total Weight (cooked):").fixedSize(horizontal: true, vertical: false)
+                    TextField("optional", value: $cookedWeight, formatter: durationFormatter)
+                        .multilineTextAlignment(.trailing)
+                        .keyboardType(.decimalPad)
+                    if cookedWeight > 0 {
+                        Text("g").italic()
                     }
                 }
             }
@@ -145,12 +174,16 @@ struct RecipeEditor: View {
             .onAppear {
                 if let recipe = recipe {
                     name = recipe.name
+                    details = recipe.metaData.details
                     ingredients = recipe.foodEntries.map({ entry in
                         Ingredient(name: entry.name, food: entry.food, amount: entry.amount, unit: entry.unit)
                     })
                     sections = recipe.metaData.instructions.sections
                     prepTime = recipe.metaData.prepTime
                     cookTime = recipe.metaData.cookTime
+                    servingSize = recipe.sizeInfo.servingSize
+                    numServings = recipe.sizeInfo.numServings
+                    cookedWeight = recipe.sizeInfo.cookedWeight ?? 0
                 }
             }
     }
@@ -211,10 +244,12 @@ struct RecipeEditor: View {
             recipe.metaData.prepTime = prepTime
             recipe.metaData.cookTime = cookTime
             recipe.metaData.instructions.sections = sections
+            recipe.sizeInfo.servingSize = servingSize
+            recipe.sizeInfo.numServings = numServings
+            recipe.sizeInfo.cookedWeight = cookedWeight > 0 ? cookedWeight : nil
         } else {
-            // TODO
             let recipe = Recipe(name: name,
-                                sizeInfo: RecipeSizeInfo(servingSize: "", numServings: 0, cookedWeight: 0),
+                                sizeInfo: RecipeSizeInfo(servingSize: servingSize, numServings: numServings, cookedWeight: cookedWeight > 0 ? cookedWeight : nil),
                                 metaData: RecipeMetaData(
                                     details: details,
                                     instructions: RecipeInstructions(sections: sections),
@@ -222,6 +257,10 @@ struct RecipeEditor: View {
                                     cookTime: cookTime,
                                     tags: []))
             modelContext.insert(recipe)
+            for ingredient in ingredients {
+                let entry = RecipeFoodEntry(name: ingredient.name, food: ingredient.food, recipe: recipe, amount: ingredient.amount, unit: ingredient.unit)
+                modelContext.insert(entry)
+            }
         }
         dismiss()
     }

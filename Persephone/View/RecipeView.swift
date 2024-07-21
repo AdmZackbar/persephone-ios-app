@@ -28,6 +28,12 @@ struct RecipeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                Text(recipe.metaData.details)
+                    .multilineTextAlignment(.leading)
+                    .lineSpacing(4)
+                    .italic()
+                    .fontWeight(.light)
+                    .font(.subheadline)
                 ScrollView([.horizontal]) {
                     HStack(spacing: 12) {
                         HStack {
@@ -53,12 +59,6 @@ struct RecipeView: View {
                     createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime)!) min", lower: "COOK")
                     Spacer()
                 }
-                Text(recipe.metaData.details)
-                    .multilineTextAlignment(.leading)
-                    .lineSpacing(6)
-                    .italic()
-                    .fontWeight(.light)
-                    .font(.subheadline)
                 Divider()
                 if (!recipe.foodEntries.isEmpty) {
                     ForEach(recipe.foodEntries.sorted(by: { x, y in
@@ -86,8 +86,9 @@ struct RecipeView: View {
                 if recipe.composition != nil {
                     NutrientView(recipe: recipe, nutrients: recipe.composition!.nutrients)
                 }
-            }.padding(24)
+            }.padding(EdgeInsets(top: 8, leading: 20, bottom: 12, trailing: 20))
         }.navigationTitle(recipe.name)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     NavigationLink {

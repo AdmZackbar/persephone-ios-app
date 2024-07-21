@@ -49,10 +49,8 @@ struct RecipeView: View {
                     }
                     Divider()
                     createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.prepTime)!) min", lower: "PREP")
-                    if recipe.metaData.cookTime != nil {
-                        Divider()
-                        createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime!)!) min", lower: "COOK")
-                    }
+                    Divider()
+                    createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime)!) min", lower: "COOK")
                     Spacer()
                 }
                 Text(recipe.metaData.details)
@@ -211,7 +209,6 @@ private struct NutrientView: View {
                                     "3. Remove and allow to cool"
                                 ])
                             ]),
-                            totalTime: 25,
                             prepTime: 8,
                             cookTime: 17,
                             tags: ["Breakfast", "Bread"]),
@@ -229,5 +226,6 @@ private struct NutrientView: View {
     container.mainContext.insert(RecipeFoodEntry(name: "Salt", recipe: recipe, amount: 600, unit: .Milligram))
     return NavigationStack {
         RecipeView(recipe: recipe)
+            .modelContainer(container)
     }
 }

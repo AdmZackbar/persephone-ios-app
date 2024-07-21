@@ -51,7 +51,7 @@ extension SchemaV1 {
         }
     }
     
-    enum FoodUnit: Codable {
+    enum FoodUnit: Codable, CaseIterable {
         // Weight (US)
         case Ounce, Pound
         // Weight (SI)
@@ -97,6 +97,39 @@ extension SchemaV1 {
                 return "L"
             }
         }
+        
+        func getNames() -> [String] {
+            switch self {
+            case .Ounce:
+                return ["oz", "ounce", "ounces"]
+            case .Pound:
+                return ["lb", "lbs", "pound", "pounds"]
+            case .Milligram:
+                return ["mg", "milligram", "milligrams"]
+            case .Gram:
+                return ["g", "gram", "grams"]
+            case .Kilogram:
+                return ["kg", "kilogram", "kilograms"]
+            case .Teaspoon:
+                return ["tsp", "teaspoon", "teaspoons"]
+            case .Tablespoon:
+                return ["tbsp", "tablespoon", "tablespoons"]
+            case .FluidOunce:
+                return ["fl oz", "fluid ounce", "fluid ounces"]
+            case .Cup:
+                return ["c", "cup", "cups"]
+            case .Pint:
+                return ["pint", "pints"]
+            case .Quart:
+                return ["qt", "quart", "quarts"]
+            case .Gallon:
+                return ["gal", "gallon", "gallons"]
+            case .Milliliter:
+                return ["mL", "milliliter", "milliliters"]
+            case .Liter:
+                return ["L", "liter", "liters"]
+            }
+        }
     }
     
     struct RecipeSizeInfo: Codable {
@@ -114,15 +147,18 @@ extension SchemaV1 {
     struct RecipeMetaData: Codable {
         var details: String
         var instructions: RecipeInstructions
-        var totalTime: Double
         var prepTime: Double
-        var cookTime: Double?
+        var cookTime: Double
+        var totalTime: Double {
+            get {
+                prepTime + cookTime
+            }
+        }
         var tags: [String]
         
-        init(details: String, instructions: RecipeInstructions, totalTime: Double, prepTime: Double, cookTime: Double? = nil, tags: [String]) {
+        init(details: String, instructions: RecipeInstructions, prepTime: Double, cookTime: Double, tags: [String]) {
             self.details = details
             self.instructions = instructions
-            self.totalTime = totalTime
             self.prepTime = prepTime
             self.cookTime = cookTime
             self.tags = tags
@@ -137,7 +173,7 @@ extension SchemaV1 {
         }
     }
     
-    struct RecipeSection: Codable {
+    struct RecipeSection: Codable, Equatable, Hashable {
         var header: String?
         var steps: [String]
         

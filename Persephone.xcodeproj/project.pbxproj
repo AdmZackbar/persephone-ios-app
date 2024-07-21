@@ -68,6 +68,8 @@
 		E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PersephoneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITests.swift; sourceTree = "<group>"; };
 		E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		E8828ECC2C4DC43C006C7CB3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		E8828ECD2C4DC456006C7CB3 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanFoodView.swift; sourceTree = "<group>"; };
 		E8D72EF02C463D3A0053CA26 /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 		E8D72EF22C4641840053CA26 /* CookbookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookbookView.swift; sourceTree = "<group>"; };
@@ -139,6 +141,8 @@
 		E860ACD52C3EFBE5007E65DE = {
 			isa = PBXGroup;
 			children = (
+				E8828ECD2C4DC456006C7CB3 /* CHANGELOG.md */,
+				E8828ECC2C4DC43C006C7CB3 /* README.md */,
 				E860ACE02C3EFBE5007E65DE /* Persephone */,
 				E860ACF32C3EFBE9007E65DE /* PersephoneTests */,
 				E860ACFD2C3EFBE9007E65DE /* PersephoneUITests */,

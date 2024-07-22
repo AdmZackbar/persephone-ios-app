@@ -88,8 +88,13 @@ struct RecipeView: View {
                 }
             }.padding(EdgeInsets(top: 8, leading: 20, bottom: 12, trailing: 20))
         }.navigationTitle(recipe.name)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(recipe.name).font(.headline).bold()
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 ToolbarItem(placement: .primaryAction) {
                     NavigationLink {
                         RecipeEditor(recipe: recipe)

@@ -29,7 +29,7 @@ private let gramFormatter: NumberFormatter = {
 }()
 
 private func format(item: FoodItem, nutrient: Nutrient) -> String {
-    gramFormatter.string(for: item.composition.nutrients[nutrient] ?? 0)!
+    gramFormatter.string(for: item.ingredients.nutrients[nutrient]?.value ?? 0)!
 }
 
 struct FoodItemView: View {
@@ -58,15 +58,15 @@ struct FoodItemView: View {
                     NutrientTable(item: item)
                 case .Ingredients:
                     VStack(alignment: .leading, spacing: 8.0) {
-                        if (item.composition.ingredients == nil || item.composition.allergens == nil) {
+                        if (item.ingredients.all.isEmpty && item.ingredients.allergens.isEmpty) {
                             Text("No ingredients recorded for this food.").padding()
                         } else {
-                            if (!(item.composition.ingredients ?? "").isEmpty) {
-                                Text(item.composition.ingredients!)
+                            if (!item.ingredients.all.isEmpty) {
+                                Text(item.ingredients.all)
                                     .multilineTextAlignment(.leading)
                             }
-                            if (!(item.composition.allergens ?? "").isEmpty) {
-                                Text("Allergens: \(item.composition.allergens!)")
+                            if (!item.ingredients.allergens.isEmpty) {
+                                Text("Allergens: \(item.ingredients.allergens)")
                                     .multilineTextAlignment(.leading)
                                     .bold()
                             }
@@ -105,14 +105,14 @@ private struct StoreInfoView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(item.storeInfo?.name ?? "Custom")
-                Text("\(currencyFormatter.string(for: Double(item.storeInfo?.price ?? 0) / 100.0)!)")
-                    .font(.title).bold()
-                Text(item.sizeInfo.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
+//                Text(item.storeInfo?.name ?? "Custom")
+//                Text("\(currencyFormatter.string(for: Double(item.storeInfo?.price ?? 0) / 100.0)!)")
+//                    .font(.title).bold()
+//                Text(item.sizeInfo.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
+//                    .font(.subheadline)
+                Text("\(gramFormatter.string(for: item.size.numServings)!) Servings")
                     .font(.subheadline)
-                Text("\(gramFormatter.string(for: item.sizeInfo.numServings)!) Servings")
-                    .font(.subheadline)
-                Text("\(item.sizeInfo.servingSize) (\(gramFormatter.string(for: item.sizeInfo.servingAmount)!)g)")
+                Text("\(item.size.servingSize) (\(gramFormatter.string(for: item.size.servingAmount.value)!)g)")
                     .font(.subheadline)
                 Spacer()
             }
@@ -145,7 +145,7 @@ private struct NutritionView: View {
         HStack {
             VStack(alignment: .leading) {
                 Text("Per Serving")
-                Text("\(gramFormatter.string(for: item.composition.nutrients[.Energy] ?? 0)!) Cal")
+                Text("\(gramFormatter.string(for: item.ingredients.nutrients[.Energy]?.value ?? 0)!) Cal")
                     .font(.title).bold()
                 Text("\(format(item: item, nutrient: .TotalFat))g Fat")
                     .font(.subheadline)
@@ -234,7 +234,7 @@ private struct NutrientTable: View {
                 Text(format(item: item, nutrient: nutrient))
                     .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
             } else {
-                Text("\(format(item: item, nutrient: nutrient)) \(nutrient.getUnit())")
+                Text("\(format(item: item, nutrient: nutrient)) \(nutrient.getCommonUnit().getAbbreviation())")
                     .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
             }
         }
@@ -244,31 +244,8 @@ private struct NutrientTable: View {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: FoodItem.self, configurations: config)
-    let item = FoodItem(name: "Lightly Breaded Chicken Chunks",
-                        metaData: FoodMetaData(
-                            brand: "Kirkland"),
-                        composition: FoodComposition(
-                            nutrients: [
-                                .Energy: 120,
-                                .TotalCarbs: 4,
-                                .TotalSugars: 1.5,
-                                .TotalFat: 3,
-                                .SaturatedFat: 1.25,
-                                .Protein: 13,
-                                .Sodium: 530,
-                                .Cholesterol: 25,
-                            ],
-                            ingredients: "Salt, Chicken, Other stuff",
-                        allergens: "Meat"),
-                        sizeInfo: FoodSizeInfo(
-                            numServings: 16,
-                            servingSize: "4 oz",
-                            totalAmount: 1814,
-                            servingAmount: 63,
-                            sizeType: .Mass),
-                        storeInfo: StoreInfo(name: "Costco", price: 1399))
+    let container = createTestModelContainer()
+    let item = createTestFoodItem(container.mainContext)
     return NavigationStack {
         FoodItemView(item: item)
     }.modelContainer(container)

@@ -138,9 +138,9 @@ struct RecipeEditor: View {
             Section("Instructions") {
                 List(sections, id: \.self.header) { section in
                     DisclosureGroup {
-                        Text(section.steps.joined(separator: "\n")).font(.subheadline).fontWeight(.thin)
+                        Text(section.details).font(.subheadline).fontWeight(.thin)
                     } label: {
-                        Text(section.header ?? "Untitled").bold()
+                        Text(section.header).bold()
                             .swipeActions {
                                 Button("Delete", role: .destructive) {
                                     deleteSection(section)
@@ -175,15 +175,15 @@ struct RecipeEditor: View {
                 if let recipe = recipe {
                     name = recipe.name
                     details = recipe.metaData.details
-                    ingredients = recipe.foodEntries.map({ entry in
-                        Ingredient(name: entry.name, food: entry.food, amount: entry.amount, unit: entry.unit)
+                    ingredients = recipe.ingredients.map({ ingredient in
+                        Ingredient(name: ingredient.name, food: ingredient.food, amount: ingredient.amount.value, unit: ingredient.amount.unit)
                     })
-                    sections = recipe.metaData.instructions.sections
+                    sections = recipe.instructions
                     prepTime = recipe.metaData.prepTime
                     cookTime = recipe.metaData.cookTime
-                    servingSize = recipe.sizeInfo.servingSize
-                    numServings = recipe.sizeInfo.numServings
-                    cookedWeight = recipe.sizeInfo.cookedWeight ?? 0
+                    servingSize = recipe.size.servingSize
+                    numServings = recipe.size.numServings
+                    cookedWeight = recipe.size.cookedAmount?.value ?? 0
                 }
             }
     }
@@ -203,7 +203,7 @@ struct RecipeEditor: View {
     
     private func parseUnit(_ unit: String) -> FoodUnit? {
         for foodUnit in FoodUnit.allCases {
-            for unitName in foodUnit.getNames() {
+            for unitName in getUnitNames(foodUnit) {
                 if unit.caseInsensitiveCompare(unitName) == .orderedSame {
                     return foodUnit
                 }
@@ -212,10 +212,43 @@ struct RecipeEditor: View {
         return nil
     }
     
+    private func getUnitNames(_ unit: FoodUnit) -> [String] {
+        switch unit {
+        case .Calorie:
+            return ["cal", "calorie", "calories"]
+        case .Ounce:
+            return ["oz", "ounce", "ounces"]
+        case .Pound:
+            return ["lb", "lbs", "pound", "pounds"]
+        case .Milligram:
+            return ["mg", "milligram", "milligrams"]
+        case .Gram:
+            return ["g", "gram", "grams"]
+        case .Kilogram:
+            return ["kg", "kilogram", "kilograms"]
+        case .Teaspoon:
+            return ["tsp", "teaspoon", "teaspoons"]
+        case .Tablespoon:
+            return ["tbsp", "tablespoon", "tablespoons"]
+        case .FluidOunce:
+            return ["fl oz", "fluid ounce", "fluid ounces"]
+        case .Cup:
+            return ["c", "cup", "cups"]
+        case .Pint:
+            return ["pint", "pints"]
+        case .Quart:
+            return ["qt", "quart", "quarts"]
+        case .Gallon:
+            return ["gal", "gallon", "gallons"]
+        case .Milliliter:
+            return ["mL", "milliliter", "milliliters"]
+        case .Liter:
+            return ["L", "liter", "liters"]
+        }
+    }
+    
     private func parseNextSection() {
-        sections.append(RecipeSection(header: nextSectionHeader.isEmpty ? nil : nextSectionHeader, steps: nextSectionDetails.split(separator: "\n").map({ str in
-            str.string
-        })))
+        sections.append(RecipeSection(header: nextSectionHeader, details: nextSectionDetails))
         nextSectionHeader = ""
         nextSectionDetails = ""
     }
@@ -234,7 +267,7 @@ struct RecipeEditor: View {
     
     private func save() {
         if !nextSectionDetails.isEmpty {
-            sections.append(RecipeSection(header: nextSectionHeader, steps: nextSectionDetails.split(separator: "\n").map({ s in s.string })))
+            sections.append(RecipeSection(header: nextSectionHeader, details: nextSectionDetails))
             nextSectionHeader = ""
             nextSectionDetails = ""
         }
@@ -243,22 +276,25 @@ struct RecipeEditor: View {
             recipe.metaData.details = details
             recipe.metaData.prepTime = prepTime
             recipe.metaData.cookTime = cookTime
-            recipe.metaData.instructions.sections = sections
-            recipe.sizeInfo.servingSize = servingSize
-            recipe.sizeInfo.numServings = numServings
-            recipe.sizeInfo.cookedWeight = cookedWeight > 0 ? cookedWeight : nil
+            recipe.instructions = sections
+            recipe.size.servingSize = servingSize
+            recipe.size.numServings = numServings
+            recipe.size.cookedAmount = cookedWeight > 0 ? FoodAmount.grams(cookedWeight) : nil
         } else {
             let recipe = Recipe(name: name,
-                                sizeInfo: RecipeSizeInfo(servingSize: servingSize, numServings: numServings, cookedWeight: cookedWeight > 0 ? cookedWeight : nil),
                                 metaData: RecipeMetaData(
                                     details: details,
-                                    instructions: RecipeInstructions(sections: sections),
                                     prepTime: prepTime,
                                     cookTime: cookTime,
-                                    tags: []))
+                                    // TODO
+                                    otherTime: 0,
+                                    tags: []),
+                                instructions: sections,
+                                size: RecipeSize(totalAmount: FoodAmount.grams(0), cookedAmount: cookedWeight > 0 ? FoodAmount.grams(cookedWeight) : nil, numServings: numServings, servingSize: servingSize),
+                                nutrients: [:])
             modelContext.insert(recipe)
             for ingredient in ingredients {
-                let entry = RecipeFoodEntry(name: ingredient.name, food: ingredient.food, recipe: recipe, amount: ingredient.amount, unit: ingredient.unit)
+                let entry = RecipeIngredient(name: ingredient.name, food: ingredient.food, recipe: recipe, amount: FoodAmount(value: ingredient.amount, unit: ingredient.unit))
                 modelContext.insert(entry)
             }
         }
@@ -285,40 +321,8 @@ private struct Ingredient: Equatable, Hashable {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Recipe.self, configurations: config)
-    let recipe = Recipe(name: "Buttermilk Waffles",
-                        sizeInfo: RecipeSizeInfo(
-                            servingSize: "1 waffle",
-                            numServings: 6,
-                            cookedWeight: 255),
-                        metaData: RecipeMetaData(
-                            details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
-                            instructions: RecipeInstructions(sections: [
-                                RecipeSection(header: "Prep", steps: [
-                                    "1. Put the mix with the water",
-                                    "2. Mix until barely combined"
-                                ]), RecipeSection(header: "Cook", steps: [
-                                    "1. Put mix into the iron",
-                                    "2. Wait until iron signals completion",
-                                    "3. Remove and allow to cool"
-                                ])
-                            ]),
-                            prepTime: 8,
-                            cookTime: 17,
-                            tags: ["Breakfast", "Bread"]),
-                        composition: FoodComposition(nutrients: [
-                            .Energy: 200,
-                            .TotalFat: 4.1,
-                            .SaturatedFat: 2,
-                            .TotalCarbs: 20,
-                            .DietaryFiber: 1,
-                            .TotalSugars: 3,
-                            .Protein: 13.5
-                        ]))
-    container.mainContext.insert(recipe)
-    container.mainContext.insert(RecipeFoodEntry(name: "Water", recipe: recipe, amount: 1.0, unit: .Liter))
-    container.mainContext.insert(RecipeFoodEntry(name: "Salt", recipe: recipe, amount: 600, unit: .Milligram))
+    let container = createTestModelContainer()
+    let recipe = createTestRecipeItem(container.mainContext)
     return NavigationStack {
         RecipeEditor(recipe: recipe)
             .modelContainer(container)

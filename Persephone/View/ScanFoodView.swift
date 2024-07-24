@@ -112,31 +112,29 @@ struct ScanFoodView: View {
         if (food.servingSize != nil && food.servingSizeUnit == "g") {
             ratio = food.servingSize! / 100.0
         }
-        var nutrientMap: [Nutrient : Double] = [:]
+        var nutrientMap: [Nutrient : FoodAmount] = [:]
         food.foodNutrients?.forEach({ nutrient in
             let adjValue = nutrient.value * ratio
             // Round to nearest half
             if let nutrient = getNutrient(nutrient.nutrientName) {
-                nutrientMap[nutrient] = round(adjValue * 2.0) / 2.0
+                nutrientMap[nutrient] = FoodAmount(value: round(adjValue * 2.0) / 2.0, unit: nutrient.getCommonUnit())
             }
         })
         let metaData = FoodMetaData(
             barcode: food.gtinUpc,
             brand: food.brandName?.capitalized)
-        let sizeInfo = FoodSizeInfo(
+        let size = FoodSize(
+            totalAmount: FoodAmount.grams(totalAmount ?? 0),
             numServings: numServings ?? 0,
-            servingSize: food.householdServingFullText?.capitalized ?? "",
-            totalAmount: totalAmount ?? 0,
-            servingAmount: food.servingSize ?? 0,
-            sizeType: .Mass)
-        let composition = FoodComposition(
+            servingSize: food.householdServingFullText?.capitalized ?? "")
+        let ingredients = FoodIngredients(
             nutrients: nutrientMap,
-            ingredients: food.ingredients?.capitalized)
+            all: food.ingredients?.capitalized ?? "")
         return FoodItem(
             name: food.description?.capitalized ?? "",
             metaData: metaData,
-            composition: composition,
-            sizeInfo: sizeInfo)
+            ingredients: ingredients,
+            size: size)
     }
     
     private func getNutrient(_ name: String) -> Nutrient? {

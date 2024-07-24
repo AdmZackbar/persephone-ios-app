@@ -159,12 +159,6 @@ struct FoodItemEditor: View {
             return totalAmount / numServings
         }
     }
-    @State private var sizeType: SizeType = .Mass
-    
-    // Store Info
-    @State private var storeExpanded: Bool = true
-    @State private var store: String = ""
-    @State private var price: Int = 0
     
     // Composition Info
     @State private var carbsExpanded: Bool = false
@@ -235,40 +229,7 @@ struct FoodItemEditor: View {
                     }
                 }
             }
-            Section("Store") {
-                Toggle("Store-Bought", isOn: $storeExpanded)
-                if (storeExpanded) {
-                    HStack {
-                        TextField("Store Name", text: $store)
-                            .textInputAutocapitalization(.words)
-                            .focused($focusedField, equals: .Store)
-                        Menu {
-                            ForEach(defaultStores, id: \.self) { s in
-                                Button(s) {
-                                    store = s
-                                }
-                            }
-                        } label: {
-                            Label("Set Store", systemImage: "list.bullet").labelStyle(.iconOnly)
-                        }
-                    }
-                    CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
-                        .focused($focusedField, equals: .Price)
-                }
-            }
             Section("Size") {
-                Picker(selection: $sizeType) {
-                    Text("Weight (g)").tag(SizeType.Mass)
-                    Text("Volume (mL)").tag(SizeType.Volume)
-                } label: {
-                    HStack {
-                        Text("Net \(sizeType == .Mass ? "Weight" : "Volume"):")
-                        TextField("required", value: $totalAmount, formatter: gramFormatter)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .focused($focusedField, equals: .TotalAmount)
-                    }
-                }
                 HStack {
                     Text("Num. Servings:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
                     TextField("required", value: $numServings, formatter: gramFormatter)
@@ -285,7 +246,7 @@ struct FoodItemEditor: View {
                         .multilineTextAlignment(.trailing)
                         .focused($focusedField, equals: .ServingSize)
                     if (servingAmount != nil) {
-                        Text("(\(intFormatter.string(for: servingAmount)!)\(sizeType == .Mass ? "g" : "mL"))").font(.subheadline).fontWeight(.thin)
+                        Text("(\(intFormatter.string(for: servingAmount)!)g)").font(.subheadline).fontWeight(.thin)
                     }
                 }
             }
@@ -357,15 +318,10 @@ struct FoodItemEditor: View {
                 // Metadata
                 barcode = item.metaData.barcode
                 brand = item.metaData.brand ?? ""
-                // Store Info
-                storeExpanded = item.storeInfo != nil
-                store = item.storeInfo?.name ?? ""
-                price = item.storeInfo?.price ?? 0
                 // Size Info
-                numServings = item.sizeInfo.numServings
-                servingSize = item.sizeInfo.servingSize
-                totalAmount = item.sizeInfo.totalAmount
-                sizeType = item.sizeInfo.sizeType
+                numServings = item.size.numServings
+                servingSize = item.size.servingSize
+                totalAmount = item.size.totalAmount.value
                 // Composition
                 calories = getNutrient(.Energy)
                 totalCarbs = getNutrient(.TotalCarbs)
@@ -384,8 +340,8 @@ struct FoodItemEditor: View {
                 potassium = getNutrient(.Potassium)
                 calcium = getNutrient(.Calcium)
                 iron = getNutrient(.Iron)
-                ingredients = item.composition.ingredients ?? ""
-                allergens = item.composition.allergens ?? ""
+                ingredients = item.ingredients.all
+                allergens = item.ingredients.allergens
             }
         }
         .navigationTitle(mode.getTitle())
@@ -414,7 +370,7 @@ struct FoodItemEditor: View {
                             dismiss()
                         }
                     }
-                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isStoreInfoInvalid() || isCompInvalid())
+                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isCompInvalid())
                 }
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Discard", role: .destructive) {
@@ -429,7 +385,7 @@ struct FoodItemEditor: View {
                             dismiss()
                         }
                     }
-                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isStoreInfoInvalid() || isCompInvalid())
+                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isCompInvalid())
                 }
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -442,7 +398,7 @@ struct FoodItemEditor: View {
     }
     
     private func getNutrient(_ nutrient: Nutrient) -> Double {
-        return item!.composition.nutrients[nutrient] ?? 0.0
+        return item!.getNutrient(nutrient)?.value ?? 0.0
     }
     
     private func isMainInfoInvalid() -> Bool {
@@ -451,10 +407,6 @@ struct FoodItemEditor: View {
     
     private func isSizeInfoInvalid() -> Bool {
         return servingSize.isEmpty || numServings <= 0 || totalAmount <= 0
-    }
-    
-    private func isStoreInfoInvalid() -> Bool {
-        return storeExpanded && (store.isEmpty || price < 0)
     }
     
     private func isCompInvalid() -> Bool {
@@ -508,7 +460,7 @@ struct FoodItemEditor: View {
                 .keyboardType(.decimalPad)
                 .focused($focusedField, equals: getFocusField(nutrient)!)
             if (nutrient != .Energy && value.wrappedValue > 0) {
-                Text(nutrient.getUnit())
+                Text(nutrient.getCommonUnit().getAbbreviation())
             }
         }
     }
@@ -520,7 +472,7 @@ struct FoodItemEditor: View {
                 .multilineTextAlignment(.trailing)
                 .keyboardType(.decimalPad)
             if (value.wrappedValue > 0) {
-                Text(nutrient.getUnit())
+                Text(nutrient.getCommonUnit().getAbbreviation())
             }
         }
     }
@@ -561,53 +513,48 @@ struct FoodItemEditor: View {
     }
     
     private func save() {
-        let storeInfo = storeExpanded ? StoreInfo(name: store, price: price) : nil
-        let sizeInfo = FoodSizeInfo(
+        let size = FoodSize(
+            totalAmount: FoodAmount.grams(totalAmount),
             numServings: numServings,
-            servingSize: servingSize,
-            totalAmount: totalAmount,
-            servingAmount: round(totalAmount / numServings),
-            sizeType: sizeType)
-        var composition = FoodComposition(
+            servingSize: servingSize)
+        var ingredients = FoodIngredients(
             nutrients: [
-                .Energy: calories,
-                .TotalCarbs: totalCarbs,
-                .DietaryFiber: dietaryFiber,
-                .TotalSugars: totalSugars,
-                .AddedSugars: addedSugars,
-                .TotalFat: totalFat,
-                .SaturatedFat: satFat,
-                .TransFat: transFat,
-                .PolyunsaturatedFat: polyFat,
-                .MonounsaturatedFat: monoFat,
-                .Protein: protein,
-                .Sodium: sodium,
-                .Cholesterol: cholesterol,
-                .VitaminD: vitaminD,
-                .Potassium: potassium,
-                .Calcium: calcium,
-                .Iron: iron
+                .Energy: FoodAmount.calories(calories),
+                .TotalCarbs: FoodAmount.grams(totalCarbs),
+                .DietaryFiber: FoodAmount.grams(dietaryFiber),
+                .TotalSugars: FoodAmount.grams(totalSugars),
+                .AddedSugars: FoodAmount.grams(addedSugars),
+                .TotalFat: FoodAmount.grams(totalFat),
+                .SaturatedFat: FoodAmount.grams(satFat),
+                .TransFat: FoodAmount.grams(transFat),
+                .PolyunsaturatedFat: FoodAmount.grams(polyFat),
+                .MonounsaturatedFat: FoodAmount.grams(monoFat),
+                .Protein: FoodAmount.grams(protein),
+                .Sodium: FoodAmount.milligrams(sodium),
+                .Cholesterol: FoodAmount.milligrams(cholesterol),
+                .VitaminD: FoodAmount.milligrams(vitaminD),
+                .Potassium: FoodAmount.milligrams(potassium),
+                .Calcium: FoodAmount.milligrams(calcium),
+                .Iron: FoodAmount.milligrams(iron)
             ],
-            ingredients: ingredients,
+            all: ingredients,
             allergens: allergens)
-        composition.nutrients.keys.forEach { key in
-            if composition.nutrients[key]! <= 0 {
-                composition.nutrients.removeValue(forKey: key)
+        ingredients.nutrients.keys.forEach { key in
+            if ingredients.nutrients[key]!.value <= 0 {
+                ingredients.nutrients.removeValue(forKey: key)
             }
         }
         if let item {
             item.name = name
             item.metaData.brand = brand
-            item.storeInfo = storeInfo
-            item.sizeInfo = sizeInfo
-            item.composition = composition
+            item.size = size
+            item.ingredients = ingredients
         } else {
             let metaData = FoodMetaData(barcode: barcode, brand: brand)
             let newItem = FoodItem(name: name,
                                    metaData: metaData,
-                                   composition: composition,
-                                   sizeInfo: sizeInfo,
-                                   storeInfo: storeInfo)
+                                   ingredients: ingredients,
+                                   size: size)
             modelContext.insert(newItem)
         }
     }
@@ -619,32 +566,8 @@ struct FoodItemEditor: View {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: FoodItem.self, configurations: config)
-    let item = FoodItem(name: "Lightly Breaded Chicken Chunks",
-                        metaData: FoodMetaData(
-                            barcode: "102032120",
-                            brand: "Kirkland"),
-                        composition: FoodComposition(
-                            nutrients: [
-                                .Energy: 120,
-                                .TotalCarbs: 4,
-                                .TotalSugars: 1.5,
-                                .TotalFat: 3,
-                                .SaturatedFat: 1.25,
-                                .Protein: 13,
-                                .Sodium: 530,
-                                .Cholesterol: 25,
-                            ],
-                            ingredients: "Salt, Chicken, Other stuff",
-                        allergens: "Meat"),
-                        sizeInfo: FoodSizeInfo(
-                            numServings: 16,
-                            servingSize: "4 oz",
-                            totalAmount: 1814,
-                            servingAmount: 63,
-                            sizeType: .Mass),
-                        storeInfo: StoreInfo(name: "Costco", price: 1399))
+    let container = createTestModelContainer()
+    let item = createTestFoodItem(container.mainContext)
     return NavigationStack {
         FoodItemEditor(item: item)
     }.modelContainer(container)

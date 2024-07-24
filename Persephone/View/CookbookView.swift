@@ -128,10 +128,10 @@ struct CookbookView: View {
     }
     
     private func duplicateRecipe(_ recipe: Recipe) {
-        let duplicateRecipe = Recipe(name: duplicateName, sizeInfo: recipe.sizeInfo, metaData: recipe.metaData, composition: recipe.composition)
+        let duplicateRecipe = Recipe(name: recipe.name, metaData: recipe.metaData, instructions: recipe.instructions, size: recipe.size, nutrients: recipe.nutrients)
         modelContext.insert(duplicateRecipe)
-        for entry in recipe.foodEntries {
-            let duplicateEntry = RecipeFoodEntry(name: entry.name, food: entry.food, recipe: duplicateRecipe, amount: entry.amount, unit: entry.unit)
+        for ingredient in recipe.ingredients {
+            let duplicateEntry = RecipeIngredient(name: ingredient.name, food: ingredient.food, recipe: duplicateRecipe, amount: ingredient.amount)
             modelContext.insert(duplicateEntry)
         }
     }
@@ -161,7 +161,7 @@ private struct PreviewRecipe: View {
             HStack(spacing: 12) {
                 HStack {
                     Image(systemName: "person.2.fill")
-                    createStackedText(upper: "\(servingFormatter.string(for: recipe.sizeInfo.numServings)!) servings", lower: recipe.sizeInfo.servingSize.uppercased())
+                    createStackedText(upper: "\(servingFormatter.string(for: recipe.size.numServings)!) servings", lower: recipe.size.servingSize.uppercased())
                 }
                 if !recipe.metaData.tags.isEmpty {
                     Divider()
@@ -181,10 +181,8 @@ private struct PreviewRecipe: View {
                 createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime)!) min", lower: "COOK")
                 Spacer()
             }.fixedSize(horizontal: false, vertical: true)
-            if (recipe.composition != nil) {
-                Divider()
-                NutrientView(recipe: recipe, nutrients: recipe.composition!.nutrients)
-            }
+            Divider()
+            NutrientView(recipe: recipe, nutrients: recipe.nutrients)
             Spacer()
         }.padding()
     }
@@ -203,7 +201,7 @@ private struct PreviewRecipe: View {
 
 private struct NutrientView: View {
     let recipe: Recipe
-    let nutrients: [Nutrient : Double]
+    let nutrients: [Nutrient : FoodAmount]
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -243,11 +241,7 @@ private struct NutrientView: View {
         HStack {
             Text(name)
             Spacer()
-            if nutrient == .Energy {
-                Text(formatter.string(for: nutrients[.Energy] ?? 0)!)
-            } else {
-                Text("\(formatter.string(for: nutrients[nutrient] ?? 0)!) \(nutrient.getUnit())")
-            }
+            Text("\(formatter.string(for: nutrients[nutrient]?.value ?? 0)!) \(nutrient.getCommonUnit().getAbbreviation())")
         }
     }
 }
@@ -264,40 +258,8 @@ private struct CustomTagLabel: LabelStyle {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Recipe.self, configurations: config)
-    let recipe = Recipe(name: "Buttermilk Waffles",
-                        sizeInfo: RecipeSizeInfo(
-                            servingSize: "1 waffle",
-                            numServings: 6,
-                            cookedWeight: 255),
-                        metaData: RecipeMetaData(
-                            details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
-                            instructions: RecipeInstructions(sections: [
-                                RecipeSection(header: "Prep", steps: [
-                                    "1. Put the mix with the water",
-                                    "2. Mix until barely combined"
-                                ]), RecipeSection(header: "Cook", steps: [
-                                    "1. Put mix into the iron",
-                                    "2. Wait until iron signals completion",
-                                    "3. Remove and allow to cool"
-                                ])
-                            ]),
-                            prepTime: 8,
-                            cookTime: 17,
-                            tags: ["Breakfast", "Bread"]),
-                        composition: FoodComposition(nutrients: [
-                            .Energy: 200,
-                            .TotalFat: 4.1,
-                            .SaturatedFat: 2,
-                            .TotalCarbs: 20,
-                            .DietaryFiber: 1,
-                            .TotalSugars: 3,
-                            .Protein: 13.5
-                        ]))
-    container.mainContext.insert(recipe)
-    container.mainContext.insert(RecipeFoodEntry(name: "Water", recipe: recipe, amount: 1.0, unit: .Liter))
-    container.mainContext.insert(RecipeFoodEntry(name: "Salt", recipe: recipe, amount: 600, unit: .Milligram))
+    let container = createTestModelContainer()
+    createTestRecipeItem(container.mainContext)
     return CookbookView()
         .modelContainer(container)
 }

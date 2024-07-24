@@ -84,17 +84,17 @@ struct DbView: View {
         VStack(alignment: .leading) {
             Text(item.name)
             HStack {
-                Text(item.metaData.brand ?? item.storeInfo?.name ?? "Custom")
+                Text(item.metaData.brand ?? "Custom")
                     .font(.subheadline)
                     .fontWeight(.light)
                     .italic()
-                if (item.storeInfo != nil) {
-                    Spacer()
-                    Text("\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!) @ \(item.storeInfo!.name)")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                        .italic()
-                }
+//                if (!item.storeItems.isEmpty) {
+//                    Spacer()
+//                    Text("\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!) @ \(item.storeInfo!.name)")
+//                        .font(.subheadline)
+//                        .fontWeight(.light)
+//                        .italic()
+//                }
             }
         }
     }
@@ -145,41 +145,41 @@ private struct NutritionView: View {
                 .font(.title2)
                 .fontWeight(.semibold)
                 .fixedSize(horizontal: false, vertical: true)
-            if (item.metaData.brand != nil || item.storeInfo != nil) {
+            if (item.metaData.brand != nil) {
                 HStack {
                     Text(item.metaData.brand ?? "").font(.subheadline).italic()
-                    Spacer()
-                    Text(item.storeInfo?.name ?? "").font(.subheadline).italic()
+//                    Spacer()
+//                    Text(item.storeInfo?.name ?? "").font(.subheadline).italic()
                 }
             }
             Divider()
             HStack {
                 VStack(alignment: .leading) {
-                    Text(item.storeInfo != nil ?
-                         "\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!)" : "No Price")
-                        .font(.title2).bold()
-                    Text(item.sizeInfo.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
+//                    Text(item.storeInfo != nil ?
+//                         "\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!)" : "No Price")
+//                        .font(.title2).bold()
+//                    Text(item.size.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
+//                        .font(.subheadline)
+//                        .fontWeight(.light)
+                    Text("\(format(item.size.numServings)) Servings")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Text("\(format(item.sizeInfo.numServings)) Servings")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Text("Serving: \(item.sizeInfo.servingSize) (\(format(item.sizeInfo.servingAmount))g)")
+                    Text("Serving: \(item.size.servingSize) (\(format(item.size.servingAmount.value))g)")
                         .font(.subheadline)
                         .fontWeight(.light)
                     Spacer()
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
-                    Text("\(format(item.composition.nutrients[.Energy])) Calories")
+                    Text("\(format(item.getNutrient(.Energy)?.value ?? 0)) Calories")
                         .font(.title2).bold()
-                    Text("\(format(item.composition.nutrients[.TotalFat]))g Fat")
+                    Text("\(format(item.getNutrient(.TotalFat)?.value ?? 0))g Fat")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Text("\(format(item.composition.nutrients[.TotalCarbs]))g Carbs")
+                    Text("\(format(item.getNutrient(.TotalCarbs)?.value ?? 0))g Carbs")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Text("\(format(item.composition.nutrients[.Protein]))g Protein")
+                    Text("\(format(item.getNutrient(.Protein)?.value ?? 0))g Protein")
                         .font(.subheadline)
                         .fontWeight(.light)
                     Spacer()
@@ -209,32 +209,8 @@ private struct NutritionView: View {
 }
 
 #Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: FoodItem.self, configurations: config)
-    let item = FoodItem(name: "Lightly Breaded Chicken Chunks",
-                        metaData: FoodMetaData(
-                            brand: "Kirkland"),
-                        composition: FoodComposition(
-                            nutrients: [
-                                .Energy: 120,
-                                .TotalCarbs: 4,
-                                .TotalSugars: 1.5,
-                                .TotalFat: 3,
-                                .SaturatedFat: 1.25,
-                                .Protein: 13,
-                                .Sodium: 530,
-                                .Cholesterol: 25,
-                            ],
-                            ingredients: "Salt, Chicken, Other stuff",
-                        allergens: "Meat"),
-                        sizeInfo: FoodSizeInfo(
-                            numServings: 16,
-                            servingSize: "4 oz",
-                            totalAmount: 1814,
-                            servingAmount: 63,
-                            sizeType: .Mass),
-                        storeInfo: StoreInfo(name: "Costco", price: 1399))
-    container.mainContext.insert(item)
+    let container = createTestModelContainer()
+    createTestFoodItem(container.mainContext)
     return DbView()
         .modelContainer(container)
 }

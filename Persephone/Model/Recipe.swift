@@ -9,177 +9,110 @@ import Foundation
 import SwiftData
 
 typealias Recipe = SchemaV1.Recipe
-typealias RecipeFoodEntry = SchemaV1.RecipeFoodEntry
-typealias FoodUnit = SchemaV1.FoodUnit
-typealias RecipeSizeInfo = SchemaV1.RecipeSizeInfo
 typealias RecipeMetaData = SchemaV1.RecipeMetaData
-typealias RecipeInstructions = SchemaV1.RecipeInstructions
 typealias RecipeSection = SchemaV1.RecipeSection
+typealias RecipeSize = SchemaV1.RecipeSize
+typealias RecipeIngredient = SchemaV1.RecipeIngredient
 
 extension SchemaV1 {
     @Model
     final class Recipe {
+        // The name of the recipe
         var name: String
-        @Relationship(deleteRule: .cascade, inverse: \RecipeFoodEntry.recipe)
-        var foodEntries: [RecipeFoodEntry] = []
-        var sizeInfo: RecipeSizeInfo
+        // Metadata of the recipe
         var metaData: RecipeMetaData
-        var composition: FoodComposition?
+        // Instructions (header -> details list)
+        var instructions: [RecipeSection]
+        // Size info of the recipe
+        var size: RecipeSize
+        // Nutrient information (nutrient -> amount per serving)
+        var nutrients: [Nutrient : FoodAmount]
         
-        init(name: String, sizeInfo: RecipeSizeInfo, metaData: RecipeMetaData, composition: FoodComposition? = nil) {
+        @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.recipe)
+        var ingredients: [RecipeIngredient] = []
+        @Relationship(deleteRule: .cascade, inverse: \RecipeInstance.recipe)
+        var instances: [RecipeInstance] = []
+        
+        init(name: String, metaData: RecipeMetaData, instructions: [RecipeSection], size: RecipeSize, nutrients: [Nutrient : FoodAmount]) {
             self.name = name
-            self.sizeInfo = sizeInfo
             self.metaData = metaData
-            self.composition = composition
+            self.instructions = instructions
+            self.size = size
+            self.nutrients = nutrients
         }
     }
     
     @Model
-    final class RecipeFoodEntry {
+    final class RecipeIngredient {
+        // The name of the food ingredient
         var name: String
+        // Optional link to the food item itself
         var food: FoodItem?
+        // The recipe of this ingredient
         var recipe: Recipe!
-        var amount: Double
-        var unit: FoodUnit
+        // The amount used
+        var amount: FoodAmount
+        // Optional notes on this ingredient
+        var notes: String?
         
-        init(name: String, food: FoodItem? = nil, recipe: Recipe, amount: Double, unit: FoodUnit) {
+        init(name: String, food: FoodItem? = nil, recipe: Recipe!, amount: FoodAmount, notes: String? = nil) {
             self.name = name
-            self.amount = amount
-            self.unit = unit
             self.food = food
             self.recipe = recipe
-        }
-    }
-    
-    enum FoodUnit: Codable, CaseIterable {
-        // Weight (US)
-        case Ounce, Pound
-        // Weight (SI)
-        case Milligram, Gram, Kilogram
-        // Volume (US)
-        case Teaspoon, Tablespoon, FluidOunce, Cup, Pint, Quart, Gallon
-        // Volume (SI)
-        case Milliliter, Liter
-        
-        func isSi() -> Bool {
-            return self == .Milligram || self == .Gram || self == .Kilogram || self == .Milliliter || self == .Liter
-        }
-        
-        func getAbbreviation() -> String {
-            switch self {
-            case .Ounce:
-                return "oz"
-            case .Pound:
-                return "lb"
-            case .Milligram:
-                return "mg"
-            case .Gram:
-                return "g"
-            case .Kilogram:
-                return "kg"
-            case .Teaspoon:
-                return "tsp"
-            case .Tablespoon:
-                return "tbsp"
-            case .FluidOunce:
-                return "fl oz"
-            case .Cup:
-                return "c"
-            case .Pint:
-                return "pint"
-            case .Quart:
-                return "qt"
-            case .Gallon:
-                return "gal"
-            case .Milliliter:
-                return "mL"
-            case .Liter:
-                return "L"
-            }
-        }
-        
-        func getNames() -> [String] {
-            switch self {
-            case .Ounce:
-                return ["oz", "ounce", "ounces"]
-            case .Pound:
-                return ["lb", "lbs", "pound", "pounds"]
-            case .Milligram:
-                return ["mg", "milligram", "milligrams"]
-            case .Gram:
-                return ["g", "gram", "grams"]
-            case .Kilogram:
-                return ["kg", "kilogram", "kilograms"]
-            case .Teaspoon:
-                return ["tsp", "teaspoon", "teaspoons"]
-            case .Tablespoon:
-                return ["tbsp", "tablespoon", "tablespoons"]
-            case .FluidOunce:
-                return ["fl oz", "fluid ounce", "fluid ounces"]
-            case .Cup:
-                return ["c", "cup", "cups"]
-            case .Pint:
-                return ["pint", "pints"]
-            case .Quart:
-                return ["qt", "quart", "quarts"]
-            case .Gallon:
-                return ["gal", "gallon", "gallons"]
-            case .Milliliter:
-                return ["mL", "milliliter", "milliliters"]
-            case .Liter:
-                return ["L", "liter", "liters"]
-            }
-        }
-    }
-    
-    struct RecipeSizeInfo: Codable {
-        var servingSize: String
-        var numServings: Double
-        var cookedWeight: Double?
-        
-        init(servingSize: String, numServings: Double, cookedWeight: Double? = nil) {
-            self.servingSize = servingSize
-            self.numServings = numServings
-            self.cookedWeight = cookedWeight
+            self.amount = amount
+            self.notes = notes
         }
     }
     
     struct RecipeMetaData: Codable {
+        // The description of the recipe
         var details: String
-        var instructions: RecipeInstructions
+        // The amount of time to prep this recipe (min)
         var prepTime: Double
+        // The amount of time to cook this recipe (min)
         var cookTime: Double
+        // Any additional time used in this recipe (min)
+        var otherTime: Double
+        // The total time used for this entire recipe (min)
         var totalTime: Double {
             get {
-                prepTime + cookTime
+                prepTime + cookTime + otherTime
+            }
+            set(value) {
+                otherTime = value - prepTime - cookTime
             }
         }
+        // Any tags used to describe this recipe
         var tags: [String]
-        
-        init(details: String, instructions: RecipeInstructions, prepTime: Double, cookTime: Double, tags: [String]) {
-            self.details = details
-            self.instructions = instructions
-            self.prepTime = prepTime
-            self.cookTime = cookTime
-            self.tags = tags
-        }
-    }
-    
-    struct RecipeInstructions: Codable {
-        var sections: [RecipeSection]
-        
-        init(sections: [RecipeSection]) {
-            self.sections = sections
-        }
     }
     
     struct RecipeSection: Codable, Equatable, Hashable {
-        var header: String?
-        var steps: [String]
-        
-        init(header: String? = nil, steps: [String] = []) {
-            self.header = header
-            self.steps = steps
+        // The header of the instruction section
+        var header: String
+        // The details of the instruction section
+        var details: String
+    }
+    
+    struct RecipeSize: Codable {
+        // The empirical net weight/volume (e.g. net wt 10 lb)
+        var totalAmount: FoodAmount
+        // The empirical net weight/volume of the cooked product
+        var cookedAmount: FoodAmount?
+        // The total number of servings that the item contains
+        var numServings: Double
+        // The friendly serving size amount (e.g. 1 waffle, 2 portions, etc.)
+        var servingSize: String
+        // The empirical serving size (e.g. 54 g)
+        var servingAmount: FoodAmount {
+            get {
+                let amount = cookedAmount ?? totalAmount
+                return FoodAmount(value: amount.value / numServings, unit: amount.unit)
+            }
+            set(value) {
+                let amount = cookedAmount ?? totalAmount
+                // Update number of servings instead of total amount
+                numServings = amount.value / value.value
+            }
         }
     }
 }

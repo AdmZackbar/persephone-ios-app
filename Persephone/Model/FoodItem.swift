@@ -9,31 +9,38 @@ import Foundation
 import SwiftData
 
 typealias FoodItem = SchemaV1.FoodItem
-typealias FoodComposition = SchemaV1.FoodComposition
 typealias FoodMetaData = SchemaV1.FoodMetaData
-typealias FoodSizeInfo = SchemaV1.FoodSizeInfo
-typealias StoreInfo = SchemaV1.StoreInfo
-typealias SizeType = SchemaV1.SizeType
-typealias Nutrient = SchemaV1.Nutrient
+typealias FoodSize = SchemaV1.FoodSize
 
 extension SchemaV1 {
     @Model
     final class FoodItem {
+        // The name of the item
         var name: String
+        // Metadata about the item
         var metaData: FoodMetaData
-        var composition: FoodComposition
-        var sizeInfo: FoodSizeInfo
-        var storeInfo: StoreInfo?
+        // Info about the ingredients and nutrition of the item
+        var ingredients: FoodIngredients
+        // Info about the size of the item
+        var size: FoodSize
         
-        @Relationship(deleteRule: .nullify, inverse: \RecipeFoodEntry.food)
-        var recipeEntries: [RecipeFoodEntry] = []
+        @Relationship(deleteRule: .nullify, inverse: \RecipeIngredient.food)
+        var recipeEntries: [RecipeIngredient] = []
+        @Relationship(deleteRule: .cascade, inverse: \StoreItem.foodItem)
+        var storeItems: [StoreItem] = []
         
-        init(name: String, metaData: FoodMetaData, composition: FoodComposition, sizeInfo: FoodSizeInfo, storeInfo: StoreInfo? = nil) {
+        init(name: String, metaData: FoodMetaData, ingredients: FoodIngredients, size: FoodSize) {
             self.name = name
             self.metaData = metaData
-            self.composition = composition
-            self.sizeInfo = sizeInfo
-            self.storeInfo = storeInfo
+            self.ingredients = ingredients
+            self.size = size
+        }
+        
+        func getNutrient(_ nutrient: Nutrient, numServings: Double = 1.0) -> FoodAmount? {
+            if let value = ingredients.nutrients[nutrient] {
+                return FoodAmount(value: value.value * numServings, unit: value.unit)
+            }
+            return nil
         }
     }
     
@@ -46,118 +53,43 @@ extension SchemaV1 {
         var brand: String?
         // The icon representing this item
         var icon: String?
+        // An image of the item
+        @Attribute(.externalStorage) var imageData: Data?
         // Set of tags that describe this item
         var tags: [String]
         
-        init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, tags: [String] = []) {
+        init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, imageData: Data? = nil, tags: [String] = []) {
             self.timestamp = timestamp
             self.barcode = barcode
             self.brand = brand
             self.icon = icon
+            self.imageData = imageData
             self.tags = tags
         }
     }
 
-    struct FoodSizeInfo: Codable {
+    struct FoodSize: Codable {
+        // The empirical net weight/volume (e.g. net wt 10 lb)
+        var totalAmount: FoodAmount
         // The total number of servings that the item contains
         var numServings: Double
-        // Describes what the serving is
+        // The friendly serving size amount (e.g. 1 waffle, 2 portions, etc.)
         var servingSize: String
-        // The total 'size' of the item (described by sizeType)
-        //  - Mass: in grams (g)
-        //  - Volume: in milliliters (mL)
-        var totalAmount: Double
-        // The 'size' of the serving (described by sizeType)
-        var servingAmount: Double
-        // The type of item this is (by weight or volume)
-        var sizeType: SizeType
+        // The empirical serving size (e.g. 54 g)
+        var servingAmount: FoodAmount {
+            get {
+                FoodAmount(value: totalAmount.value / numServings, unit: totalAmount.unit)
+            }
+            set(value) {
+                // Update number of servings instead of total amount
+                numServings = totalAmount.value / value.value
+            }
+        }
         
-        init(numServings: Double, servingSize: String, totalAmount: Double, servingAmount: Double, sizeType: SizeType) {
+        init(totalAmount: FoodAmount, numServings: Double, servingSize: String) {
+            self.totalAmount = totalAmount
             self.numServings = numServings
             self.servingSize = servingSize
-            self.totalAmount = totalAmount
-            self.servingAmount = servingAmount
-            self.sizeType = sizeType
-        }
-    }
-    
-    enum SizeType: String, CaseIterable, Codable {
-        case Mass = "Mass"
-        case Volume = "Volume"
-    }
-
-    struct StoreInfo: Codable {
-        // The name of the store where the item was purchased from
-        var name: String
-        // The price of the item in its entirity (in US cents)
-        var price: Int
-        // If the item can still be purchased in this state
-        var active: Bool
-        
-        init(name: String, price: Int, active: Bool = true) {
-            self.name = name
-            self.price = price
-            self.active = active
-        }
-    }
-    
-    struct FoodComposition: Codable {
-        // Stores the amount of each nutrient per serving (in mg)
-        var nutrients: [Nutrient: Double]
-        // The full list of ingredients that make up the item
-        var ingredients: String?
-        // The full list of known allergens for the item
-        var allergens: String?
-        
-        init(nutrients: [Nutrient : Double], ingredients: String? = nil, allergens: String? = nil) {
-            self.nutrients = nutrients
-            self.ingredients = ingredients
-            self.allergens = allergens
-        }
-    }
-    
-    enum Nutrient: Codable, Hashable {
-        // Energy (Calories)
-        case Energy
-        // Carbs (g)
-        case TotalCarbs,
-             DietaryFiber,
-             TotalSugars,
-             AddedSugars
-        // Fats (g)
-        case TotalFat,
-             SaturatedFat,
-             TransFat,
-             PolyunsaturatedFat,
-             MonounsaturatedFat
-        // Other (g)
-        case Protein
-        // Other (mg)
-        case Sodium,
-             Cholesterol,
-             Calcium,
-             VitaminD,
-             Iron,
-             Potassium
-        
-        func getUnit() -> String {
-            switch self {
-            case .Energy:
-                return "Calories"
-            case .TotalCarbs,
-                    .DietaryFiber,
-                    .TotalSugars,
-                    .AddedSugars,
-                    .TotalFat,
-                    .SaturatedFat,
-                    .TransFat,
-                    .PolyunsaturatedFat,
-                    .MonounsaturatedFat,
-                    .Protein:
-                return "g"
-            default:
-                return "mg"
-            }
         }
     }
 }

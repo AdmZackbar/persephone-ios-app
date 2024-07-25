@@ -23,6 +23,35 @@ enum EditorMode {
     }
 }
 
+enum FoodSheetEnum: Identifiable, SheetEnum {
+    var id: String {
+        switch self {
+        case .Nutrients(_, let n):
+            return n.wrappedValue.description
+        case .StoreItem(_, let i):
+            return i?.store.name ?? "item editor"
+        case .Store(let s):
+            return s?.name ?? "store editor"
+        }
+    }
+    
+    case Nutrients(item: FoodItem?, nutrientAmounts: Binding<[Nutrient : FoodAmount]>)
+    case StoreItem(foodItem: FoodItem, item: StoreItem?)
+    case Store(store: Store?)
+    
+    @ViewBuilder
+    func view(coordinator: SheetCoordinator<FoodSheetEnum>) -> some View {
+        switch self {
+        case .Nutrients(let i, let n):
+            NutrientSheet(item: i, nutrientAmounts: n)
+        case .StoreItem(let f, let i):
+            StoreItemSheet(foodItem: f, item: i)
+        case .Store(let s):
+            StoreSheet(store: s)
+        }
+    }
+}
+
 struct FoodItemEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext
@@ -82,20 +111,9 @@ struct FoodItemEditor: View {
     let item: FoodItem?
     let mode: EditorMode
     
-    private let defaultBrands: [String] = [
-        "Kirkland Signature",
-        "Publix"
-    ]
-    private let defaultStores: [String] = [
-        "Costco",
-        "Publix",
-        "Target",
-        "Kroger",
-        "Trader Joe's",
-        "Amazon"
-    ]
-    
+    @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     @FocusState private var focusedField: FocusableField?
+    @Query(sort: \StoreItem.store?.name) private var storeItems: [StoreItem] = []
     
     // Main Info
     @State private var name: String = ""
@@ -119,7 +137,6 @@ struct FoodItemEditor: View {
     }
     
     // Nutrients
-    @State private var showNutrientEditor: Bool = false
     @State private var nutrientAmounts: [Nutrient : FoodAmount] = [:]
     // Other
     @State private var ingredients: String = ""
@@ -158,15 +175,6 @@ struct FoodItemEditor: View {
                     TextField("Brand", text: $brand)
                         .textInputAutocapitalization(.words)
                         .focused($focusedField, equals: .Brand)
-                    Menu {
-                        ForEach(defaultBrands, id: \.self) { b in
-                            Button(b) {
-                                brand = b
-                            }
-                        }
-                    } label: {
-                        Label("Set Brand", systemImage: "list.bullet").labelStyle(.iconOnly)
-                    }
                 }
             }
             Section("Size") {
@@ -204,9 +212,54 @@ struct FoodItemEditor: View {
                     }
                 }
             }
+            Section("Store Listings") {
+                List(storeItems, id: \.store.name) { storeItem in
+                    VStack {
+                        HStack {
+                            Text(storeItem.store.name).font(.title3).bold()
+                            Spacer()
+                            Text(currencyFormatter.string(for: Double(storeItem.price.cents) / 100.0)!).font(.headline).bold()
+                        }
+                        HStack {
+                            Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
+                            Spacer()
+                            Text("\(storeItem.quantity) units").font(.subheadline)
+                        }
+                    }.swipeActions(allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            modelContext.delete(storeItem)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        Button {
+                            sheetCoordinator.presentSheet(.StoreItem(foodItem: item!, item: storeItem))
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                    }.contextMenu {
+                        Button {
+                            sheetCoordinator.presentSheet(.StoreItem(foodItem: item!, item: storeItem))
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        Button(role: .destructive) {
+                            modelContext.delete(storeItem)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                }
+                if let item {
+                    Button {
+                        sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: nil))
+                    } label: {
+                        Label("Add Listing", systemImage: "plus")
+                    }
+                }
+            }
             Section("Nutrients") {
                 Button("Edit Nutrients") {
-                    showNutrientEditor = true
+                    sheetCoordinator.presentSheet(.Nutrients(item: item, nutrientAmounts: $nutrientAmounts))
                 }
             }
             Section("Ingredients") {
@@ -301,28 +354,7 @@ struct FoodItemEditor: View {
             }
         }
         .navigationBarBackButtonHidden()
-        .sheet(isPresented: $showNutrientEditor) {
-            NavigationStack {
-                NutrientEditor($nutrientAmounts).toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button(item == nil ? "Clear" : "Revert") {
-                            if let item = item {
-                                nutrientAmounts = item.ingredients.nutrients
-                            } else {
-                                nutrientAmounts = [:]
-                            }
-                            showNutrientEditor = false
-                        }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("Hide") {
-                            showNutrientEditor = false
-                        }
-                    }
-                }.navigationTitle("Nutrients")
-                    .navigationBarTitleDisplayMode(.inline)
-            }
-        }
+        .sheetCoordinating(coordinator: sheetCoordinator)
     }
     
     private func createAmountUnitOption(_ unit: FoodUnit) -> some View {
@@ -356,7 +388,7 @@ struct FoodItemEditor: View {
             totalAmount: FoodAmount(value: totalAmount, unit: amountUnit),
             numServings: numServings,
             servingSize: servingSize)
-        var ingredients = FoodIngredients(
+        let ingredients = FoodIngredients(
             nutrients: nutrientAmounts,
             all: ingredients,
             allergens: allergens)
@@ -381,7 +413,175 @@ struct FoodItemEditor: View {
     }
 }
 
-struct NutrientEditor: View {
+struct StoreSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) var modelContext
+    
+    let store: Store?
+    
+    @State private var name: String = ""
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                HStack {
+                    Text("Name:")
+                    TextField("required", text: $name).textInputAutocapitalization(.words)
+                }
+            }.navigationTitle(store == nil ? "Add Store" : "Edit Store")
+                .navigationBarBackButtonHidden()
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(store == nil ? "Cancel" : "Revert") {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Save") {
+                            if let store {
+                                store.name = name
+                            } else {
+                                let store = Store(name: name)
+                                modelContext.insert(store)
+                            }
+                            dismiss()
+                        }.disabled(name.isEmpty)
+                    }
+                }
+        }.presentationDetents([.medium])
+            .onAppear {
+                if let store {
+                    name = store.name
+                }
+            }
+    }
+    
+    init(store: Store? = nil) {
+        self.store = store
+    }
+}
+
+struct StoreItemSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    
+    @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
+    @Query(sort: \Store.name) private var stores: [Store]
+    
+    let foodItem: FoodItem
+    let item: StoreItem?
+    
+    @State private var store: Store? = nil
+    @State private var quantity: Int = 1
+    @State private var price: Int = 0
+    @State private var available: Bool = true
+    
+    let currencyFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
+    
+    let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }()
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                if !stores.isEmpty {
+                    HStack {
+                        Text("Store:")
+                        Menu(store?.name ?? "Select Store...") {
+                            ForEach(stores, id: \.name) { s in
+                                Button(s.name) {
+                                    store = s
+                                }
+                            }
+                            Divider()
+                            Button {
+                                sheetCoordinator.presentSheet(.Store(store: nil))
+                            } label: {
+                                Label("Add Store", systemImage: "plus")
+                            }
+                        }
+                    }
+                } else {
+                    Button("Add Store...") {
+                        sheetCoordinator.presentSheet(.Store(store: nil))
+                    }
+                }
+                HStack {
+                    Text("Total Price:")
+                    CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
+                }
+                Stepper {
+                    HStack {
+                        Text("Quantity:")
+                        TextField("", value: $quantity, formatter: formatter)
+                    }
+                } onIncrement: {
+                    quantity += 1
+                } onDecrement: {
+                    if quantity > 1 {
+                        quantity -= 1
+                    }
+                }
+                Toggle(isOn: $available) {
+                    Text("Available:")
+                }
+            }.navigationTitle(item == nil ? "Add Store Entry" : "Edit Store Entry")
+                .navigationBarBackButtonHidden()
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(item == nil ? "Cancel" : "Revert") {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Save") {
+                            if let item {
+                                item.store = store
+                                item.quantity = quantity
+                                item.price = Price(cents: price)
+                                item.available = available
+                            } else {
+                                let item = StoreItem(store: store, foodItem: foodItem, quantity: quantity, price: Price(cents: price), available: available)
+                                modelContext.insert(item)
+                            }
+                            dismiss()
+                        }.disabled(store == nil || quantity < 1 || price <= 0)
+                    }
+                }
+                .sheetCoordinating(coordinator: sheetCoordinator)
+        }.presentationDetents([.medium])
+            .onAppear {
+                if let item {
+                    store = item.store
+                    quantity = item.quantity
+                    price = item.price.cents
+                    available = item.available
+                }
+            }
+    }
+    
+    init(foodItem: FoodItem, item: StoreItem? = nil) {
+        self.foodItem = foodItem
+        self.item = item
+    }
+}
+
+struct NutrientSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    let item: FoodItem?
+    
     @Binding private var nutrientAmounts: [Nutrient : FoodAmount]
     
     let formatter: NumberFormatter = {
@@ -394,24 +594,45 @@ struct NutrientEditor: View {
     }()
     
     var body: some View {
-        List {
-            createNutrientEntry(.Energy).font(.title2).bold()
-            createNutrientEntry(.TotalFat).bold()
-            createNutrientEntry(.SaturatedFat).fontWeight(.thin)
-            createNutrientEntry(.TransFat).fontWeight(.thin)
-            createNutrientEntry(.PolyunsaturatedFat).fontWeight(.thin)
-            createNutrientEntry(.MonounsaturatedFat).fontWeight(.thin)
-            createNutrientEntry(.Cholesterol).bold()
-            createNutrientEntry(.Sodium).bold()
-            createNutrientEntry(.TotalCarbs).bold()
-            createNutrientEntry(.DietaryFiber).fontWeight(.thin)
-            createNutrientEntry(.TotalSugars).fontWeight(.thin)
-            createNutrientEntry(.AddedSugars).fontWeight(.thin)
-            createNutrientEntry(.Protein).bold()
-            createNutrientEntry(.VitaminD).italic().fontWeight(.thin)
-            createNutrientEntry(.Potassium).italic().fontWeight(.thin)
-            createNutrientEntry(.Calcium).italic().fontWeight(.thin)
-            createNutrientEntry(.Iron).italic().fontWeight(.thin)
+        NavigationStack {
+            List {
+                createNutrientEntry(.Energy).font(.title2).bold()
+                createNutrientEntry(.TotalFat).bold()
+                createNutrientEntry(.SaturatedFat).fontWeight(.thin)
+                createNutrientEntry(.TransFat).fontWeight(.thin)
+                createNutrientEntry(.PolyunsaturatedFat).fontWeight(.thin)
+                createNutrientEntry(.MonounsaturatedFat).fontWeight(.thin)
+                createNutrientEntry(.Cholesterol).bold()
+                createNutrientEntry(.Sodium).bold()
+                createNutrientEntry(.TotalCarbs).bold()
+                createNutrientEntry(.DietaryFiber).fontWeight(.thin)
+                createNutrientEntry(.TotalSugars).fontWeight(.thin)
+                createNutrientEntry(.AddedSugars).fontWeight(.thin)
+                createNutrientEntry(.Protein).bold()
+                createNutrientEntry(.VitaminD).italic().fontWeight(.thin)
+                createNutrientEntry(.Potassium).italic().fontWeight(.thin)
+                createNutrientEntry(.Calcium).italic().fontWeight(.thin)
+                createNutrientEntry(.Iron).italic().fontWeight(.thin)
+            }.navigationTitle("Nutrients")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(item != nil ? "Revert" : "Clear") {
+                            if let item = item {
+                                nutrientAmounts = item.ingredients.nutrients
+                            } else {
+                                nutrientAmounts = [:]
+                            }
+                            
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Hide") {
+                            dismiss()
+                        }
+                    }
+                }
         }
     }
     
@@ -429,16 +650,30 @@ struct NutrientEditor: View {
                 Text(nutrient.getCommonUnit().getAbbreviation())
             }
         }.swipeActions(allowsFullSwipe: false) {
-            Button("Clear") {
-                clearEntry(nutrient)
-            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0).tint(.red)
-            Button("Round") {
-                roundEntry(nutrient)
-            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0).tint(.blue)
+            if nutrientAmounts[nutrient]?.value ?? 0 > 0 {
+                Button("Clear") {
+                    clearEntry(nutrient)
+                }.tint(.red)
+            }
+            if item != nil && nutrientAmounts[nutrient] != item?.getNutrient(nutrient) {
+                Button("Revert") {
+                    revertEntry(nutrient)
+                }
+            }
+            if nutrientAmounts[nutrient]?.value ?? 0 > 0 {
+                Button("Round") {
+                    roundEntry(nutrient)
+                }.tint(.blue)
+            }
         }.contextMenu {
             Button("Clear") {
                 clearEntry(nutrient)
             }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0)
+            if item != nil {
+                Button("Revert") {
+                    revertEntry(nutrient)
+                }.disabled(nutrientAmounts[nutrient] == item?.getNutrient(nutrient))
+            }
             Button("Round") {
                 roundEntry(nutrient)
             }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0)
@@ -453,6 +688,12 @@ struct NutrientEditor: View {
     
     private func clearEntry(_ nutrient: Nutrient) {
         nutrientAmounts[nutrient] = nil
+    }
+    
+    private func revertEntry(_ nutrient: Nutrient) {
+        if let item = item {
+            nutrientAmounts[nutrient] = item.getNutrient(nutrient)
+        }
     }
     
     private func getFieldName(_ nutrient: Nutrient) -> String {
@@ -494,7 +735,8 @@ struct NutrientEditor: View {
         }
     }
     
-    init(_ nutrientAmounts: Binding<[Nutrient : FoodAmount]>) {
+    init(item: FoodItem?, nutrientAmounts: Binding<[Nutrient : FoodAmount]>) {
+        self.item = item
         self._nutrientAmounts = nutrientAmounts
     }
 }
@@ -502,6 +744,9 @@ struct NutrientEditor: View {
 #Preview {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
+    let store = Store(name: "Costco")
+    container.mainContext.insert(store)
+    container.mainContext.insert(StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 500), available: true))
     return NavigationStack {
         FoodItemEditor(item: item)
     }.modelContainer(container)

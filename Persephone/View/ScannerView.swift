@@ -10,7 +10,7 @@ import VisionKit
 
 @MainActor
 struct ScannerView: UIViewControllerRepresentable {
-    var barcodeHandler: (String) -> Void
+    var delegate: ScannerDelegate?
     
     var scannerViewController: DataScannerViewController = DataScannerViewController(
         recognizedDataTypes: [.barcode(symbologies: [.ean13, .upce])],
@@ -47,7 +47,7 @@ struct ScannerView: UIViewControllerRepresentable {
                 switch item {
                 case .barcode(let code):
                     if (!(code.payloadStringValue ?? "").isEmpty) {
-                        parent.barcodeHandler(code.payloadStringValue!)
+                        parent.delegate?.barcodeDidScan(code.payloadStringValue!)
                         parent.scannerViewController.stopScanning()
                     }
                     break
@@ -71,8 +71,10 @@ struct ScannerView: UIViewControllerRepresentable {
     }
 }
 
+protocol ScannerDelegate {
+    func barcodeDidScan(_ barcode: String)
+}
+
 #Preview {
-    ScannerView { barcode in
-        print(barcode)
-    }
+    ScannerView()
 }

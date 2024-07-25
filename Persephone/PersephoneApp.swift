@@ -25,7 +25,6 @@ struct PersephoneApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-        }
-        .modelContainer(sharedModelContainer)
+        }.modelContainer(sharedModelContainer)
     }
 }

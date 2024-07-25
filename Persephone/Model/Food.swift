@@ -28,6 +28,30 @@ extension SchemaV1 {
         var value: Double
         // The unit of the amount
         var unit: FoodUnit
+        
+        func toMilligrams() throws -> FoodAmount {
+            var modifier: Double!
+            switch unit {
+            case .Milligram:
+                modifier = 1
+                break
+            case .Gram:
+                modifier = 1000
+                break
+            case .Kilogram:
+                modifier = 1000000
+                break
+            case .Ounce:
+                modifier = 28349.5
+                break
+            case .Pound:
+                modifier = 453592
+                break
+            default:
+                throw FoodError.invalidUnit(unit: unit)
+            }
+            return FoodAmount(value: value * modifier, unit: .Milligram)
+        }
     }
     
     enum FoodUnit: Codable, CaseIterable, Equatable, Hashable {
@@ -94,5 +118,9 @@ extension SchemaV1 {
                 return "L"
             }
         }
+    }
+    
+    enum FoodError: Error {
+        case invalidUnit(unit: FoodUnit)
     }
 }

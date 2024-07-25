@@ -28,8 +28,8 @@ struct FoodItemEditor: View {
     @Environment(\.modelContext) var modelContext
     
     private enum FocusableField: Hashable, CaseIterable {
-        case Name, Brand, Store, Price, TotalAmount, NumServings, ServingSize
-        case Calories, TotalFat, Sodium, Cholesterol, TotalCarbs, Protein
+        case Name, Brand, Price, TotalAmount, NumServings, ServingSize
+        case Calories, TotalFat, Cholesterol, Sodium, TotalCarbs, Protein
         case VitaminD, Potassium, Calcium, Iron
         case Ingredients, Allergens
         
@@ -39,13 +39,13 @@ struct FoodItemEditor: View {
                 return nil
             case .Brand:
                 return .Name
-            case .Store:
-                return .Brand
+//            case .Store:
+//                return .Brand
             // TODO
             case .Price:
                 return nil
             case .TotalAmount:
-                return .Store
+                return .Brand
             case .NumServings:
                 return .TotalAmount
             case .ServingSize:
@@ -54,12 +54,12 @@ struct FoodItemEditor: View {
                 return .ServingSize
             case .TotalFat:
                 return .Calories
-            case .Sodium:
-                return .TotalFat
             case .Cholesterol:
-                return .Sodium
-            case .TotalCarbs:
+                return .TotalFat
+            case .Sodium:
                 return .Cholesterol
+            case .TotalCarbs:
+                return .Sodium
             case .Protein:
                 return .TotalCarbs
             case .VitaminD:
@@ -82,9 +82,9 @@ struct FoodItemEditor: View {
             case .Name:
                 return .Brand
             case .Brand:
-                return .Store
-            case .Store:
                 return .TotalAmount
+//            case .Store:
+//                return .TotalAmount
             // TODO
             case .Price:
                 return nil
@@ -97,10 +97,10 @@ struct FoodItemEditor: View {
             case .Calories:
                 return .TotalFat
             case .TotalFat:
-                return .Sodium
-            case .Sodium:
                 return .Cholesterol
             case .Cholesterol:
+                return .Sodium
+            case .Sodium:
                 return .TotalCarbs
             case .TotalCarbs:
                 return .Protein
@@ -148,6 +148,7 @@ struct FoodItemEditor: View {
     @State private var brand: String = ""
     
     // Size Info
+    @State private var amountUnit: FoodUnit = .Gram
     @State private var numServings: Double = 0.0
     @State private var servingSize: String = ""
     @State private var totalAmount: Double = 0.0
@@ -230,6 +231,20 @@ struct FoodItemEditor: View {
                 }
             }
             Section("Size") {
+                Picker(selection: $amountUnit) {
+                    createAmountUnitOption(.Gram)
+                    createAmountUnitOption(.Ounce)
+                    createAmountUnitOption(.Milliliter)
+                    createAmountUnitOption(.FluidOunce)
+                } label: {
+                    HStack {
+                        Text("Total Amount:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                        TextField("required", value: $totalAmount, formatter: gramFormatter)
+                            .multilineTextAlignment(.trailing)
+                            .keyboardType(.decimalPad)
+                            .focused($focusedField, equals: .TotalAmount)
+                    }
+                }
                 HStack {
                     Text("Num. Servings:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
                     TextField("required", value: $numServings, formatter: gramFormatter)
@@ -246,7 +261,7 @@ struct FoodItemEditor: View {
                         .multilineTextAlignment(.trailing)
                         .focused($focusedField, equals: .ServingSize)
                     if (servingAmount != nil) {
-                        Text("(\(intFormatter.string(for: servingAmount)!)g)").font(.subheadline).fontWeight(.thin)
+                        Text("(\(intFormatter.string(for: servingAmount)!) \(amountUnit.getAbbreviation()))").font(.subheadline).fontWeight(.thin)
                     }
                 }
             }
@@ -319,6 +334,7 @@ struct FoodItemEditor: View {
                 barcode = item.metaData.barcode
                 brand = item.metaData.brand ?? ""
                 // Size Info
+                amountUnit = item.size.totalAmount.unit
                 numServings = item.size.numServings
                 servingSize = item.size.servingSize
                 totalAmount = item.size.totalAmount.value
@@ -395,6 +411,10 @@ struct FoodItemEditor: View {
             }
         }
         .navigationBarBackButtonHidden()
+    }
+    
+    private func createAmountUnitOption(_ unit: FoodUnit) -> some View {
+        Text(unit.getAbbreviation()).tag(unit).font(.subheadline).fontWeight(.thin)
     }
     
     private func getNutrient(_ nutrient: Nutrient) -> Double {
@@ -514,7 +534,7 @@ struct FoodItemEditor: View {
     
     private func save() {
         let size = FoodSize(
-            totalAmount: FoodAmount.grams(totalAmount),
+            totalAmount: FoodAmount(value: totalAmount, unit: amountUnit),
             numServings: numServings,
             servingSize: servingSize)
         var ingredients = FoodIngredients(

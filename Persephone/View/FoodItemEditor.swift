@@ -28,10 +28,7 @@ struct FoodItemEditor: View {
     @Environment(\.modelContext) var modelContext
     
     private enum FocusableField: Hashable, CaseIterable {
-        case Name, Brand, Price, TotalAmount, NumServings, ServingSize
-        case Calories, TotalFat, Cholesterol, Sodium, TotalCarbs, Protein
-        case VitaminD, Potassium, Calcium, Iron
-        case Ingredients, Allergens
+        case Name, Brand, Price, TotalAmount, NumServings, ServingSize, Ingredients, Allergens
         
         func getPrevious() -> FocusableField? {
             switch self {
@@ -50,28 +47,8 @@ struct FoodItemEditor: View {
                 return .TotalAmount
             case .ServingSize:
                 return .NumServings
-            case .Calories:
-                return .ServingSize
-            case .TotalFat:
-                return .Calories
-            case .Cholesterol:
-                return .TotalFat
-            case .Sodium:
-                return .Cholesterol
-            case .TotalCarbs:
-                return .Sodium
-            case .Protein:
-                return .TotalCarbs
-            case .VitaminD:
-                return .Protein
-            case .Potassium:
-                return .VitaminD
-            case .Calcium:
-                return .Potassium
-            case .Iron:
-                return .Calcium
             case .Ingredients:
-                return .Iron
+                return .ServingSize
             case .Allergens:
                 return .Ingredients
             }
@@ -93,26 +70,6 @@ struct FoodItemEditor: View {
             case .NumServings:
                 return .ServingSize
             case .ServingSize:
-                return .Calories
-            case .Calories:
-                return .TotalFat
-            case .TotalFat:
-                return .Cholesterol
-            case .Cholesterol:
-                return .Sodium
-            case .Sodium:
-                return .TotalCarbs
-            case .TotalCarbs:
-                return .Protein
-            case .Protein:
-                return .VitaminD
-            case .VitaminD:
-                return .Potassium
-            case .Potassium:
-                return .Calcium
-            case .Calcium:
-                return .Iron
-            case .Iron:
                 return .Ingredients
             case .Ingredients:
                 return .Allergens
@@ -161,27 +118,9 @@ struct FoodItemEditor: View {
         }
     }
     
-    // Composition Info
-    @State private var carbsExpanded: Bool = false
-    @State private var fatExpanded: Bool = false
-    @State private var calories: Double = 0.0
     // Nutrients
-    @State private var totalCarbs: Double = 0.0
-    @State private var dietaryFiber: Double = 0.0
-    @State private var totalSugars: Double = 0.0
-    @State private var addedSugars: Double = 0.0
-    @State private var totalFat: Double = 0.0
-    @State private var satFat: Double = 0.0
-    @State private var transFat: Double = 0.0
-    @State private var polyFat: Double = 0.0
-    @State private var monoFat: Double = 0.0
-    @State private var protein: Double = 0.0
-    @State private var sodium: Double = 0.0
-    @State private var cholesterol: Double = 0.0
-    @State private var calcium: Double = 0.0
-    @State private var potassium: Double = 0.0
-    @State private var vitaminD: Double = 0.0
-    @State private var iron: Double = 0.0
+    @State private var showNutrientEditor: Bool = false
+    @State private var nutrientAmounts: [Nutrient : FoodAmount] = [:]
     // Other
     @State private var ingredients: String = ""
     @State private var allergens: String = ""
@@ -193,7 +132,7 @@ struct FoodItemEditor: View {
         return formatter
     }()
     
-    let gramFormatter: NumberFormatter = {
+    let sizeFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 2
@@ -239,7 +178,7 @@ struct FoodItemEditor: View {
                 } label: {
                     HStack {
                         Text("Total Amount:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
-                        TextField("required", value: $totalAmount, formatter: gramFormatter)
+                        TextField("required", value: $totalAmount, formatter: sizeFormatter)
                             .multilineTextAlignment(.trailing)
                             .keyboardType(.decimalPad)
                             .focused($focusedField, equals: .TotalAmount)
@@ -247,7 +186,7 @@ struct FoodItemEditor: View {
                 }
                 HStack {
                     Text("Num. Servings:").gridCellAnchor(UnitPoint(x: 0, y: 0.5))
-                    TextField("required", value: $numServings, formatter: gramFormatter)
+                    TextField("required", value: $numServings, formatter: sizeFormatter)
                         .multilineTextAlignment(.trailing)
                         .keyboardType(.decimalPad)
                         .focused($focusedField, equals: .NumServings)
@@ -266,42 +205,9 @@ struct FoodItemEditor: View {
                 }
             }
             Section("Nutrients") {
-                createNutrientEntry(.Energy, value: $calories)
-                DisclosureGroup(
-                    isExpanded: $fatExpanded,
-                    content: {
-                        Grid {
-                            createNutrientSubEntry(.SaturatedFat, value: $satFat)
-                            Divider()
-                            createNutrientSubEntry(.TransFat, value: $transFat)
-                            Divider()
-                            createNutrientSubEntry(.PolyunsaturatedFat, value: $polyFat)
-                            Divider()
-                            createNutrientSubEntry(.MonounsaturatedFat, value: $monoFat)
-                        }
-                    },
-                    label: { createNutrientEntry(.TotalFat, value: $totalFat) }
-                )
-                createNutrientEntry(.Cholesterol, value: $cholesterol)
-                createNutrientEntry(.Sodium, value: $sodium)
-                DisclosureGroup(
-                    isExpanded: $carbsExpanded,
-                    content: {
-                        Grid {
-                            createNutrientSubEntry(.DietaryFiber, value: $dietaryFiber)
-                            Divider()
-                            createNutrientSubEntry(.TotalSugars, value: $totalSugars)
-                            Divider()
-                            createNutrientSubEntry(.AddedSugars, value: $addedSugars)
-                        }
-                    },
-                    label: { createNutrientEntry(.TotalCarbs, value: $totalCarbs) }
-                )
-                createNutrientEntry(.Protein, value: $protein)
-                createNutrientEntry(.VitaminD, value: $vitaminD)
-                createNutrientEntry(.Potassium, value: $potassium)
-                createNutrientEntry(.Calcium, value: $calcium)
-                createNutrientEntry(.Iron, value: $iron)
+                Button("Edit Nutrients") {
+                    showNutrientEditor = true
+                }
             }
             Section("Ingredients") {
                 TextEditor(text: $ingredients)
@@ -333,29 +239,13 @@ struct FoodItemEditor: View {
                 // Metadata
                 barcode = item.metaData.barcode
                 brand = item.metaData.brand ?? ""
-                // Size Info
+                // Size
                 amountUnit = item.size.totalAmount.unit
                 numServings = item.size.numServings
                 servingSize = item.size.servingSize
                 totalAmount = item.size.totalAmount.value
-                // Composition
-                calories = getNutrient(.Energy)
-                totalCarbs = getNutrient(.TotalCarbs)
-                dietaryFiber = getNutrient(.DietaryFiber)
-                totalSugars = getNutrient(.TotalSugars)
-                addedSugars = getNutrient(.AddedSugars)
-                totalFat = getNutrient(.TotalFat)
-                satFat = getNutrient(.SaturatedFat)
-                transFat = getNutrient(.TransFat)
-                polyFat = getNutrient(.PolyunsaturatedFat)
-                monoFat = getNutrient(.MonounsaturatedFat)
-                protein = getNutrient(.Protein)
-                sodium = getNutrient(.Sodium)
-                cholesterol = getNutrient(.Cholesterol)
-                vitaminD = getNutrient(.VitaminD)
-                potassium = getNutrient(.Potassium)
-                calcium = getNutrient(.Calcium)
-                iron = getNutrient(.Iron)
+                // Ingredients
+                nutrientAmounts = item.ingredients.nutrients
                 ingredients = item.ingredients.all
                 allergens = item.ingredients.allergens
             }
@@ -386,7 +276,7 @@ struct FoodItemEditor: View {
                             dismiss()
                         }
                     }
-                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isCompInvalid())
+                    .disabled(isMainInfoInvalid() || isSizeInvalid() || isIngredientsInvalid())
                 }
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Discard", role: .destructive) {
@@ -401,7 +291,7 @@ struct FoodItemEditor: View {
                             dismiss()
                         }
                     }
-                    .disabled(isMainInfoInvalid() || isSizeInfoInvalid() || isCompInvalid())
+                    .disabled(isMainInfoInvalid() || isSizeInvalid() || isIngredientsInvalid())
                 }
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
@@ -411,26 +301,158 @@ struct FoodItemEditor: View {
             }
         }
         .navigationBarBackButtonHidden()
+        .sheet(isPresented: $showNutrientEditor) {
+            NavigationStack {
+                NutrientEditor($nutrientAmounts).toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(item == nil ? "Clear" : "Revert") {
+                            if let item = item {
+                                nutrientAmounts = item.ingredients.nutrients
+                            } else {
+                                nutrientAmounts = [:]
+                            }
+                            showNutrientEditor = false
+                        }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Hide") {
+                            showNutrientEditor = false
+                        }
+                    }
+                }.navigationTitle("Nutrients")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+        }
     }
     
     private func createAmountUnitOption(_ unit: FoodUnit) -> some View {
         Text(unit.getAbbreviation()).tag(unit).font(.subheadline).fontWeight(.thin)
     }
     
-    private func getNutrient(_ nutrient: Nutrient) -> Double {
-        return item!.getNutrient(nutrient)?.value ?? 0.0
-    }
-    
     private func isMainInfoInvalid() -> Bool {
         return name.isEmpty
     }
     
-    private func isSizeInfoInvalid() -> Bool {
+    private func isSizeInvalid() -> Bool {
         return servingSize.isEmpty || numServings <= 0 || totalAmount <= 0
     }
     
-    private func isCompInvalid() -> Bool {
-        return calories < 0
+    private func isIngredientsInvalid() -> Bool {
+        return !nutrientAmounts.values.allSatisfy { amount in
+            amount.value >= 0
+        }
+    }
+    
+    private func focusPreviousField() {
+        focusedField = focusedField?.getPrevious()
+    }
+    
+    private func focusNextField() {
+        focusedField = focusedField?.getNext()
+    }
+    
+    private func save() {
+        let size = FoodSize(
+            totalAmount: FoodAmount(value: totalAmount, unit: amountUnit),
+            numServings: numServings,
+            servingSize: servingSize)
+        var ingredients = FoodIngredients(
+            nutrients: nutrientAmounts,
+            all: ingredients,
+            allergens: allergens)
+        if let item {
+            item.name = name
+            item.metaData.brand = brand
+            item.size = size
+            item.ingredients = ingredients
+        } else {
+            let metaData = FoodMetaData(barcode: barcode, brand: brand)
+            let newItem = FoodItem(name: name,
+                                   metaData: metaData,
+                                   ingredients: ingredients,
+                                   size: size)
+            modelContext.insert(newItem)
+        }
+    }
+    
+    init(item: FoodItem?, mode: EditorMode? = nil) {
+        self.item = item
+        self.mode = mode ?? (item == nil ? .Add : .Edit)
+    }
+}
+
+struct NutrientEditor: View {
+    @Binding private var nutrientAmounts: [Nutrient : FoodAmount]
+    
+    let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        formatter.zeroSymbol = ""
+        formatter.groupingSeparator = ""
+        return formatter
+    }()
+    
+    var body: some View {
+        List {
+            createNutrientEntry(.Energy).font(.title2).bold()
+            createNutrientEntry(.TotalFat).bold()
+            createNutrientEntry(.SaturatedFat).fontWeight(.thin)
+            createNutrientEntry(.TransFat).fontWeight(.thin)
+            createNutrientEntry(.PolyunsaturatedFat).fontWeight(.thin)
+            createNutrientEntry(.MonounsaturatedFat).fontWeight(.thin)
+            createNutrientEntry(.Cholesterol).bold()
+            createNutrientEntry(.Sodium).bold()
+            createNutrientEntry(.TotalCarbs).bold()
+            createNutrientEntry(.DietaryFiber).fontWeight(.thin)
+            createNutrientEntry(.TotalSugars).fontWeight(.thin)
+            createNutrientEntry(.AddedSugars).fontWeight(.thin)
+            createNutrientEntry(.Protein).bold()
+            createNutrientEntry(.VitaminD).italic().fontWeight(.thin)
+            createNutrientEntry(.Potassium).italic().fontWeight(.thin)
+            createNutrientEntry(.Calcium).italic().fontWeight(.thin)
+            createNutrientEntry(.Iron).italic().fontWeight(.thin)
+        }
+    }
+    
+    private func createNutrientEntry(_ nutrient: Nutrient) -> some View {
+        HStack(spacing: 8) {
+            Text(getFieldName(nutrient))
+            TextField("", value: Binding<Double>(get: {
+                nutrientAmounts[nutrient]?.value ?? 0
+            }, set: { value in
+                nutrientAmounts[nutrient] = FoodAmount(value: value, unit: nutrient.getCommonUnit())
+            }), formatter: formatter)
+                .multilineTextAlignment(.trailing)
+                .keyboardType(.decimalPad)
+            if (nutrient != .Energy && nutrientAmounts[nutrient]?.value ?? 0 > 0) {
+                Text(nutrient.getCommonUnit().getAbbreviation())
+            }
+        }.swipeActions(allowsFullSwipe: false) {
+            Button("Clear") {
+                clearEntry(nutrient)
+            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0).tint(.red)
+            Button("Round") {
+                roundEntry(nutrient)
+            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0).tint(.blue)
+        }.contextMenu {
+            Button("Clear") {
+                clearEntry(nutrient)
+            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0)
+            Button("Round") {
+                roundEntry(nutrient)
+            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0)
+        }
+    }
+    
+    private func roundEntry(_ nutrient: Nutrient) {
+        if let amount = nutrientAmounts[nutrient] {
+            nutrientAmounts[nutrient] = FoodAmount(value: round(amount.value), unit: amount.unit)
+        }
+    }
+    
+    private func clearEntry(_ nutrient: Nutrient) {
+        nutrientAmounts[nutrient] = nil
     }
     
     private func getFieldName(_ nutrient: Nutrient) -> String {
@@ -472,116 +494,8 @@ struct FoodItemEditor: View {
         }
     }
     
-    private func createNutrientEntry(_ nutrient: Nutrient, value: Binding<Double>) -> some View {
-        HStack(spacing: 12.0) {
-            Text(getFieldName(nutrient))
-            TextField("", value: value, formatter: gramFormatter)
-                .multilineTextAlignment(.trailing)
-                .keyboardType(.decimalPad)
-                .focused($focusedField, equals: getFocusField(nutrient)!)
-            if (nutrient != .Energy && value.wrappedValue > 0) {
-                Text(nutrient.getCommonUnit().getAbbreviation())
-            }
-        }
-    }
-    
-    private func createNutrientSubEntry(_ nutrient: Nutrient, value: Binding<Double>) -> some View {
-        GridRow {
-            Text(getFieldName(nutrient)).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
-            TextField("", value: value, formatter: gramFormatter)
-                .multilineTextAlignment(.trailing)
-                .keyboardType(.decimalPad)
-            if (value.wrappedValue > 0) {
-                Text(nutrient.getCommonUnit().getAbbreviation())
-            }
-        }
-    }
-    
-    private func getFocusField(_ nutrient: Nutrient) -> FocusableField? {
-        switch nutrient {
-        case .Energy:
-            return .Calories
-        case .TotalFat:
-            return .TotalFat
-        case .Sodium:
-            return .Sodium
-        case .Cholesterol:
-            return .Cholesterol
-        case .TotalCarbs:
-            return .TotalCarbs
-        case .Protein:
-            return .Protein
-        case .VitaminD:
-            return .VitaminD
-        case .Potassium:
-            return .Potassium
-        case .Calcium:
-            return .Calcium
-        case .Iron:
-            return .Iron
-        default:
-            return nil
-        }
-    }
-    
-    private func focusPreviousField() {
-        focusedField = focusedField?.getPrevious()
-    }
-    
-    private func focusNextField() {
-        focusedField = focusedField?.getNext()
-    }
-    
-    private func save() {
-        let size = FoodSize(
-            totalAmount: FoodAmount(value: totalAmount, unit: amountUnit),
-            numServings: numServings,
-            servingSize: servingSize)
-        var ingredients = FoodIngredients(
-            nutrients: [
-                .Energy: FoodAmount.calories(calories),
-                .TotalCarbs: FoodAmount.grams(totalCarbs),
-                .DietaryFiber: FoodAmount.grams(dietaryFiber),
-                .TotalSugars: FoodAmount.grams(totalSugars),
-                .AddedSugars: FoodAmount.grams(addedSugars),
-                .TotalFat: FoodAmount.grams(totalFat),
-                .SaturatedFat: FoodAmount.grams(satFat),
-                .TransFat: FoodAmount.grams(transFat),
-                .PolyunsaturatedFat: FoodAmount.grams(polyFat),
-                .MonounsaturatedFat: FoodAmount.grams(monoFat),
-                .Protein: FoodAmount.grams(protein),
-                .Sodium: FoodAmount.milligrams(sodium),
-                .Cholesterol: FoodAmount.milligrams(cholesterol),
-                .VitaminD: FoodAmount.milligrams(vitaminD),
-                .Potassium: FoodAmount.milligrams(potassium),
-                .Calcium: FoodAmount.milligrams(calcium),
-                .Iron: FoodAmount.milligrams(iron)
-            ],
-            all: ingredients,
-            allergens: allergens)
-        ingredients.nutrients.keys.forEach { key in
-            if ingredients.nutrients[key]!.value <= 0 {
-                ingredients.nutrients.removeValue(forKey: key)
-            }
-        }
-        if let item {
-            item.name = name
-            item.metaData.brand = brand
-            item.size = size
-            item.ingredients = ingredients
-        } else {
-            let metaData = FoodMetaData(barcode: barcode, brand: brand)
-            let newItem = FoodItem(name: name,
-                                   metaData: metaData,
-                                   ingredients: ingredients,
-                                   size: size)
-            modelContext.insert(newItem)
-        }
-    }
-    
-    init(item: FoodItem?, mode: EditorMode? = nil) {
-        self.item = item
-        self.mode = mode ?? (item == nil ? .Add : .Edit)
+    init(_ nutrientAmounts: Binding<[Nutrient : FoodAmount]>) {
+        self._nutrientAmounts = nutrientAmounts
     }
 }
 

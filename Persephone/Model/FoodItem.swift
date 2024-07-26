@@ -17,6 +17,8 @@ extension SchemaV1 {
     final class FoodItem {
         // The name of the item
         var name: String
+        // Any additional information about the item
+        var details: String?
         // Metadata about the item
         var metaData: FoodMetaData
         // Info about the ingredients and nutrition of the item
@@ -29,8 +31,9 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \StoreItem.foodItem)
         var storeItems: [StoreItem] = []
         
-        init(name: String, metaData: FoodMetaData, ingredients: FoodIngredients, size: FoodSize) {
+        init(name: String, details: String? = nil, metaData: FoodMetaData, ingredients: FoodIngredients, size: FoodSize) {
             self.name = name
+            self.details = details
             self.metaData = metaData
             self.ingredients = ingredients
             self.size = size

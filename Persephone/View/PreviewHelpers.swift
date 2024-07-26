@@ -18,7 +18,7 @@ func createTestModelContainer() -> ModelContainer {
 @discardableResult
 func createTestFoodItem(_ context: ModelContext) -> FoodItem {
     let item = FoodItem(name: "Test Food",
-                        metaData: FoodMetaData(tags: ["Bread"]),
+                        metaData: FoodMetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"]),
                         ingredients: FoodIngredients(
                             nutrients: [
                                 .Energy: FoodAmount.calories(120),
@@ -36,6 +36,9 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
                             ]),
                         size: FoodSize(totalAmount: FoodAmount.grams(450), numServings: 5, servingSize: "1 unit"))
     context.insert(item)
+    let store = Store(name: "Costco")
+    context.insert(store)
+    context.insert(StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 500), available: true))
     return item
 }
 

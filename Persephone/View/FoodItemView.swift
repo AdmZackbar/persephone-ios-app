@@ -34,8 +34,10 @@ private func format(item: FoodItem, nutrient: Nutrient) -> String {
 
 struct FoodItemView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
     var item: FoodItem
+    
     @State private var viewType: ViewType = .AllNutrients
     
     var body: some View {
@@ -56,6 +58,13 @@ struct FoodItemView: View {
                 switch (viewType) {
                 case .AllNutrients:
                     NutrientTable(item: item)
+                        .contextMenu {
+                            Button {
+                                sheetCoordinator.presentSheet(.Nutrients(item: item))
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                        }
                 case .Ingredients:
                     VStack(alignment: .leading, spacing: 8.0) {
                         if (item.ingredients.all.isEmpty && item.ingredients.allergens.isEmpty) {
@@ -88,14 +97,28 @@ struct FoodItemView: View {
                     }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    NavigationLink {
-                        FoodItemEditor(item: item)
+                    Menu {
+                        Button {
+                            sheetCoordinator.presentSheet(.Nutrients(item: item))
+                        } label: {
+                            Label("Nutrition", systemImage: "tablecells")
+                        }
+                        if !item.storeItems.isEmpty {
+                            Menu("Store Listing") {
+                                ForEach(item.storeItems, id: \.store?.name) { storeItem in
+                                    Button(storeItem.store.name) {
+                                        sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: storeItem))
+                                    }
+                                }
+                            }
+                        }
                     } label: {
-                        Text("Edit")
+                        Label("Edit", systemImage: "pencil").labelStyle(.titleOnly)
                     }
                 }
             }
         }.background(Color(UIColor.secondarySystemBackground))
+            .sheetCoordinating(coordinator: sheetCoordinator)
     }
 }
 
@@ -105,11 +128,13 @@ private struct StoreInfoView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-//                Text(item.storeInfo?.name ?? "Custom")
-//                Text("\(currencyFormatter.string(for: Double(item.storeInfo?.price ?? 0) / 100.0)!)")
-//                    .font(.title).bold()
-//                Text(item.sizeInfo.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
-//                    .font(.subheadline)
+                if let storeItem = item.storeItems.first {
+                    Text(storeItem.store.name)
+                    Text("\(currencyFormatter.string(for: Double(storeItem.price.cents) / Double(storeItem.quantity) / 100.0)!)")
+                        .font(.title).bold()
+                }
+                Text(item.size.totalAmount.unit.isWeight() ? "Net Wt. \(formatWeight(item.size.totalAmount.value))" : "Net Vol. \(formatVolume(item.size.totalAmount.value))")
+                    .font(.subheadline)
                 Text("\(gramFormatter.string(for: item.size.numServings)!) Servings")
                     .font(.subheadline)
                 Text("\(item.size.servingSize) (\(gramFormatter.string(for: item.size.servingAmount.value)!)g)")
@@ -210,10 +235,7 @@ private struct NutrientTable: View {
                 Divider()
                 createRow(name: "Protein", nutrient: .Protein)
                     .bold()
-            }.padding()
-                .background(Color("BackgroundColor"))
-                .clipShape(RoundedRectangle(cornerRadius: 12.0))
-            Grid {
+                Divider()
                 createRow(name: "Vitamin D", nutrient: .VitaminD)
                 Divider()
                 createRow(name: "Calcium", nutrient: .Calcium)

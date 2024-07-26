@@ -23,16 +23,16 @@ struct FoodItemView: View {
     var item: FoodItem
     
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 16) {
             Grid(horizontalSpacing: 16) {
                 GridRow {
                     StoreInfoView(item: item)
                     NutritionTabView(item: item)
                 }
-            }.frame(height: 170)
+            }.frame(height: 160)
             MainTabView(sheetCoordinator: sheetCoordinator, item: item)
-        }.padding()
-            .navigationBarTitleDisplayMode(.inline)
+        }.navigationBarTitleDisplayMode(.inline)
+            .padding()
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     if item.metaData.brand != nil {
@@ -51,13 +51,16 @@ struct FoodItemView: View {
                         } label: {
                             Label("Nutrition", systemImage: "tablecells")
                         }
-                        if !item.storeItems.isEmpty {
-                            Menu("Store Listing") {
-                                ForEach(item.storeItems, id: \.store?.name) { storeItem in
-                                    Button(storeItem.store.name) {
-                                        sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: storeItem))
-                                    }
+                        Menu("Store Listings") {
+                            ForEach(item.storeItems, id: \.store?.name) { storeItem in
+                                Button(storeItem.store.name) {
+                                    sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: storeItem))
                                 }
+                            }
+                            Button {
+                                sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: nil))
+                            } label: {
+                                Label("Add Listing", systemImage: "plus")
                             }
                         }
                     } label: {
@@ -130,14 +133,15 @@ private struct NutritionTabView: View {
         TabView {
             ScrollView(.vertical) {
                 NutritionView(item: item, header: "Per Serving", modifier: 1)
-                    .frame(height: 130)
+                    .frame(height: 126)
                 NutritionView(item: item, header: "Whole Amount", modifier: item.size.numServings)
-                    .frame(height: 130)
+                    .frame(height: 134)
             }.tag(ViewType.Main).scrollTargetBehavior(.paging)
-                .padding(EdgeInsets(top: 8, leading: 0, bottom: 32, trailing: 0))
+                .padding(12)
             MacroChartView(item: item).tag(ViewType.Macro)
-                .padding(EdgeInsets(top: 8, leading: 8, bottom: 32, trailing: 8))
-        }.tabViewStyle(.page(indexDisplayMode: .always))
+                .padding(12)
+        }.tabViewStyle(.page(indexDisplayMode: .automatic))
+            .indexViewStyle(.page(backgroundDisplayMode: .automatic))
             .background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }
@@ -173,8 +177,7 @@ private struct NutritionView: View {
                 Spacer()
             }
             Spacer()
-        }.padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private func format(_ nutrient: Nutrient) -> String {
@@ -197,28 +200,73 @@ private struct MacroChartView: View {
     }()
     
     var body: some View {
-        Chart(createData(item), id: \.name) { name, amount in
-            SectorMark(
-                angle: .value("Amount", amount),
-                innerRadius: .ratio(0.6),
-                outerRadius: .inset(2),
-                angularInset: 1
-            ).cornerRadius(4)
-                .foregroundStyle(by: .value("Macro type", name))
-        }.chartLegend(position: .bottom, alignment: .center, spacing: 2)
-            .chartForegroundStyleScale([
-                "Carbs": Color.green,
-                "Fat": Color.orange,
-                "Protein": Color.indigo
-            ])
+        let data = createData(item)
+        return ZStack {
+            Chart(data, id: \.name) { name, amount in
+                SectorMark(
+                    angle: .value("Amount", amount),
+                    innerRadius: .ratio(0.65),
+                    outerRadius: .inset(8),
+                    angularInset: 2
+                ).cornerRadius(4)
+                    .foregroundStyle(by: .value("Macro type", name))
+            }.chartLegend(.hidden)
+                .chartForegroundStyleScale([
+                    "Carbs": Color.green,
+                    "Fat": Color.orange,
+                    "Protein": Color.purple,
+                    "None": Color.gray
+                ])
+            VStack(spacing: 2) {
+                Text(formatter.string(for: item.getNutrient(.Energy)?.value ?? 0)!).font(.title3).fontWeight(.heavy)
+                Text("Cal").font(.caption).bold()
+            }
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Protein").font(.caption).fontWeight(.heavy).foregroundStyle(.purple)
+                    Spacer()
+                }
+                HStack {
+                    Text("\(formatter.string(for: computeAmount(.Protein))!)g").font(.caption).bold().foregroundStyle(.purple)
+                    Spacer()
+                }
+                Spacer()
+            }
+            VStack(spacing: 0) {
+                HStack {
+                    Spacer()
+                    Text("Carbs").font(.caption).fontWeight(.heavy).foregroundStyle(.green)
+                }
+                HStack {
+                    Spacer()
+                    Text("\(formatter.string(for: computeAmount(.TotalCarbs))!)g").font(.caption).bold().foregroundStyle(.green)
+                }
+                Spacer()
+            }
+            VStack(spacing: 0) {
+                Spacer()
+                HStack {
+                    Text("Fat").font(.caption).fontWeight(.heavy).foregroundStyle(.orange)
+                    Spacer()
+                }
+                HStack {
+                    Text("\(formatter.string(for: computeAmount(.TotalFat))!)g").font(.caption).bold().foregroundStyle(.orange)
+                    Spacer()
+                }
+            }
+        }
     }
     
     private func createData(_ item: FoodItem) -> [(name: String, amount: Double)] {
-        return [
-            (name: "Carbs", amount: computeAmount(.TotalCarbs)),
-            (name: "Fat", amount: computeAmount(.TotalFat)),
-            (name: "Protein", amount: computeAmount(.Protein))
+        let data = [
+            (name: "Carbs", amount: computeAmount(.TotalCarbs) * 4),
+            (name: "Fat", amount: computeAmount(.TotalFat) * 9),
+            (name: "Protein", amount: computeAmount(.Protein) * 4)
         ]
+        if data.allSatisfy({ (name: String, amount: Double) in amount <= 0 }) {
+            return [(name: "None", amount: 1)]
+        }
+        return data
     }
     
     private func computeAmount(_ nutrient: Nutrient) -> Double {
@@ -279,6 +327,7 @@ private struct MainTabView: View {
                 }.tag(ViewType.Ingredients).padding()
             }
         }.tabViewStyle(.page(indexDisplayMode: .always))
+            .indexViewStyle(.page(backgroundDisplayMode: .interactive))
             .background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }

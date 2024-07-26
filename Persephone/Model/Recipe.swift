@@ -55,7 +55,7 @@ extension SchemaV1 {
         // Optional notes on this ingredient
         var notes: String?
         
-        init(name: String, food: FoodItem? = nil, recipe: Recipe!, amount: FoodAmount, notes: String? = nil) {
+        init(name: String, food: FoodItem? = nil, recipe: Recipe, amount: FoodAmount, notes: String? = nil) {
             self.name = name
             self.food = food
             self.recipe = recipe

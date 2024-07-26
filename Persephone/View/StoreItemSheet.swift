@@ -40,46 +40,48 @@ struct StoreItemSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                if !stores.isEmpty {
-                    HStack {
-                        Text("Store:")
-                        Menu(store?.name ?? "Select Store...") {
-                            ForEach(stores, id: \.name) { s in
-                                Button(s.name) {
-                                    store = s
+                Section(foodItem.name) {
+                    if !stores.isEmpty {
+                        HStack {
+                            Text("Store:")
+                            Menu(store?.name ?? "Select Store...") {
+                                ForEach(stores, id: \.name) { s in
+                                    Button(s.name) {
+                                        store = s
+                                    }
+                                }
+                                Divider()
+                                Button {
+                                    sheetCoordinator.presentSheet(.Store(store: nil))
+                                } label: {
+                                    Label("Add Store", systemImage: "plus")
                                 }
                             }
-                            Divider()
-                            Button {
-                                sheetCoordinator.presentSheet(.Store(store: nil))
-                            } label: {
-                                Label("Add Store", systemImage: "plus")
-                            }
+                        }
+                    } else {
+                        Button("Add Store...") {
+                            sheetCoordinator.presentSheet(.Store(store: nil))
                         }
                     }
-                } else {
-                    Button("Add Store...") {
-                        sheetCoordinator.presentSheet(.Store(store: nil))
-                    }
-                }
-                HStack {
-                    Text("Total Price:")
-                    CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
-                }
-                Stepper {
                     HStack {
-                        Text("Quantity:")
-                        TextField("", value: $quantity, formatter: formatter)
+                        Text("Total Price:")
+                        CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
                     }
-                } onIncrement: {
-                    quantity += 1
-                } onDecrement: {
-                    if quantity > 1 {
-                        quantity -= 1
+                    Stepper {
+                        HStack {
+                            Text("Quantity:")
+                            TextField("", value: $quantity, formatter: formatter)
+                        }
+                    } onIncrement: {
+                        quantity += 1
+                    } onDecrement: {
+                        if quantity > 1 {
+                            quantity -= 1
+                        }
                     }
-                }
-                Toggle(isOn: $available) {
-                    Text("Available:")
+                    Toggle(isOn: $available) {
+                        Text("Available:")
+                    }
                 }
             }.navigationTitle(item == nil ? "Add Store Entry" : "Edit Store Entry")
                 .navigationBarBackButtonHidden()
@@ -92,15 +94,7 @@ struct StoreItemSheet: View {
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button("Save") {
-                            if let item {
-                                item.store = store
-                                item.quantity = quantity
-                                item.price = Price(cents: price)
-                                item.available = available
-                            } else {
-                                let item = StoreItem(store: store, foodItem: foodItem, quantity: quantity, price: Price(cents: price), available: available)
-                                modelContext.insert(item)
-                            }
+                            save()
                             dismiss()
                         }.disabled(store == nil || quantity < 1 || price <= 0)
                     }
@@ -117,6 +111,17 @@ struct StoreItemSheet: View {
             }
     }
     
+    private func save() {
+        if let item {
+            item.store = store!
+            item.quantity = quantity
+            item.price = Price(cents: price)
+            item.available = available
+        } else {
+            foodItem.storeItems.append(StoreItem(store: store!, foodItem: foodItem, quantity: quantity, price: Price(cents: price), available: available))
+        }
+    }
+    
     init(foodItem: FoodItem, item: StoreItem? = nil) {
         self.foodItem = foodItem
         self.item = item
@@ -126,12 +131,8 @@ struct StoreItemSheet: View {
 #Preview {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
-    let store = Store(name: "Costco")
-    container.mainContext.insert(store)
     container.mainContext.insert(Store(name: "Publix"))
     container.mainContext.insert(Store(name: "Target"))
-    let storeItem = StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 500), available: true)
-    container.mainContext.insert(storeItem)
-    return StoreItemSheet(foodItem: item, item: storeItem)
+    return StoreItemSheet(foodItem: item, item: item.storeItems.first)
         .modelContainer(container)
 }

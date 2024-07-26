@@ -23,7 +23,7 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \ShoppingListEntry.shoppingList)
         var entries: [ShoppingListEntry] = []
         
-        init(store: Store!, targetDate: Date) {
+        init(store: Store, targetDate: Date) {
             self.store = store
             self.targetDate = targetDate
         }
@@ -40,7 +40,7 @@ extension SchemaV1 {
         // Any additional notes about the item
         var notes: String?
         
-        init(shoppingList: ShoppingList!, storeItem: StoreItem!, amount: Int, notes: String? = nil) {
+        init(shoppingList: ShoppingList, storeItem: StoreItem, amount: Int, notes: String? = nil) {
             self.shoppingList = shoppingList
             self.storeItem = storeItem
             self.amount = amount

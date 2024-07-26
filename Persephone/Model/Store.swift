@@ -53,7 +53,7 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \ShoppingListEntry.storeItem)
         var shoppingListEntries: [ShoppingListEntry] = []
         
-        init(store: Store!, foodItem: FoodItem!, quantity: Int, price: Price, available: Bool, priceHistory: [PriceHistoryEntry] = []) {
+        init(store: Store, foodItem: FoodItem, quantity: Int, price: Price, available: Bool, priceHistory: [PriceHistoryEntry] = []) {
             self.store = store
             self.foodItem = foodItem
             self.quantity = quantity

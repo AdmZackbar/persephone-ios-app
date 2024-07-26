@@ -35,7 +35,7 @@ extension SchemaV1 {
         // If false, this is just a planned entry
         var confirmed: Bool
         
-        init(logEntry: LogEntry!, food: FoodInstance!, confirmed: Bool) {
+        init(logEntry: LogEntry, food: FoodInstance, confirmed: Bool) {
             self.logEntry = logEntry
             self.food = food
             self.confirmed = confirmed
@@ -48,7 +48,7 @@ extension SchemaV1 {
         var food: FoodItem!
         var confirmed: Bool
         
-        init(logEntry: LogEntry!, food: FoodItem!, confirmed: Bool) {
+        init(logEntry: LogEntry, food: FoodItem, confirmed: Bool) {
             self.logEntry = logEntry
             self.food = food
             self.confirmed = confirmed
@@ -61,7 +61,7 @@ extension SchemaV1 {
         var recipe: RecipeInstance!
         var confirmed: Bool
         
-        init(logEntry: LogEntry!, recipe: RecipeInstance!, confirmed: Bool) {
+        init(logEntry: LogEntry, recipe: RecipeInstance, confirmed: Bool) {
             self.logEntry = logEntry
             self.recipe = recipe
             self.confirmed = confirmed

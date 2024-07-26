@@ -29,7 +29,7 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.food)
         var recipes: [RecipeInstanceIngredient] = []
         
-        init(foodItem: FoodItem!, price: Price, remaining: FoodAmount, buyDate: Date, expDate: Date, freezeDate: Date? = nil) {
+        init(foodItem: FoodItem, price: Price, remaining: FoodAmount, buyDate: Date, expDate: Date, freezeDate: Date? = nil) {
             self.foodItem = foodItem
             self.price = price
             self.remaining = remaining

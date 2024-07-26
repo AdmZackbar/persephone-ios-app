@@ -42,7 +42,7 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
     context.insert(item)
     let store = Store(name: "Costco")
     context.insert(store)
-    context.insert(StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 500), available: true))
+    item.storeItems.append(StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 500), available: true))
     return item
 }
 
@@ -74,7 +74,9 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                             .Protein: FoodAmount.grams(13.5)
                         ])
     context.insert(recipe)
-    context.insert(RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: 1.2, unit: .Liter)))
-    context.insert(RecipeIngredient(name: "Salt", recipe: recipe, amount: FoodAmount(value: 600, unit: .Milligram)))
+    recipe.ingredients.append(contentsOf: [
+        RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: 1.2, unit: .Liter)),
+        RecipeIngredient(name: "Salt", recipe: recipe, amount: FoodAmount(value: 600, unit: .Milligram))
+    ])
     return recipe
 }

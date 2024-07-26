@@ -32,7 +32,7 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.recipeInstance)
         var ingredients: [RecipeInstanceIngredient] = []
         
-        init(recipe: Recipe!, remaining: FoodAmount, creationDate: Date, expDate: Date, freezeDate: Date? = nil, prepNotes: String, postNotes: String) {
+        init(recipe: Recipe, remaining: FoodAmount, creationDate: Date, expDate: Date, freezeDate: Date? = nil, prepNotes: String, postNotes: String) {
             self.recipe = recipe
             self.remaining = remaining
             self.creationDate = creationDate
@@ -52,7 +52,7 @@ extension SchemaV1 {
         // The amount of the food used
         var amount: FoodAmount
         
-        init(recipeInstance: RecipeInstance!, food: FoodInstance!, amount: FoodAmount) {
+        init(recipeInstance: RecipeInstance, food: FoodInstance, amount: FoodAmount) {
             self.recipeInstance = recipeInstance
             self.food = food
             self.amount = amount

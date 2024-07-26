@@ -114,7 +114,6 @@ struct RecipeEditor: View {
                     Text("Serving Size:").fixedSize(horizontal: true, vertical: false)
                     TextField("required", text: $servingSize)
                         .multilineTextAlignment(.trailing)
-                        .keyboardType(.decimalPad)
                 }
                 HStack {
                     Text("Num. Servings:").fixedSize(horizontal: true, vertical: false)
@@ -294,8 +293,7 @@ struct RecipeEditor: View {
                                 nutrients: [:])
             modelContext.insert(recipe)
             for ingredient in ingredients {
-                let entry = RecipeIngredient(name: ingredient.name, food: ingredient.food, recipe: recipe, amount: FoodAmount(value: ingredient.amount, unit: ingredient.unit))
-                modelContext.insert(entry)
+                recipe.ingredients.append(RecipeIngredient(name: ingredient.name, food: ingredient.food, recipe: recipe, amount: FoodAmount(value: ingredient.amount, unit: ingredient.unit)))
             }
         }
         dismiss()

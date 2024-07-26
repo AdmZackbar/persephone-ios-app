@@ -113,7 +113,6 @@ struct FoodItemEditor: View {
     
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     @FocusState private var focusedField: FocusableField?
-    @Query(sort: \StoreItem.store?.name) private var storeItems: [StoreItem] = []
     
     // Main Info
     @State private var name: String = ""
@@ -135,6 +134,9 @@ struct FoodItemEditor: View {
             return totalAmount / numServings
         }
     }
+    
+    // Store
+    @State private var storeItems: [StoreItem] = []
     
     // Nutrients
     @State private var nutrientAmounts: [Nutrient : FoodAmount] = [:]
@@ -302,6 +304,8 @@ struct FoodItemEditor: View {
                 numServings = item.size.numServings
                 servingSize = item.size.servingSize
                 totalAmount = item.size.totalAmount.value
+                // Store
+                storeItems = item.storeItems
                 // Ingredients
                 nutrientAmounts = item.ingredients.nutrients
                 ingredients = item.ingredients.all
@@ -402,6 +406,7 @@ struct FoodItemEditor: View {
             item.metaData.brand = brand
             item.size = size
             item.ingredients = ingredients
+            item.storeItems = storeItems
         } else {
             let metaData = FoodMetaData(barcode: barcode, brand: brand)
             let newItem = FoodItem(name: name,
@@ -409,6 +414,9 @@ struct FoodItemEditor: View {
                                    ingredients: ingredients,
                                    size: size)
             modelContext.insert(newItem)
+            storeItems.forEach { storeItem in
+                modelContext.insert(storeItem)
+            }
         }
     }
     

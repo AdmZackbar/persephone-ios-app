@@ -29,6 +29,30 @@ extension SchemaV1 {
         // The unit of the amount
         var unit: FoodUnit
         
+        func toGrams() throws -> FoodAmount {
+            var modifier: Double!
+            switch unit {
+            case .Milligram:
+                modifier = 0.001
+                break
+            case .Gram:
+                modifier = 1
+                break
+            case .Kilogram:
+                modifier = 1000
+                break
+            case .Ounce:
+                modifier = 28.3495
+                break
+            case .Pound:
+                modifier = 453.592
+                break
+            default:
+                throw FoodError.invalidUnit(unit: unit)
+            }
+            return FoodAmount(value: value * modifier, unit: .Milligram)
+        }
+        
         func toMilligrams() throws -> FoodAmount {
             var modifier: Double!
             switch unit {

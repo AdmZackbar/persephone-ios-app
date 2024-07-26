@@ -5,12 +5,9 @@
 //  Created by Zach Wassynger on 7/10/24.
 //
 
+import Charts
 import SwiftData
 import SwiftUI
-
-private enum ViewType {
-    case AllNutrients, Ingredients
-}
 
 private let currencyFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
@@ -19,81 +16,32 @@ private let currencyFormatter: NumberFormatter = {
     return formatter
 }()
 
-private let gramFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
-    formatter.minimumFractionDigits = 0
-    formatter.maximumFractionDigits = 2
-    formatter.alwaysShowsDecimalSeparator = false
-    return formatter
-}()
-
-private func format(item: FoodItem, nutrient: Nutrient) -> String {
-    gramFormatter.string(for: item.ingredients.nutrients[nutrient]?.value ?? 0)!
-}
-
 struct FoodItemView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
     var item: FoodItem
     
-    @State private var viewType: ViewType = .AllNutrients
-    
     var body: some View {
-        ScrollView {
-            VStack(spacing: 12.0) {
-                Grid(horizontalSpacing: 16.0) {
-                    GridRow {
-                        StoreInfoView(item: item)
-                        NutritionView(item: item)
-                    }
-                }.frame(height: 150.0)
-                Picker("Test", selection: $viewType) {
-                    Text("All Nutrients")
-                        .tag(ViewType.AllNutrients)
-                    Text("Ingredients")
-                        .tag(ViewType.Ingredients)
-                }.padding(EdgeInsets(top: 12.0, leading: 0.0, bottom: 0.0, trailing: 0.0)).pickerStyle(.segmented)
-                switch (viewType) {
-                case .AllNutrients:
-                    NutrientTable(item: item)
-                        .contextMenu {
-                            Button {
-                                sheetCoordinator.presentSheet(.Nutrients(item: item))
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                        }
-                case .Ingredients:
-                    VStack(alignment: .leading, spacing: 8.0) {
-                        if (item.ingredients.all.isEmpty && item.ingredients.allergens.isEmpty) {
-                            Text("No ingredients recorded for this food.").padding()
-                        } else {
-                            if (!item.ingredients.all.isEmpty) {
-                                Text(item.ingredients.all)
-                                    .multilineTextAlignment(.leading)
-                            }
-                            if (!item.ingredients.allergens.isEmpty) {
-                                Text("Allergens: \(item.ingredients.allergens)")
-                                    .multilineTextAlignment(.leading)
-                                    .bold()
-                            }
-                        }
-                    }.frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color("BackgroundColor"))
-                        .clipShape(RoundedRectangle(cornerRadius: 12.0))
+        VStack(spacing: 24) {
+            Grid(horizontalSpacing: 16) {
+                GridRow {
+                    StoreInfoView(item: item)
+                    NutritionTabView(item: item)
                 }
-                Spacer()
-            }
-            .padding()
+            }.frame(height: 170)
+            MainTabView(sheetCoordinator: sheetCoordinator, item: item)
+        }.padding()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    VStack {
+                    if item.metaData.brand != nil {
+                        VStack {
+                            Text(item.name).font(.headline)
+                            Text(item.metaData.brand ?? "").font(.subheadline)
+                        }
+                    } else {
                         Text(item.name).font(.headline)
-                        Text(item.metaData.brand ?? "").font(.subheadline)
                     }
                 }
                 ToolbarItem(placement: .primaryAction) {
@@ -116,14 +64,20 @@ struct FoodItemView: View {
                         Label("Edit", systemImage: "pencil").labelStyle(.titleOnly)
                     }
                 }
-            }
-        }.background(Color(UIColor.secondarySystemBackground))
-            .sheetCoordinating(coordinator: sheetCoordinator)
+            }.background(Color(UIColor.secondarySystemBackground))
+                .sheetCoordinating(coordinator: sheetCoordinator)
     }
 }
 
 private struct StoreInfoView: View {
     var item: FoodItem
+    
+    private let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
     
     var body: some View {
         HStack {
@@ -135,9 +89,9 @@ private struct StoreInfoView: View {
                 }
                 Text(item.size.totalAmount.unit.isWeight() ? "Net Wt. \(formatWeight(item.size.totalAmount.value))" : "Net Vol. \(formatVolume(item.size.totalAmount.value))")
                     .font(.subheadline)
-                Text("\(gramFormatter.string(for: item.size.numServings)!) Servings")
+                Text("\(formatter.string(for: item.size.numServings)!) Servings")
                     .font(.subheadline)
-                Text("\(item.size.servingSize) (\(gramFormatter.string(for: item.size.servingAmount.value)!)g)")
+                Text("\(item.size.servingSize) (\(formatter.string(for: item.size.servingAmount.value)!)g)")
                     .font(.subheadline)
                 Spacer()
             }
@@ -145,123 +99,188 @@ private struct StoreInfoView: View {
         }.padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("BackgroundColor"))
-            .clipShape(RoundedRectangle(cornerRadius: 12.0))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
     private func formatVolume(_ volume: Double) -> String {
-        if (volume > 500.0) {
-            return "\(gramFormatter.string(for: volume / 1000.0)!)L"
+        if (volume > 500) {
+            return "\(formatter.string(for: volume / 1000)!)L"
         }
-        return "\(gramFormatter.string(for: volume)!)mL"
+        return "\(formatter.string(for: volume)!)mL"
     }
     
     private func formatWeight(_ weight: Double) -> String {
-        if (weight > 500.0) {
-            return "\(gramFormatter.string(for: weight / 1000.0)!)kg"
+        if (weight > 500) {
+            return "\(formatter.string(for: weight / 1000)!)kg"
         }
-        return "\(gramFormatter.string(for: weight)!)g"
+        return "\(formatter.string(for: weight)!)g"
+    }
+}
+
+private struct NutritionTabView: View {
+    private enum ViewType {
+        case Main, Macro
+    }
+    
+    var item: FoodItem
+    
+    // selection currently breaks page indicator, so don't impl that for now
+    
+    var body: some View {
+        TabView {
+            ScrollView(.vertical) {
+                NutritionView(item: item, header: "Per Serving", modifier: 1)
+                    .frame(height: 130)
+                NutritionView(item: item, header: "Whole Amount", modifier: item.size.numServings)
+                    .frame(height: 130)
+            }.tag(ViewType.Main).scrollTargetBehavior(.paging)
+                .padding(EdgeInsets(top: 8, leading: 0, bottom: 32, trailing: 0))
+            MacroChartView(item: item).tag(ViewType.Macro)
+                .padding(EdgeInsets(top: 8, leading: 8, bottom: 32, trailing: 8))
+        }.tabViewStyle(.page(indexDisplayMode: .always))
+            .background(Color("BackgroundColor"))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
 private struct NutritionView: View {
     var item: FoodItem
+    var header: String
+    var modifier: Double
+    
+    private let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
     
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("Per Serving")
-                Text("\(gramFormatter.string(for: item.ingredients.nutrients[.Energy]?.value ?? 0)!) Cal")
+                Text(header)
+                Text(format(.Energy))
                     .font(.title).bold()
-                Text("\(format(item: item, nutrient: .TotalFat))g Fat")
+                Text("\(format(.TotalFat)) Fat")
                     .font(.subheadline)
                     .fontWeight(.light)
-                Text("\(format(item: item, nutrient: .TotalCarbs))g Carbs")
+                Text("\(format(.TotalCarbs)) Carbs")
                     .font(.subheadline)
                     .fontWeight(.light)
-                Text("\(format(item: item, nutrient: .Protein))g Protein")
+                Text("\(format(.Protein)) Protein")
                     .font(.subheadline)
                     .fontWeight(.light)
                 Spacer()
             }
             Spacer()
         }.padding()
-            .frame(maxWidth: .infinity, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-            .background(Color("BackgroundColor"))
-            .clipShape(RoundedRectangle(cornerRadius: 12.0))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private func format(_ nutrient: Nutrient) -> String {
+        if nutrient == .Energy {
+            return "\(formatter.string(for: (item.getNutrient(.Energy)?.value ?? 0) * modifier)!) Cal"
+        }
+        let amount = try? item.getNutrient(nutrient)?.toGrams()
+        return "\(formatter.string(for: (amount?.value ?? 0) * modifier)!)g"
     }
 }
 
-private struct NutrientTable: View {
+private struct MacroChartView: View {
     var item: FoodItem
     
+    private let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 1
+        return formatter
+    }()
+    
     var body: some View {
-        VStack {
-            Grid {
-                createRow(name: "Calories", nutrient: .Energy)
-                    .bold()
-                Divider()
-                createRow(name: "Total Fat", nutrient: .TotalFat)
-                    .bold()
-                Divider()
-                createRow(name: "Saturated Fat", nutrient: .SaturatedFat, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Trans Fat", nutrient: .TransFat, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Polyunsaturated Fat", nutrient: .PolyunsaturatedFat, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Monounsaturated Fat", nutrient: .MonounsaturatedFat, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Cholesterol", nutrient: .Cholesterol)
-                    .bold()
-                Divider()
-                createRow(name: "Sodium", nutrient: .Sodium)
-                    .bold()
-                Divider()
-                createRow(name: "Total Carbohydrates", nutrient: .TotalCarbs)
-                    .bold()
-                Divider()
-                createRow(name: "Dietary Fiber", nutrient: .DietaryFiber, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Total Sugars", nutrient: .TotalSugars, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Added Sugars", nutrient: .AddedSugars, indented: true)
-                    .font(.subheadline)
-                Divider()
-                createRow(name: "Protein", nutrient: .Protein)
-                    .bold()
-                Divider()
-                createRow(name: "Vitamin D", nutrient: .VitaminD)
-                Divider()
-                createRow(name: "Calcium", nutrient: .Calcium)
-                Divider()
-                createRow(name: "Iron", nutrient: .Iron)
-                Divider()
-                createRow(name: "Potassium", nutrient: .Potassium)
-            }.padding()
-                .background(Color("BackgroundColor"))
-                .clipShape(RoundedRectangle(cornerRadius: 12.0))
-        }
+        Chart(createData(item), id: \.name) { name, amount in
+            SectorMark(
+                angle: .value("Amount", amount),
+                innerRadius: .ratio(0.6),
+                outerRadius: .inset(2),
+                angularInset: 1
+            ).cornerRadius(4)
+                .foregroundStyle(by: .value("Macro type", name))
+        }.chartLegend(position: .bottom, alignment: .center, spacing: 2)
+            .chartForegroundStyleScale([
+                "Carbs": Color.green,
+                "Fat": Color.orange,
+                "Protein": Color.indigo
+            ])
     }
     
-    private func createRow(name: String, nutrient: Nutrient, indented: Bool = false) -> some View {
-        GridRow {
-            Text(name).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
-            if (nutrient == .Energy) {
-                Text(format(item: item, nutrient: nutrient))
-                    .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
-            } else {
-                Text("\(format(item: item, nutrient: nutrient)) \(nutrient.getCommonUnit().getAbbreviation())")
-                    .gridCellAnchor(UnitPoint(x: 1, y: 0.5))
+    private func createData(_ item: FoodItem) -> [(name: String, amount: Double)] {
+        return [
+            (name: "Carbs", amount: computeAmount(.TotalCarbs)),
+            (name: "Fat", amount: computeAmount(.TotalFat)),
+            (name: "Protein", amount: computeAmount(.Protein))
+        ]
+    }
+    
+    private func computeAmount(_ nutrient: Nutrient) -> Double {
+        return (try? item.getNutrient(nutrient)?.toGrams())?.value ?? 0
+    }
+}
+
+private struct MainTabView: View {
+    private enum ViewType {
+        case Nutrients, Ingredients, Description
+    }
+    
+    @ObservedObject var sheetCoordinator: SheetCoordinator<FoodSheetEnum>
+    
+    var item: FoodItem
+    
+    @State private var viewType: ViewType = .Nutrients
+    
+    var body: some View {
+        TabView(selection: $viewType) {
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Description").font(.title2).bold()
+                    Text(item.details ?? "No description set.").multilineTextAlignment(.leading)
+                    Spacer(minLength: 20)
+                    Text("Barcode: \(item.metaData.barcode ?? "None")").font(.caption)
+                    Text("Created On: \(item.metaData.timestamp.formatted(date: .abbreviated, time: .standard))").font(.caption)
+                    // Expands to fill horizontally
+                    HStack {
+                        Spacer()
+                    }
+                }
+            }.tag(ViewType.Description).padding()
+            ScrollView(.vertical) {
+                NutrientTableView(nutrients: item.ingredients.nutrients)
+                    .contextMenu {
+                        Button {
+                            sheetCoordinator.presentSheet(.Nutrients(item: item))
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                    }.padding()
+            }.tag(ViewType.Nutrients)
+            if !item.ingredients.all.isEmpty || !item.ingredients.allergens.isEmpty {
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Ingredients").font(.title2).bold()
+                        Text(item.ingredients.all.isEmpty ? "No known ingredients" : item.ingredients.all)
+                            .multilineTextAlignment(.leading)
+                        Text("Allergens: \(item.ingredients.allergens.isEmpty ? "None" : item.ingredients.allergens)")
+                            .multilineTextAlignment(.leading)
+                            .bold()
+                        // Expands to fill horizontally
+                        HStack {
+                            Spacer()
+                        }
+                    }
+                }.tag(ViewType.Ingredients).padding()
             }
-        }
-        .italic(indented)
-        .padding(EdgeInsets(top: 0.0, leading: indented ? 8.0 : 0.0, bottom: 0.0, trailing: 0.0))
+        }.tabViewStyle(.page(indexDisplayMode: .always))
+            .background(Color("BackgroundColor"))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 

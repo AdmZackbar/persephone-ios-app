@@ -18,7 +18,7 @@ struct NutrientTableView: View {
     }()
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             createRow(name: "Calories", nutrient: .Energy).bold().font(.title)
             createRow(name: "Total Fat", nutrient: .TotalFat).bold()
             createRow(name: "Saturated Fat", nutrient: .SaturatedFat, indented: true).font(.subheadline)

@@ -26,7 +26,7 @@ struct FoodItemView: View {
         VStack(spacing: 16) {
             Grid(horizontalSpacing: 16) {
                 GridRow {
-                    StoreInfoView(item: item)
+                    SizeTabView(item: item)
                     NutritionTabView(item: item)
                 }
             }.frame(height: 160)
@@ -120,6 +120,35 @@ private struct StoreInfoView: View {
     }
 }
 
+private struct SizeTabView: View {
+    var item: FoodItem
+    
+    private let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Serving Size").font(.subheadline)
+                Text(item.size.servingSize).font(.title2).bold()
+                Text("\(formatter.string(for: item.size.servingAmount.value)!)\(item.size.servingAmount.unit.getAbbreviation())").fontWeight(.light)
+                Spacer()
+                Text("\(formatter.string(for: item.size.numServings)!) servings").lineLimit(1)
+                Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(formatter.string(for: item.size.totalAmount.value)!)\(item.size.totalAmount.unit.getAbbreviation())").font(.subheadline).fontWeight(.light).lineLimit(1)
+                
+            }
+            Spacer()
+        }.padding(12)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color("BackgroundColor"))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
 private struct NutritionTabView: View {
     private enum ViewType {
         case Main, Macro
@@ -132,9 +161,9 @@ private struct NutritionTabView: View {
     var body: some View {
         TabView {
             ScrollView(.vertical) {
-                NutritionView(item: item, header: "Per Serving", modifier: 1)
+                NutritionView(item: item, header: item.size.servingSize, modifier: 1)
                     .frame(height: 126)
-                NutritionView(item: item, header: "Whole Amount", modifier: item.size.numServings)
+                NutritionView(item: item, header: "Whole Container", modifier: item.size.numServings)
                     .frame(height: 134)
             }.tag(ViewType.Main).scrollTargetBehavior(.paging)
                 .padding(12)
@@ -162,7 +191,7 @@ private struct NutritionView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(header)
+                Text(header).font(.subheadline)
                 Text(format(.Energy))
                     .font(.title).bold()
                 Text("\(format(.TotalFat)) Fat")

@@ -32,21 +32,18 @@ extension SchemaV1 {
         func toGrams() throws -> FoodAmount {
             var modifier: Double!
             switch unit {
+            case .Microgram:
+                modifier = 0.000001
             case .Milligram:
                 modifier = 0.001
-                break
             case .Gram:
                 modifier = 1
-                break
             case .Kilogram:
                 modifier = 1000
-                break
             case .Ounce:
                 modifier = 28.3495
-                break
             case .Pound:
                 modifier = 453.592
-                break
             default:
                 throw FoodError.invalidUnit(unit: unit)
             }
@@ -56,21 +53,18 @@ extension SchemaV1 {
         func toMilligrams() throws -> FoodAmount {
             var modifier: Double!
             switch unit {
+            case .Microgram:
+                modifier = 0.001
             case .Milligram:
                 modifier = 1
-                break
             case .Gram:
                 modifier = 1000
-                break
             case .Kilogram:
                 modifier = 1000000
-                break
             case .Ounce:
                 modifier = 28349.5
-                break
             case .Pound:
                 modifier = 453592
-                break
             default:
                 throw FoodError.invalidUnit(unit: unit)
             }
@@ -84,7 +78,7 @@ extension SchemaV1 {
         // Weight (US)
         case Ounce, Pound
         // Weight (SI)
-        case Milligram, Gram, Kilogram
+        case Microgram, Milligram, Gram, Kilogram
         // Volume (US)
         case Teaspoon, Tablespoon, FluidOunce, Cup, Pint, Quart, Gallon
         // Volume (SI)
@@ -92,7 +86,7 @@ extension SchemaV1 {
         
         func isSi() -> Bool {
             switch self {
-            case .Milligram, .Gram, .Kilogram, .Milliliter, .Liter:
+            case .Microgram, .Milligram, .Gram, .Kilogram, .Milliliter, .Liter:
                 return true
             default:
                 return false
@@ -101,7 +95,7 @@ extension SchemaV1 {
         
         func isWeight() -> Bool {
             switch self {
-            case .Ounce, .Pound, .Milligram, .Gram, .Kilogram:
+            case .Ounce, .Pound, .Microgram, .Milligram, .Gram, .Kilogram:
                 return true
             default:
                 return false
@@ -116,6 +110,8 @@ extension SchemaV1 {
                 return "oz"
             case .Pound:
                 return "lb"
+            case .Microgram:
+                return "mcg"
             case .Milligram:
                 return "mg"
             case .Gram:

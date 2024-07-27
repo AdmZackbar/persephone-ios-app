@@ -41,10 +41,9 @@ extension SchemaV1 {
              TransFat,
              PolyunsaturatedFat,
              MonounsaturatedFat
-        // Other (g)
-        case Protein
-        // Other (mg)
-        case Sodium,
+        // Other
+        case Protein,
+             Sodium,
              Cholesterol,
              Calcium,
              VitaminD,
@@ -55,8 +54,10 @@ extension SchemaV1 {
             switch self {
             case .Energy:
                 return .Calorie
-            case .Sodium, .Cholesterol, .Calcium, .VitaminD, .Iron, .Potassium:
+            case .Sodium, .Cholesterol, .Calcium, .Iron, .Potassium:
                 return .Milligram
+            case .VitaminD:
+                return .Microgram
             default:
                 return .Gram
             }

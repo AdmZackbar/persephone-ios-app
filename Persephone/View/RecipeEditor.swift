@@ -219,6 +219,8 @@ struct RecipeEditor: View {
             return ["oz", "ounce", "ounces"]
         case .Pound:
             return ["lb", "lbs", "pound", "pounds"]
+        case .Microgram:
+            return ["mcg", "microgram", "micrograms"]
         case .Milligram:
             return ["mg", "milligram", "milligrams"]
         case .Gram:

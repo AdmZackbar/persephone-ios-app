@@ -71,6 +71,7 @@ struct StoreItemSheet: View {
                         HStack {
                             Text("Quantity:")
                             TextField("", value: $quantity, formatter: formatter)
+                                .keyboardType(.numberPad)
                         }
                     } onIncrement: {
                         quantity += 1

@@ -29,7 +29,7 @@ struct FoodItemView: View {
                     SizeTabView(item: item)
                     NutritionTabView(item: item)
                 }
-            }.frame(height: 160)
+            }.frame(height: 140)
             if !item.storeItems.isEmpty {
                 StoreItemsTabView(storeItems: item.storeItems.sorted(by: { x, y in
                     let unitX = Double(x.price.cents) / Double(x.quantity)
@@ -53,11 +53,6 @@ struct FoodItemView: View {
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
-                        Button {
-                            sheetCoordinator.presentSheet(.Nutrients(item: item))
-                        } label: {
-                            Label("Nutrition", systemImage: "tablecells")
-                        }
                         Menu("Store Listings") {
                             ForEach(item.storeItems.sorted(by: { x, y in x.store.name < y.store.name }), id: \.store.name) { storeItem in
                                 Button(storeItem.store.name) {
@@ -69,6 +64,11 @@ struct FoodItemView: View {
                             } label: {
                                 Label("Add Listing", systemImage: "plus")
                             }
+                        }
+                        Button {
+                            sheetCoordinator.presentSheet(.Nutrients(item: item))
+                        } label: {
+                            Label("Nutrition", systemImage: "tablecells")
                         }
                     } label: {
                         Label("Edit", systemImage: "pencil").labelStyle(.titleOnly)
@@ -94,11 +94,11 @@ private struct StoreItemsTabView: View {
             TabView(selection: $tabSelection) {
                 ForEach(storeItems) { storeItem in
                     HStack(spacing: 18) {
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(storeItem.store.name).font(.title2).bold()
                             Text("\(storeItem.quantity) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100)!)")
-                            Spacer()
                             Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
+                            Spacer()
                         }
                         Spacer()
                         VStack(alignment: .leading) {
@@ -121,14 +121,19 @@ private struct StoreItemsTabView: View {
                 }
             }.frame(maxWidth: .infinity)
                 .tabViewStyle(.page(indexDisplayMode: .never))
-            // Tab indicators
-            HStack(spacing: 6) {
-                ForEach(storeItems) { storeItem in
-                    Image(systemName: "circle.fill")
-                        .font(.system(size: 9))
-                        .foregroundStyle(tabSelection == storeItem.store.name ? Color.primary : .gray)
-                }
-            }.padding(.bottom, 6)
+            // Tab indicators (only need to show if there's more than 1 listing
+            if storeItems.count > 1 {
+                HStack {
+                    HStack(spacing: 6) {
+                        ForEach(storeItems) { storeItem in
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 9))
+                                .foregroundStyle(tabSelection == storeItem.store.name ? Color.accentColor : .gray)
+                        }
+                    }
+                    Spacer()
+                }.padding(EdgeInsets(top: 0, leading: 16, bottom: 12, trailing: 0))
+            }
         }.background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }
@@ -186,28 +191,46 @@ private struct SizeTabView: View {
 }
 
 private struct NutritionTabView: View {
-    private enum ViewType {
+    private enum ViewType: String, Identifiable, CaseIterable, Equatable, Hashable {
+        var id: String {
+            rawValue
+        }
+        
         case Main, Macro
     }
     
     var item: FoodItem
     
-    // selection currently breaks page indicator, so don't impl that for now
+    @State private var tabSelection: ViewType = .Main
     
     var body: some View {
-        TabView {
-            ScrollView(.vertical) {
-                NutritionView(item: item, header: item.size.servingSize, modifier: 1)
-                    .frame(height: 126)
-                NutritionView(item: item, header: "Whole Container", modifier: item.size.numServings)
-                    .frame(height: 134)
-            }.tag(ViewType.Main).scrollTargetBehavior(.paging)
-                .padding(12)
-            MacroChartView(item: item).tag(ViewType.Macro)
-                .padding(12)
-        }.tabViewStyle(.page(indexDisplayMode: .automatic))
-            .indexViewStyle(.page(backgroundDisplayMode: .automatic))
-            .background(Color("BackgroundColor"))
+        ZStack(alignment: .bottom) {
+            TabView(selection: $tabSelection) {
+                ScrollView(.vertical) {
+                    NutritionView(item: item, header: item.size.servingSize, modifier: 1)
+                        .frame(height: 126)
+                    NutritionView(item: item, header: "Whole Container", modifier: item.size.numServings)
+                        .frame(height: 134)
+                }.scrollTargetBehavior(.paging)
+                    .padding(12)
+                    .tag(ViewType.Main)
+                MacroChartView(item: item)
+                    .padding(12)
+                    .tag(ViewType.Macro)
+            }.tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(maxWidth: .infinity)
+            // Tab indicators
+            HStack {
+                Spacer()
+                HStack(spacing: 6) {
+                    ForEach(ViewType.allCases) { type in
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 9))
+                            .foregroundStyle(tabSelection == type ? Color.accentColor : .gray)
+                    }
+                }
+            }.padding(EdgeInsets(top: 0, leading: 0, bottom: 12, trailing: 12))
+        }.background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -340,60 +363,74 @@ private struct MacroChartView: View {
 }
 
 private struct MainTabView: View {
-    private enum ViewType {
-        case Nutrients, Ingredients, Description
+    private enum ViewType: String, Identifiable, CaseIterable, Equatable, Hashable {
+        var id: String {
+            rawValue
+        }
+        
+        case Description, Nutrients, Ingredients
     }
     
     @ObservedObject var sheetCoordinator: SheetCoordinator<FoodSheetEnum>
     
     var item: FoodItem
     
-    @State private var viewType: ViewType = .Description
+    @State private var tabSelection: ViewType = .Description
     
     var body: some View {
-        TabView(selection: $viewType) {
-            ScrollView(.vertical) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Description").font(.title2).bold()
-                    Text(item.details ?? "No description set.").multilineTextAlignment(.leading)
-                    Spacer(minLength: 20)
-                    Text("Barcode: \(item.metaData.barcode ?? "None")").font(.caption)
-                    Text("Created On: \(item.metaData.timestamp.formatted(date: .abbreviated, time: .standard))").font(.caption)
-                    // Expands to fill horizontally
-                    HStack {
-                        Spacer()
-                    }
-                }
-            }.tag(ViewType.Description).padding()
-            ScrollView(.vertical) {
-                NutrientTableView(nutrients: item.ingredients.nutrients)
-                    .contextMenu {
-                        Button {
-                            sheetCoordinator.presentSheet(.Nutrients(item: item))
-                        } label: {
-                            Label("Edit", systemImage: "pencil")
-                        }
-                    }.padding()
-            }.tag(ViewType.Nutrients)
-            if !item.ingredients.all.isEmpty || !item.ingredients.allergens.isEmpty {
+        ZStack(alignment: .bottom) {
+            TabView(selection: $tabSelection) {
                 ScrollView(.vertical) {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Ingredients").font(.title2).bold()
-                        Text(item.ingredients.all.isEmpty ? "No known ingredients" : item.ingredients.all)
-                            .multilineTextAlignment(.leading)
-                        Text("Allergens: \(item.ingredients.allergens.isEmpty ? "None" : item.ingredients.allergens)")
-                            .multilineTextAlignment(.leading)
-                            .bold()
+                        Text("Description").font(.title2).bold()
+                        Text(item.details ?? "No description set.").multilineTextAlignment(.leading)
+                        Spacer(minLength: 20)
+                        Text("Barcode: \(item.metaData.barcode ?? "None")").font(.caption)
+                        Text("Created On: \(item.metaData.timestamp.formatted(date: .abbreviated, time: .standard))").font(.caption)
                         // Expands to fill horizontally
                         HStack {
                             Spacer()
                         }
                     }
-                }.tag(ViewType.Ingredients).padding()
-            }
-        }.tabViewStyle(.page(indexDisplayMode: .always))
-            .indexViewStyle(.page(backgroundDisplayMode: .interactive))
-            .background(Color("BackgroundColor"))
+                }.padding().tag(ViewType.Description)
+                ScrollView(.vertical) {
+                    NutrientTableView(nutrients: item.ingredients.nutrients)
+                        .contextMenu {
+                            Button {
+                                sheetCoordinator.presentSheet(.Nutrients(item: item))
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                        }.padding()
+                }.tag(ViewType.Nutrients)
+                if !item.ingredients.all.isEmpty || !item.ingredients.allergens.isEmpty {
+                    ScrollView(.vertical) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Ingredients").font(.title2).bold()
+                            Text(item.ingredients.all.isEmpty ? "No known ingredients" : item.ingredients.all)
+                                .multilineTextAlignment(.leading)
+                            Text("Allergens: \(item.ingredients.allergens.isEmpty ? "None" : item.ingredients.allergens)")
+                                .multilineTextAlignment(.leading)
+                                .bold()
+                            // Expands to fill horizontally
+                            HStack {
+                                Spacer()
+                            }
+                        }
+                    }.padding()
+                        .tag(ViewType.Ingredients)
+                }
+            }.tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(maxWidth: .infinity)
+            // Tab indicators
+            HStack(spacing: 6) {
+                ForEach(ViewType.allCases) { type in
+                    Image(systemName: "circle.fill")
+                        .font(.system(size: 9))
+                        .foregroundStyle(tabSelection == type ? Color.accentColor : .gray)
+                }
+            }.padding(.bottom, 6)
+        }.background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

@@ -31,8 +31,11 @@ struct FoodItemView: View {
                 }
             }.frame(height: 160)
             if !item.storeItems.isEmpty {
-                StoreItemsTabView(storeItems: item.storeItems)
-                    .frame(height: 120)
+                StoreItemsTabView(storeItems: item.storeItems.sorted(by: { x, y in
+                    let unitX = Double(x.price.cents) / Double(x.quantity)
+                    let unitY = Double(y.price.cents) / Double(y.quantity)
+                    return unitX < unitY
+                })).frame(height: 120)
             }
             MainTabView(sheetCoordinator: sheetCoordinator, item: item)
         }.navigationBarTitleDisplayMode(.inline)
@@ -56,7 +59,7 @@ struct FoodItemView: View {
                             Label("Nutrition", systemImage: "tablecells")
                         }
                         Menu("Store Listings") {
-                            ForEach(item.storeItems, id: \.store?.name) { storeItem in
+                            ForEach(item.storeItems.sorted(by: { x, y in x.store.name < y.store.name }), id: \.store.name) { storeItem in
                                 Button(storeItem.store.name) {
                                     sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: storeItem))
                                 }
@@ -77,40 +80,56 @@ struct FoodItemView: View {
 }
 
 private struct StoreItemsTabView: View {
-    let storeItems: [StoreItem]
+    @State private var tabSelection: String
+    
+    var storeItems: [StoreItem]
+    
+    init(storeItems: [StoreItem]) {
+        self.tabSelection = storeItems.first!.store.name
+        self.storeItems = storeItems
+    }
     
     var body: some View {
-        TabView {
-            ForEach(storeItems) { storeItem in
-                HStack(spacing: 18) {
-                    VStack(alignment: .leading) {
-                        Text(storeItem.store.name).font(.title).bold()
-                        Text("\(storeItem.quantity) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100)!)")
-                        Spacer()
-                        Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
-                    }
-                    Spacer()
-                    VStack(alignment: .leading) {
-                        Text(computeCostPerUnit(storeItem)).bold()
-                        Text("per Unit").font(.caption).fontWeight(.light)
-                        Spacer()
-                        Text(computeCostPerServing(storeItem)).bold()
-                        Text("per Serving").font(.caption).fontWeight(.light)
-                    }
-                    VStack(alignment: .leading) {
-                        if storeItem.foodItem.getNutrient(.Energy)?.value ?? 0 != 0 {
-                            Text(computeCostPerCalories(storeItem)).bold()
-                            Text("per 100 cal").font(.caption).fontWeight(.light)
+        ZStack(alignment: .bottom) {
+            TabView(selection: $tabSelection) {
+                ForEach(storeItems) { storeItem in
+                    HStack(spacing: 18) {
+                        VStack(alignment: .leading) {
+                            Text(storeItem.store.name).font(.title2).bold()
+                            Text("\(storeItem.quantity) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100)!)")
                             Spacer()
+                            Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
                         }
-                        Text(computeCostPerUnitTotal(storeItem)).bold()
-                        Text("per 100 \(storeItem.foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
-                    }
-                }.padding()
-            }
-        }.tabViewStyle(.page(indexDisplayMode: .automatic))
-            .indexViewStyle(.page(backgroundDisplayMode: .automatic))
-            .background(Color("BackgroundColor"))
+                        Spacer()
+                        VStack(alignment: .leading) {
+                            Text(computeCostPerUnit(storeItem)).bold()
+                            Text("per Unit").font(.caption).fontWeight(.light)
+                            Spacer()
+                            Text(computeCostPerServing(storeItem)).bold()
+                            Text("per Serving").font(.caption).fontWeight(.light)
+                        }
+                        VStack(alignment: .leading) {
+                            if storeItem.foodItem.getNutrient(.Energy)?.value ?? 0 != 0 {
+                                Text(computeCostPerCalories(storeItem)).bold()
+                                Text("per 100 cal").font(.caption).fontWeight(.light)
+                                Spacer()
+                            }
+                            Text(computeCostPerUnitTotal(storeItem)).bold()
+                            Text("per 100 \(storeItem.foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
+                        }
+                    }.padding().tag(storeItem.store.name)
+                }
+            }.frame(maxWidth: .infinity)
+                .tabViewStyle(.page(indexDisplayMode: .never))
+            // Tab indicators
+            HStack(spacing: 6) {
+                ForEach(storeItems) { storeItem in
+                    Image(systemName: "circle.fill")
+                        .font(.system(size: 9))
+                        .foregroundStyle(tabSelection == storeItem.store.name ? Color.primary : .gray)
+                }
+            }.padding(.bottom, 6)
+        }.background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
@@ -210,7 +229,7 @@ private struct NutritionView: View {
             VStack(alignment: .leading) {
                 Text(header).font(.subheadline)
                 Text(format(.Energy))
-                    .font(.title).bold()
+                    .font(.title2).bold()
                 Text("\(format(.TotalFat)) Fat")
                     .font(.subheadline)
                     .fontWeight(.light)

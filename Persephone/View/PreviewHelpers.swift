@@ -42,7 +42,10 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
     context.insert(item)
     let store = Store(name: "Costco")
     context.insert(store)
-    item.storeItems.append(StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 500), available: true))
+    item.storeItems.append(StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 699), available: true))
+    let store2 = Store(name: "Publix")
+    context.insert(store2)
+    item.storeItems.append(StoreItem(store: store2, foodItem: item, quantity: 3, price: Price(cents: 1099), available: true))
     return item
 }
 

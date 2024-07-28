@@ -18,7 +18,7 @@ extension SchemaV1 {
     @Model
     final class Store {
         // The name of the store
-        var name: String
+        @Attribute(.unique) var name: String
         // An image of the store
         @Attribute(.externalStorage) var imageData: Data?
         

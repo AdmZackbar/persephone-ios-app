@@ -28,6 +28,8 @@
 		E8743BA12C52DC3A00E1B871 /* StoreItemSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743BA02C52DC3A00E1B871 /* StoreItemSheet.swift */; };
 		E8743BA32C52DC6300E1B871 /* NutrientSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743BA22C52DC6300E1B871 /* NutrientSheet.swift */; };
 		E8743BA52C5344D000E1B871 /* NutrientTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743BA42C5344D000E1B871 /* NutrientTableView.swift */; };
+		E8743BAB2C56ED0B00E1B871 /* FoodSheetEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743BAA2C56ED0B00E1B871 /* FoodSheetEnum.swift */; };
+		E8743BAD2C56ED9F00E1B871 /* FoodTagSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743BAC2C56ED9F00E1B871 /* FoodTagSheet.swift */; };
 		E8828ECF2C4F5154006C7CB3 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ECE2C4F5154006C7CB3 /* Store.swift */; };
 		E8828ED12C4F529A006C7CB3 /* Food.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ED02C4F529A006C7CB3 /* Food.swift */; };
 		E8828ED32C4F543A006C7CB3 /* ShoppingList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ED22C4F543A006C7CB3 /* ShoppingList.swift */; };
@@ -89,6 +91,8 @@
 		E8743BA02C52DC3A00E1B871 /* StoreItemSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreItemSheet.swift; sourceTree = "<group>"; };
 		E8743BA22C52DC6300E1B871 /* NutrientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutrientSheet.swift; sourceTree = "<group>"; };
 		E8743BA42C5344D000E1B871 /* NutrientTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutrientTableView.swift; sourceTree = "<group>"; };
+		E8743BAA2C56ED0B00E1B871 /* FoodSheetEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodSheetEnum.swift; sourceTree = "<group>"; };
+		E8743BAC2C56ED9F00E1B871 /* FoodTagSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodTagSheet.swift; sourceTree = "<group>"; };
 		E8828ECC2C4DC43C006C7CB3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E8828ECD2C4DC456006C7CB3 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		E8828ECE2C4F5154006C7CB3 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
@@ -169,9 +173,11 @@
 				E82CFBD92C3F078D0055C6B2 /* MainView.swift */,
 				E82CFBDB2C3F0D990055C6B2 /* DbView.swift */,
 				E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */,
+				E8743BAA2C56ED0B00E1B871 /* FoodSheetEnum.swift */,
 				E80E2C492C40157A00D35BE7 /* FoodItemView.swift */,
 				E8743BA42C5344D000E1B871 /* NutrientTableView.swift */,
 				E80E2C4B2C401AF300D35BE7 /* FoodItemEditor.swift */,
+				E8743BAC2C56ED9F00E1B871 /* FoodTagSheet.swift */,
 				E8743BA22C52DC6300E1B871 /* NutrientSheet.swift */,
 				E8743BA02C52DC3A00E1B871 /* StoreItemSheet.swift */,
 				E8743B9E2C52DC1C00E1B871 /* StoreSheet.swift */,
@@ -401,7 +407,9 @@
 				E8828ED72C502F37006C7CB3 /* FoodInstance.swift in Sources */,
 				E8743BA52C5344D000E1B871 /* NutrientTableView.swift in Sources */,
 				E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */,
+				E8743BAD2C56ED9F00E1B871 /* FoodTagSheet.swift in Sources */,
 				E8828EE52C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift in Sources */,
+				E8743BAB2C56ED0B00E1B871 /* FoodSheetEnum.swift in Sources */,
 				E8D72EF12C463D3A0053CA26 /* Recipe.swift in Sources */,
 				E8828ECF2C4F5154006C7CB3 /* Store.swift in Sources */,
 				E80E2C422C3F6CCF00D35BE7 /* CurrencyTextField.swift in Sources */,

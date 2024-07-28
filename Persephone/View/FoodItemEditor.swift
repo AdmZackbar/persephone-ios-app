@@ -23,35 +23,6 @@ enum EditorMode {
     }
 }
 
-enum FoodSheetEnum: Identifiable, SheetEnum {
-    var id: String {
-        switch self {
-        case .Nutrients(let f):
-            return f.name
-        case .StoreItem(_, let i):
-            return i?.store.name ?? "item editor"
-        case .Store(let s):
-            return s?.name ?? "store editor"
-        }
-    }
-    
-    case Nutrients(item: FoodItem)
-    case StoreItem(foodItem: FoodItem, item: StoreItem?)
-    case Store(store: Store?)
-    
-    @ViewBuilder
-    func view(coordinator: SheetCoordinator<FoodSheetEnum>) -> some View {
-        switch self {
-        case .Nutrients(let f):
-            NutrientSheet(item: f)
-        case .StoreItem(let f, let i):
-            StoreItemSheet(foodItem: f, item: i)
-        case .Store(let s):
-            StoreSheet(store: s)
-        }
-    }
-}
-
 struct FoodItemEditor: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext

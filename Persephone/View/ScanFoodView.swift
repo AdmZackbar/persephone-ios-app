@@ -239,6 +239,13 @@ private struct ConfirmFoodScanView: View {
                         .textInputAutocapitalization(.words)
                 }.bold()
             }
+            Section("Tags") {
+                Text(item.metaData.tags.isEmpty ? "No tags" : item.metaData.tags.joined(separator: ", "))
+                    .italic(item.metaData.tags.isEmpty)
+                Button("Edit Tags...") {
+                    sheetCoordinator.presentSheet(.Tags(item: item))
+                }
+            }
             Section("Store Listings") {
                 List(item.storeItems) { storeItem in
                     HStack {

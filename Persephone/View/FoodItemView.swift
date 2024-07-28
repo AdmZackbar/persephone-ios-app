@@ -42,10 +42,19 @@ struct FoodItemView: View {
             .padding()
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    if item.metaData.brand != nil {
+                    if item.metaData.brand != nil || !item.metaData.tags.isEmpty {
                         VStack {
                             Text(item.name).font(.headline)
-                            Text(item.metaData.brand ?? "").font(.subheadline)
+                            if item.metaData.brand != nil {
+                                Text(item.metaData.brand ?? "").font(.caption)
+                            }
+                            if !item.metaData.tags.isEmpty {
+                                Label {
+                                    Text(item.metaData.tags.joined(separator: ", ")).font(.caption).italic()
+                                } icon: {
+                                    Image(systemName: "tag.fill").font(.system(size: 9))
+                                }.labelStyle(.titleAndIcon)
+                            }
                         }
                     } else {
                         Text(item.name).font(.headline)
@@ -69,6 +78,11 @@ struct FoodItemView: View {
                             sheetCoordinator.presentSheet(.Nutrients(item: item))
                         } label: {
                             Label("Nutrition", systemImage: "tablecells")
+                        }
+                        Button {
+                            sheetCoordinator.presentSheet(.Tags(item: item))
+                        } label: {
+                            Label("Tags", systemImage: "tag.fill")
                         }
                     } label: {
                         Label("Edit", systemImage: "pencil").labelStyle(.titleOnly)
@@ -127,7 +141,7 @@ private struct StoreItemsTabView: View {
                     HStack(spacing: 6) {
                         ForEach(storeItems) { storeItem in
                             Image(systemName: "circle.fill")
-                                .font(.system(size: 9))
+                                .font(.system(size: 8))
                                 .foregroundStyle(tabSelection == storeItem.store.name ? Color.accentColor : .gray)
                         }
                     }
@@ -208,9 +222,9 @@ private struct NutritionTabView: View {
             TabView(selection: $tabSelection) {
                 ScrollView(.vertical) {
                     NutritionView(item: item, header: item.size.servingSize, modifier: 1)
-                        .frame(height: 126)
+                        .frame(height: 120)
                     NutritionView(item: item, header: "Whole Container", modifier: item.size.numServings)
-                        .frame(height: 134)
+                        .frame(height: 116)
                 }.scrollTargetBehavior(.paging)
                     .padding(12)
                     .tag(ViewType.Main)
@@ -225,7 +239,7 @@ private struct NutritionTabView: View {
                 HStack(spacing: 6) {
                     ForEach(ViewType.allCases) { type in
                         Image(systemName: "circle.fill")
-                            .font(.system(size: 9))
+                            .font(.system(size: 8))
                             .foregroundStyle(tabSelection == type ? Color.accentColor : .gray)
                     }
                 }
@@ -426,7 +440,7 @@ private struct MainTabView: View {
             HStack(spacing: 6) {
                 ForEach(ViewType.allCases) { type in
                     Image(systemName: "circle.fill")
-                        .font(.system(size: 9))
+                        .font(.system(size: 8))
                         .foregroundStyle(tabSelection == type ? Color.accentColor : .gray)
                 }
             }.padding(.bottom, 6)

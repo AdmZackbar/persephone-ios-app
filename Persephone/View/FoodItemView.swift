@@ -30,6 +30,10 @@ struct FoodItemView: View {
                     NutritionTabView(item: item)
                 }
             }.frame(height: 160)
+            if !item.storeItems.isEmpty {
+                StoreItemsTabView(storeItems: item.storeItems)
+                    .frame(height: 120)
+            }
             MainTabView(sheetCoordinator: sheetCoordinator, item: item)
         }.navigationBarTitleDisplayMode(.inline)
             .padding()
@@ -72,51 +76,64 @@ struct FoodItemView: View {
     }
 }
 
-private struct StoreInfoView: View {
-    var item: FoodItem
-    
-    private let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
+private struct StoreItemsTabView: View {
+    let storeItems: [StoreItem]
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                if let storeItem = item.storeItems.first {
-                    Text(storeItem.store.name)
-                    Text("\(currencyFormatter.string(for: Double(storeItem.price.cents) / Double(storeItem.quantity) / 100.0)!)")
-                        .font(.title).bold()
-                }
-                Text(item.size.totalAmount.unit.isWeight() ? "Net Wt. \(formatWeight(item.size.totalAmount.value))" : "Net Vol. \(formatVolume(item.size.totalAmount.value))")
-                    .font(.subheadline)
-                Text("\(formatter.string(for: item.size.numServings)!) Servings")
-                    .font(.subheadline)
-                Text("\(item.size.servingSize) (\(formatter.string(for: item.size.servingAmount.value)!)g)")
-                    .font(.subheadline)
-                Spacer()
+        TabView {
+            ForEach(storeItems) { storeItem in
+                HStack(spacing: 18) {
+                    VStack(alignment: .leading) {
+                        Text(storeItem.store.name).font(.title).bold()
+                        Text("\(storeItem.quantity) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100)!)")
+                        Spacer()
+                        Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
+                    }
+                    Spacer()
+                    VStack(alignment: .leading) {
+                        Text(computeCostPerUnit(storeItem)).bold()
+                        Text("per Unit").font(.caption).fontWeight(.light)
+                        Spacer()
+                        Text(computeCostPerServing(storeItem)).bold()
+                        Text("per Serving").font(.caption).fontWeight(.light)
+                    }
+                    VStack(alignment: .leading) {
+                        if storeItem.foodItem.getNutrient(.Energy)?.value ?? 0 != 0 {
+                            Text(computeCostPerCalories(storeItem)).bold()
+                            Text("per 100 cal").font(.caption).fontWeight(.light)
+                            Spacer()
+                        }
+                        Text(computeCostPerUnitTotal(storeItem)).bold()
+                        Text("per 100 \(storeItem.foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
+                    }
+                }.padding()
             }
-            Spacer()
-        }.padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }.tabViewStyle(.page(indexDisplayMode: .automatic))
+            .indexViewStyle(.page(backgroundDisplayMode: .automatic))
             .background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
-    private func formatVolume(_ volume: Double) -> String {
-        if (volume > 500) {
-            return "\(formatter.string(for: volume / 1000)!)L"
-        }
-        return "\(formatter.string(for: volume)!)mL"
+    private func computeUnitCost(_ storeItem: StoreItem) -> Double {
+        Double(storeItem.price.cents) / 100 / Double(storeItem.quantity)
     }
     
-    private func formatWeight(_ weight: Double) -> String {
-        if (weight > 500) {
-            return "\(formatter.string(for: weight / 1000)!)kg"
-        }
-        return "\(formatter.string(for: weight)!)g"
+    private func computeCostPerUnit(_ storeItem: StoreItem) -> String {
+        currencyFormatter.string(for: computeUnitCost(storeItem))!
+    }
+    
+    private func computeCostPerServing(_ storeItem: StoreItem) -> String {
+        currencyFormatter.string(for: computeUnitCost(storeItem) / storeItem.foodItem.size.numServings)!
+    }
+    
+    private func computeCostPerCalories(_ storeItem: StoreItem) -> String {
+        let caloriesPerServing = storeItem.foodItem.getNutrient(.Energy)!.value
+        let totalCal = storeItem.foodItem.size.numServings * caloriesPerServing
+        return currencyFormatter.string(for: computeUnitCost(storeItem) / (totalCal / 100))!
+    }
+    
+    private func computeCostPerUnitTotal(_ storeItem: StoreItem) -> String {
+        currencyFormatter.string(for: computeUnitCost(storeItem) / storeItem.foodItem.size.totalAmount.value * 100)!
     }
 }
 
@@ -312,7 +329,7 @@ private struct MainTabView: View {
     
     var item: FoodItem
     
-    @State private var viewType: ViewType = .Nutrients
+    @State private var viewType: ViewType = .Description
     
     var body: some View {
         TabView(selection: $viewType) {

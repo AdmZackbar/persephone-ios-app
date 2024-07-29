@@ -11,7 +11,7 @@ import SwiftUI
 struct MainView: View {
     var body: some View {
         TabView {
-            DbView()
+            FoodDatabaseView()
                 .tabItem {
                     Label("Database", systemImage: "tablecells")
                 }

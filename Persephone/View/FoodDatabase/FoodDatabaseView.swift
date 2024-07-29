@@ -1,5 +1,5 @@
 //
-//  DbView.swift
+//  FoodDatabaseView.swift
 //  Persephone
 //
 //  Created by Zach Wassynger on 7/10/24.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct DbView: View {
+struct FoodDatabaseView: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
     
@@ -211,6 +211,6 @@ private struct NutritionView: View {
 #Preview {
     let container = createTestModelContainer()
     createTestFoodItem(container.mainContext)
-    return DbView()
+    return FoodDatabaseView()
         .modelContainer(container)
 }

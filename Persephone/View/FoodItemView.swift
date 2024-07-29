@@ -23,8 +23,23 @@ struct FoodItemView: View {
     var item: FoodItem
     
     var body: some View {
-        VStack(spacing: 16) {
-            Grid(horizontalSpacing: 16) {
+        VStack(spacing: 12) {
+            if !(item.metaData.brand ?? "").isEmpty || !item.metaData.tags.isEmpty {
+                HStack {
+                    if !(item.metaData.brand ?? "").isEmpty {
+                        Text(item.metaData.brand!).font(.subheadline).fontWeight(.semibold)
+                    }
+                    Spacer()
+                    if !item.metaData.tags.isEmpty {
+                        Label {
+                            Text(item.metaData.tags.joined(separator: ", ")).font(.subheadline).italic()
+                        } icon: {
+                            Image(systemName: "tag.fill").font(.system(size: 12))
+                        }.labelStyle(.titleAndIcon)
+                    }
+                }
+            }
+            Grid(horizontalSpacing: 12) {
                 GridRow {
                     SizeTabView(item: item)
                     NutritionTabView(item: item)
@@ -35,34 +50,25 @@ struct FoodItemView: View {
                     let unitX = Double(x.price.cents) / Double(x.quantity)
                     let unitY = Double(y.price.cents) / Double(y.quantity)
                     return unitX < unitY
-                })).frame(height: 120)
+                })).frame(height: 112)
             }
             MainTabView(sheetCoordinator: sheetCoordinator, item: item)
         }.navigationBarTitleDisplayMode(.inline)
-            .padding()
+            .padding(EdgeInsets(top: 4, leading: 12, bottom: 12, trailing: 12))
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    if item.metaData.brand != nil || !item.metaData.tags.isEmpty {
-                        VStack {
-                            Text(item.name).font(.headline)
-                            if item.metaData.brand != nil {
-                                Text(item.metaData.brand ?? "").font(.caption)
-                            }
-                            if !item.metaData.tags.isEmpty {
-                                Label {
-                                    Text(item.metaData.tags.joined(separator: ", ")).font(.caption).italic()
-                                } icon: {
-                                    Image(systemName: "tag.fill").font(.system(size: 9))
-                                }.labelStyle(.titleAndIcon)
-                            }
-                        }
-                    } else {
-                        Text(item.name).font(.headline)
-                    }
+                    Text(item.name).font(.headline)
+                        .multilineTextAlignment(.center)
+                        .frame(maxHeight: .infinity)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
-                        Menu("Store Listings") {
+                        Button {
+                            sheetCoordinator.presentSheet(.General(item: item))
+                        } label: {
+                            Label("General", systemImage: "pencil")
+                        }
+                        Menu {
                             ForEach(item.storeItems.sorted(by: { x, y in x.store.name < y.store.name }), id: \.store.name) { storeItem in
                                 Button(storeItem.store.name) {
                                     sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: storeItem))
@@ -73,6 +79,8 @@ struct FoodItemView: View {
                             } label: {
                                 Label("Add Listing", systemImage: "plus")
                             }
+                        } label: {
+                            Label("Store Listings", systemImage: "storefront")
                         }
                         Button {
                             sheetCoordinator.presentSheet(.Nutrients(item: item))
@@ -82,7 +90,7 @@ struct FoodItemView: View {
                         Button {
                             sheetCoordinator.presentSheet(.Tags(item: item))
                         } label: {
-                            Label("Tags", systemImage: "tag.fill")
+                            Label("Tags", systemImage: "tag")
                         }
                     } label: {
                         Label("Edit", systemImage: "pencil").labelStyle(.titleOnly)
@@ -131,7 +139,7 @@ private struct StoreItemsTabView: View {
                             Text(computeCostPerUnitTotal(storeItem)).bold()
                             Text("per 100 \(storeItem.foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
                         }
-                    }.padding().tag(storeItem.store.name)
+                    }.padding(12).tag(storeItem.store.name)
                 }
             }.frame(maxWidth: .infinity)
                 .tabViewStyle(.page(indexDisplayMode: .never))
@@ -146,7 +154,7 @@ private struct StoreItemsTabView: View {
                         }
                     }
                     Spacer()
-                }.padding(EdgeInsets(top: 0, leading: 16, bottom: 12, trailing: 0))
+                }.padding(EdgeInsets(top: 0, leading: 12, bottom: 8, trailing: 0))
             }
         }.background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -406,7 +414,7 @@ private struct MainTabView: View {
                             Spacer()
                         }
                     }
-                }.padding().tag(ViewType.Description)
+                }.padding(12).tag(ViewType.Description)
                 ScrollView(.vertical) {
                     NutrientTableView(nutrients: item.ingredients.nutrients)
                         .contextMenu {
@@ -415,7 +423,7 @@ private struct MainTabView: View {
                             } label: {
                                 Label("Edit", systemImage: "pencil")
                             }
-                        }.padding()
+                        }.padding(12)
                 }.tag(ViewType.Nutrients)
                 if !item.ingredients.all.isEmpty || !item.ingredients.allergens.isEmpty {
                     ScrollView(.vertical) {
@@ -431,7 +439,7 @@ private struct MainTabView: View {
                                 Spacer()
                             }
                         }
-                    }.padding()
+                    }.padding(12)
                         .tag(ViewType.Ingredients)
                 }
             }.tabViewStyle(.page(indexDisplayMode: .never))

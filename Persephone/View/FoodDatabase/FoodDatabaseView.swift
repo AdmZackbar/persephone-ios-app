@@ -83,19 +83,10 @@ struct FoodDatabaseView: View {
     private func createListItem(_ item: FoodItem) -> some View {
         VStack(alignment: .leading) {
             Text(item.name)
-            HStack {
-                Text(item.metaData.brand ?? "Custom")
-                    .font(.subheadline)
-                    .fontWeight(.light)
-                    .italic()
-//                if (!item.storeItems.isEmpty) {
-//                    Spacer()
-//                    Text("\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!) @ \(item.storeInfo!.name)")
-//                        .font(.subheadline)
-//                        .fontWeight(.light)
-//                        .italic()
-//                }
-            }
+            Text(item.metaData.brand ?? "Custom")
+                .font(.subheadline)
+                .fontWeight(.light)
+                .italic()
         }
     }
     
@@ -140,37 +131,23 @@ private struct NutritionView: View {
     let item: FoodItem
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(item.name)
-                .font(.title2)
+                .font(.title)
                 .fontWeight(.semibold)
                 .fixedSize(horizontal: false, vertical: true)
-            if (item.metaData.brand != nil) {
-                HStack {
-                    Text(item.metaData.brand ?? "").font(.subheadline).italic()
-//                    Spacer()
-//                    Text(item.storeInfo?.name ?? "").font(.subheadline).italic()
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 6) {
+                    if item.metaData.brand != nil {
+                        Text(item.metaData.brand ?? "").font(.headline).italic()
+                    }
+                    if !item.metaData.tags.isEmpty {
+                        Label(item.metaData.tags.joined(separator: ", "), systemImage: "tag.fill").font(.subheadline)
+                    }
                 }
             }
-            Divider()
-            HStack {
+            HStack(alignment: .top) {
                 VStack(alignment: .leading) {
-//                    Text(item.storeInfo != nil ?
-//                         "\(currencyFormatter.string(for: Double(item.storeInfo!.price) / 100.0)!)" : "No Price")
-//                        .font(.title2).bold()
-//                    Text(item.size.sizeType == .Mass ? "Net Wt. \(formatWeight(item.sizeInfo.totalAmount))" : "Net Vol. \(formatVolume(item.sizeInfo.totalAmount))")
-//                        .font(.subheadline)
-//                        .fontWeight(.light)
-                    Text("\(format(item.size.numServings)) Servings")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Text("Serving: \(item.size.servingSize) (\(format(item.size.servingAmount.value))g)")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Spacer()
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
                     Text("\(format(item.getNutrient(.Energy)?.value ?? 0)) Calories")
                         .font(.title2).bold()
                     Text("\(format(item.getNutrient(.TotalFat)?.value ?? 0))g Fat")
@@ -182,9 +159,19 @@ private struct NutritionView: View {
                     Text("\(format(item.getNutrient(.Protein)?.value ?? 0))g Protein")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Spacer()
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("\(item.size.servingSize) (\(format(item.size.servingAmount.value))\(item.size.servingAmount.unit.getAbbreviation()))").font(.headline).bold()
+                    Text("\(format(item.size.numServings)) servings").font(.subheadline)
+                    Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(format(item.size.totalAmount.value)) \(item.size.totalAmount.unit.getAbbreviation())")
+                        .font(.subheadline).fontWeight(.light)
                 }
             }
+            if item.details != nil {
+                Text(item.details!).italic()
+            }
+            Spacer()
         }
         .padding()
     }

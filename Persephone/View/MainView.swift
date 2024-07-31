@@ -19,7 +19,7 @@ struct MainView: View {
                 .tabItem {
                     Label("Cookbook", systemImage: "book")
                 }
-            Text("Inventory")
+            InventoryView()
                 .tabItem {
                     Label("Inventory", systemImage: "list.clipboard")
                 }

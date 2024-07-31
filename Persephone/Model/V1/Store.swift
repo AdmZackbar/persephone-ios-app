@@ -73,5 +73,15 @@ extension SchemaV1 {
     struct Price: Codable, Equatable, Hashable {
         // The price of an item in US cents
         var cents: Int
+        
+        func toString() -> String {
+            let formatter: NumberFormatter = {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .currency
+                formatter.maximumFractionDigits = 2
+                return formatter
+            }()
+            return formatter.string(for: (Double(cents) / 100.0))!
+        }
     }
 }

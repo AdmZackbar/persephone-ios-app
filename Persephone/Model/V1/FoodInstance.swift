@@ -9,6 +9,7 @@ import Foundation
 import SwiftData
 
 typealias FoodInstance = SchemaV1.FoodInstance
+typealias FoodInstanceOrigin = SchemaV1.FoodInstanceOrigin
 typealias FoodInstanceDates = SchemaV1.FoodInstanceDates
 typealias FoodInstanceAmount = SchemaV1.FoodInstanceAmount
 
@@ -17,8 +18,8 @@ extension SchemaV1 {
     final class FoodInstance {
         // The type of food
         var foodItem: FoodItem!
-        // The cost of the food
-        var price: Price
+        // The origin of the food (store bought, gifted, grown)
+        var origin: FoodInstanceOrigin
         // The amount of food that is left over
         var amount: FoodInstanceAmount
         // Relevant dates pertaining to the food
@@ -27,17 +28,26 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.food)
         var recipes: [RecipeInstanceIngredient] = []
         
-        init(foodItem: FoodItem, price: Price, amount: FoodInstanceAmount, dates: FoodInstanceDates) {
+        init(foodItem: FoodItem, origin: FoodInstanceOrigin, amount: FoodInstanceAmount, dates: FoodInstanceDates) {
             self.foodItem = foodItem
-            self.price = price
+            self.origin = origin
             self.amount = amount
             self.dates = dates
         }
     }
     
+    enum FoodInstanceOrigin: Codable {
+        // Store-bought
+        case Store(store: String, price: Price)
+        // Obtained for free from someone/somewhere
+        case Gift(from: String)
+        // Grown and obtained in some organic manner
+        case Grown(location: String)
+    }
+    
     struct FoodInstanceDates: Codable {
-        // The purchase date
-        var buyDate: Date
+        // The acquisition date
+        var acqDate: Date
         // The nominal expiration date
         var expDate: Date
         // The date this was frozen (if applicable)

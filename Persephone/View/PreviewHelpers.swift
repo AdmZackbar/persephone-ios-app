@@ -83,3 +83,10 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
     ])
     return recipe
 }
+
+@discardableResult
+func createTestFoodInstance(_ context: ModelContext) -> FoodInstance {
+    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", price: Price(cents: 530)), amount: .Single(total: FoodAmount(value: 530, unit: .Gram), remaining: FoodAmount(value: 420, unit: .Gram)), dates: FoodInstanceDates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
+    context.insert(item)
+    return item
+}

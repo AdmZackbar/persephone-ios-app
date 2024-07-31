@@ -17,6 +17,8 @@
 		E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C502C41C23200D35BE7 /* ScannerView.swift */; };
 		E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBD92C3F078D0055C6B2 /* MainView.swift */; };
 		E82CFBDC2C3F0D990055C6B2 /* FoodDatabaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBDB2C3F0D990055C6B2 /* FoodDatabaseView.swift */; };
+		E847B1EB2C5AA4D00084CD13 /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E847B1EA2C5AA4D00084CD13 /* InventoryView.swift */; };
+		E847B1ED2C5AA93E0084CD13 /* InventoryFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E847B1EC2C5AA93E0084CD13 /* InventoryFoodView.swift */; };
 		E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */; };
 		E860ACE82C3EFBE8007E65DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACE72C3EFBE8007E65DE /* Assets.xcassets */; };
 		E860ACEB2C3EFBE8007E65DE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */; };
@@ -78,6 +80,8 @@
 		E80E2C502C41C23200D35BE7 /* ScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerView.swift; sourceTree = "<group>"; };
 		E82CFBD92C3F078D0055C6B2 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		E82CFBDB2C3F0D990055C6B2 /* FoodDatabaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseView.swift; sourceTree = "<group>"; };
+		E847B1EA2C5AA4D00084CD13 /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
+		E847B1EC2C5AA93E0084CD13 /* InventoryFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryFoodView.swift; sourceTree = "<group>"; };
 		E860ACDE2C3EFBE5007E65DE /* Persephone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persephone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneApp.swift; sourceTree = "<group>"; };
 		E860ACE72C3EFBE8007E65DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -166,6 +170,7 @@
 			children = (
 				E8743BB12C58306800E1B871 /* Cookbook */,
 				E8743BB02C58302A00E1B871 /* FoodDatabase */,
+				E847B1E92C5AA4650084CD13 /* Inventory */,
 				E82CFBD92C3F078D0055C6B2 /* MainView.swift */,
 				E8828EDD2C503BF5006C7CB3 /* PreviewHelpers.swift */,
 			);
@@ -186,6 +191,15 @@
 				E8828ECE2C4F5154006C7CB3 /* Store.swift */,
 			);
 			path = V1;
+			sourceTree = "<group>";
+		};
+		E847B1E92C5AA4650084CD13 /* Inventory */ = {
+			isa = PBXGroup;
+			children = (
+				E847B1EA2C5AA4D00084CD13 /* InventoryView.swift */,
+				E847B1EC2C5AA93E0084CD13 /* InventoryFoodView.swift */,
+			);
+			path = Inventory;
 			sourceTree = "<group>";
 		};
 		E860ACD52C3EFBE5007E65DE = {
@@ -421,6 +435,7 @@
 				E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */,
 				E80E2C4C2C401AF300D35BE7 /* FoodItemEditor.swift in Sources */,
 				E82CFBDC2C3F0D990055C6B2 /* FoodDatabaseView.swift in Sources */,
+				E847B1EB2C5AA4D00084CD13 /* InventoryView.swift in Sources */,
 				E8743BAF2C5755E300E1B871 /* FoodGeneralSheet.swift in Sources */,
 				E8D72EF32C4641840053CA26 /* CookbookView.swift in Sources */,
 				E8743B9F2C52DC1C00E1B871 /* StoreSheet.swift in Sources */,
@@ -428,6 +443,7 @@
 				E80E2C462C400B0800D35BE7 /* Schema.swift in Sources */,
 				E8D72EF52C470E1E0053CA26 /* RecipeEditor.swift in Sources */,
 				E8743BA12C52DC3A00E1B871 /* StoreItemSheet.swift in Sources */,
+				E847B1ED2C5AA93E0084CD13 /* InventoryFoodView.swift in Sources */,
 				E80E2C4A2C40157A00D35BE7 /* FoodItemView.swift in Sources */,
 				E8828EE72C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift in Sources */,
 				E8828EE32C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift in Sources */,

@@ -9,6 +9,7 @@ import Foundation
 import SwiftData
 
 typealias RecipeInstance = SchemaV1.RecipeInstance
+typealias RecipeInstanceDates = SchemaV1.RecipeInstanceDates
 typealias RecipeInstanceIngredient = SchemaV1.RecipeInstanceIngredient
 
 extension SchemaV1 {
@@ -17,13 +18,9 @@ extension SchemaV1 {
         // The recipe this is based on
         var recipe: Recipe!
         // The amount of food remaining from this batch
-        var remaining: FoodAmount
-        // The date it was created
-        var creationDate: Date
-        // The nominal expiration date
-        var expDate: Date
-        // The date this was frozen (if applicable)
-        var freezeDate: Date?
+        var amount: FoodInstanceAmount
+        // The relevant dates for this instance
+        var dates: RecipeInstanceDates
         // Any notes on how it was made
         var prepNotes: String
         // Any notes on its quality or anything after it was made
@@ -32,27 +29,37 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.recipeInstance)
         var ingredients: [RecipeInstanceIngredient] = []
         
-        init(recipe: Recipe, remaining: FoodAmount, creationDate: Date, expDate: Date, freezeDate: Date? = nil, prepNotes: String, postNotes: String) {
+        init(recipe: Recipe, amount: FoodInstanceAmount, dates: RecipeInstanceDates, prepNotes: String, postNotes: String) {
             self.recipe = recipe
-            self.remaining = remaining
-            self.creationDate = creationDate
-            self.expDate = expDate
-            self.freezeDate = freezeDate
+            self.amount = amount
+            self.dates = dates
             self.prepNotes = prepNotes
             self.postNotes = postNotes
         }
     }
     
+    struct RecipeInstanceDates: Codable {
+        // The date it was created
+        var creationDate: Date
+        // The nominal expiration date
+        var expDate: Date
+        // The date this was frozen (if applicable)
+        var freezeDate: Date?
+    }
+    
     @Model
     final class RecipeInstanceIngredient {
+        // The name of the ingredient/food
+        var name: String
         // The recipe instance
         var recipeInstance: RecipeInstance!
         // The food used in the creation of the recipe
-        var food: FoodInstance!
+        var food: FoodInstance?
         // The amount of the food used
         var amount: FoodAmount
         
-        init(recipeInstance: RecipeInstance, food: FoodInstance, amount: FoodAmount) {
+        init(name: String, recipeInstance: RecipeInstance, food: FoodInstance? = nil, amount: FoodAmount) {
+            self.name = name
             self.recipeInstance = recipeInstance
             self.food = food
             self.amount = amount

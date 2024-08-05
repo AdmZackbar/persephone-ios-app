@@ -10,7 +10,21 @@ import SwiftUI
 struct RecipeIngredientSheet: View {
     @Environment(\.dismiss) var dismiss
     
-    let ingredient: RecipeIngredient?
+    enum Mode: Equatable {
+        case Add(recipe: Recipe)
+        case Edit(ingredient: RecipeIngredient)
+        
+        func computeTitle() -> String {
+            switch self {
+            case .Add(_):
+                "Add Ingredient"
+            case .Edit(_):
+                "Edit Ingredient"
+            }
+        }
+    }
+    
+    let mode: Mode
     
     @State private var name: String = ""
     @State private var amount: String = ""
@@ -99,14 +113,18 @@ struct RecipeIngredientSheet: View {
                 Section("Notes") {
                     TextField("optional", text: $notes, axis: .vertical).textInputAutocapitalization(.sentences).lineLimit(3...5)
                 }
-            }.navigationTitle(ingredient == nil ? "Add Ingredient" : "Edit Ingredient")
+            }.navigationTitle(mode.computeTitle())
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden()
                 .onAppear {
-                    if let ingredient {
+                    switch mode {
+                    case .Edit(let ingredient):
                         name = ingredient.name
                         amount = "\(formatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation())"
                         notes = ingredient.notes ?? ""
+                    default:
+                        // Do nothing
+                        break
                     }
                 }
                 .toolbar {
@@ -117,7 +135,10 @@ struct RecipeIngredientSheet: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Save") {
-                            if let ingredient {
+                            switch mode {
+                            case .Add(let recipe):
+                                recipe.ingredients.append(RecipeIngredient(name: name, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: amountUnit!)))
+                            case .Edit(let ingredient):
                                 ingredient.name = name
                                 ingredient.amount = FoodAmount(value: amountValue!, unit: amountUnit!)
                                 ingredient.notes = notes.isEmpty ? nil : notes
@@ -131,5 +152,7 @@ struct RecipeIngredientSheet: View {
 }
 
 #Preview {
-    RecipeIngredientSheet(ingredient: nil)
+    let container = createTestModelContainer()
+    let recipe = createTestRecipeItem(container.mainContext)
+    return RecipeIngredientSheet(mode: .Add(recipe: recipe))
 }

@@ -14,7 +14,19 @@ struct RecipeEditor: View {
     
     @StateObject var sheetCoordinator = SheetCoordinator<CookbookSheetEnum>()
     
-    var recipe: Recipe?
+    private enum Mode: Equatable {
+        case Add, Edit
+    }
+    
+    private var mode: Mode
+    private var recipe: Recipe
+    private var ingredientsBackup: [RecipeIngredient]
+    
+    init(recipe: Recipe? = nil) {
+        self.mode = recipe == nil ? .Add : .Edit
+        self.recipe = recipe ?? Recipe(name: "", metaData: RecipeMetaData(details: "", prepTime: 0, cookTime: 0, otherTime: 0, tags: []), instructions: [], size: RecipeSize(totalAmount: FoodAmount(value: 0, unit: .Gram), numServings: 1, servingSize: ""), nutrients: [:])
+        self.ingredientsBackup = recipe?.ingredients ?? []
+    }
     
     @State private var name: String = ""
     @State private var details: String = ""
@@ -27,7 +39,6 @@ struct RecipeEditor: View {
     private var totalTime: Double {
         cookTime + prepTime + otherTime
     }
-    @State private var ingredients: [RecipeIngredient] = []
     
     private let timeFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -126,19 +137,19 @@ struct RecipeEditor: View {
                 }
             }
             Section("Ingredients") {
-                List(ingredients, id: \.name) { ingredient in
+                List(recipe.ingredients, id: \.name) { ingredient in
                     Text("\(timeFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation()) of \(ingredient.name)")
                         .onTapGesture {
-                            sheetCoordinator.presentSheet(.Ingredients(ingredient: ingredient))
+                            sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
                         }
                 }
                 Button {
-                    sheetCoordinator.presentSheet(.Ingredients(ingredient: nil))
+                    sheetCoordinator.presentSheet(.AddIngredient(recipe: recipe))
                 } label: {
                     Label("Add Ingredient", systemImage: "plus")
                 }
             }
-        }.navigationTitle(recipe != nil ? "Edit Recipe" : "Create Recipe")
+        }.navigationTitle(mode == .Add ? "Create Recipe" : "Edit Recipe")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
             .sheetCoordinating(coordinator: sheetCoordinator)
@@ -155,7 +166,7 @@ struct RecipeEditor: View {
                 }
             }
             .onAppear {
-                if let recipe = recipe {
+                if mode == .Edit {
                     name = recipe.name
                     details = recipe.metaData.details
                     tags = recipe.metaData.tags
@@ -164,34 +175,27 @@ struct RecipeEditor: View {
                     prepTime = recipe.metaData.prepTime
                     cookTime = recipe.metaData.cookTime
                     otherTime = recipe.metaData.otherTime
-                    ingredients = recipe.ingredients
                 }
             }
     }
     
     private func save() {
-        if let recipe = recipe {
-            recipe.name = name
-            recipe.metaData.details = details
-        } else {
-            // TODO
-//            let recipe = Recipe(name: name,
-//                                metaData: RecipeMetaData(
-//                                    details: details,
-//                                    prepTime: prepTime,
-//                                    cookTime: cookTime,
-//                                    // TODO
-//                                    otherTime: 0,
-//                                    tags: []),
-//                                instructions: sections,
-//                                size: RecipeSize(totalAmount: FoodAmount.grams(0), cookedAmount: cookedWeight > 0 ? FoodAmount.grams(cookedWeight) : nil, numServings: numServings, servingSize: servingSize),
-//                                nutrients: [:])
-//            modelContext.insert(recipe)
+        recipe.name = name
+        recipe.metaData.details = details
+        recipe.metaData.tags = tags
+        recipe.size.servingSize = servingSize
+        recipe.size.numServings = numServings
+        recipe.metaData.prepTime = prepTime
+        recipe.metaData.cookTime = cookTime
+        recipe.metaData.otherTime = otherTime
+        if mode == .Add {
+            modelContext.insert(recipe)
         }
         dismiss()
     }
     
     private func discard() {
+        recipe.ingredients = ingredientsBackup
         dismiss()
     }
 }

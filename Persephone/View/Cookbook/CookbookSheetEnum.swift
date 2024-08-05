@@ -12,21 +12,26 @@ enum CookbookSheetEnum: Identifiable, SheetEnum {
         switch self {
         case .Tags(_):
             "Tag Editor"
-        case .Ingredients(_):
-            "Ingredient Editor"
+        case .AddIngredient(_):
+            "Add Ingredient"
+        case .EditIngredient(_):
+            "Edit Ingredient"
         }
     }
     
     case Tags(tags: Binding<[String]>)
-    case Ingredients(ingredient: RecipeIngredient?)
+    case AddIngredient(recipe: Recipe)
+    case EditIngredient(ingredient: RecipeIngredient)
     
     @ViewBuilder
     func view(coordinator: SheetCoordinator<CookbookSheetEnum>) -> some View {
         switch self {
         case .Tags(let tags):
             RecipeTagSheet(tags: tags)
-        case .Ingredients(let ingredient):
-            RecipeIngredientSheet(ingredient: ingredient)
+        case .AddIngredient(let recipe):
+            RecipeIngredientSheet(mode: .Add(recipe: recipe))
+        case .EditIngredient(let ingredient):
+            RecipeIngredientSheet(mode: .Edit(ingredient: ingredient))
         }
     }
 }

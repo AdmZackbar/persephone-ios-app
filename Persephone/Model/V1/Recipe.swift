@@ -96,8 +96,6 @@ extension SchemaV1 {
     struct RecipeSize: Codable {
         // The empirical net weight/volume (e.g. net wt 10 lb)
         var totalAmount: FoodAmount
-        // The empirical net weight/volume of the cooked product
-        var cookedAmount: FoodAmount?
         // The total number of servings that the item contains
         var numServings: Double
         // The friendly serving size amount (e.g. 1 waffle, 2 portions, etc.)
@@ -105,13 +103,11 @@ extension SchemaV1 {
         // The empirical serving size (e.g. 54 g)
         var servingAmount: FoodAmount {
             get {
-                let amount = cookedAmount ?? totalAmount
-                return FoodAmount(value: amount.value / numServings, unit: amount.unit)
+                FoodAmount(value: totalAmount.value / numServings, unit: totalAmount.unit)
             }
             set(value) {
-                let amount = cookedAmount ?? totalAmount
                 // Update number of servings instead of total amount
-                numServings = amount.value / value.value
+                numServings = totalAmount.value / value.value
             }
         }
     }

@@ -72,7 +72,7 @@ extension SchemaV1 {
         }
     }
     
-    enum FoodUnit: Codable, CaseIterable, Equatable, Hashable {
+    enum FoodUnit: Codable, Equatable, Hashable {
         // Energy
         case Calorie
         // Weight (US)
@@ -83,13 +83,15 @@ extension SchemaV1 {
         case Teaspoon, Tablespoon, FluidOunce, Cup, Pint, Quart, Gallon
         // Volume (SI)
         case Milliliter, Liter
+        // Other
+        case Custom(name: String)
         
         func isSi() -> Bool {
             switch self {
             case .Microgram, .Milligram, .Gram, .Kilogram, .Milliliter, .Liter:
-                return true
+                true
             default:
-                return false
+                false
             }
         }
         
@@ -105,37 +107,39 @@ extension SchemaV1 {
         func getAbbreviation() -> String {
             switch self {
             case .Calorie:
-                return ""
+                ""
             case .Ounce:
-                return "oz"
+                "oz"
             case .Pound:
-                return "lb"
+                "lb"
             case .Microgram:
-                return "mcg"
+                "mcg"
             case .Milligram:
-                return "mg"
+                "mg"
             case .Gram:
-                return "g"
+                "g"
             case .Kilogram:
-                return "kg"
+                "kg"
             case .Teaspoon:
-                return "tsp"
+                "tsp"
             case .Tablespoon:
-                return "tbsp"
+                "tbsp"
             case .FluidOunce:
-                return "fl oz"
+                "fl oz"
             case .Cup:
-                return "c"
+                "c"
             case .Pint:
-                return "pint"
+                "pint"
             case .Quart:
-                return "qt"
+                "qt"
             case .Gallon:
-                return "gal"
+                "gal"
             case .Milliliter:
-                return "mL"
+                "mL"
             case .Liter:
-                return "L"
+                "L"
+            case .Custom(let name):
+                name
             }
         }
     }

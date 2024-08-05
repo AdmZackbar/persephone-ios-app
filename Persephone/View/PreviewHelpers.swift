@@ -64,7 +64,6 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                         ],
                         size: RecipeSize(
                             totalAmount: FoodAmount.grams(350),
-                            cookedAmount: FoodAmount.grams(255),
                             numServings: 6,
                             servingSize: "1 waffle"),
                         nutrients: [

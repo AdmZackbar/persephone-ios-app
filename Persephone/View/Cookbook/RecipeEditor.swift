@@ -138,13 +138,18 @@ struct RecipeEditor: View {
             }
             Section("Ingredients") {
                 List(recipe.ingredients, id: \.name) { ingredient in
-                    Text("\(timeFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation()) of \(ingredient.name)")
+                    Text("\(timeFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
                         .onTapGesture {
                             sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
                         }
                 }
-                Button {
-                    sheetCoordinator.presentSheet(.AddIngredient(recipe: recipe))
+                Menu {
+                    Button("Food Item Ingredient...") {
+                        sheetCoordinator.presentSheet(.AddItemIngredient(recipe: recipe))
+                    }
+                    Button("Custom Ingredient...") {
+                        sheetCoordinator.presentSheet(.AddIngredient(recipe: recipe))
+                    }
                 } label: {
                     Label("Add Ingredient", systemImage: "plus")
                 }
@@ -217,6 +222,7 @@ private struct Ingredient: Equatable, Hashable {
 #Preview {
     let container = createTestModelContainer()
     let recipe = createTestRecipeItem(container.mainContext)
+    createTestFoodItem(container.mainContext)
     return NavigationStack {
         RecipeEditor(recipe: recipe)
             .modelContainer(container)

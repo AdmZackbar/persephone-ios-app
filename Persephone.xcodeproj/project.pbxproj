@@ -22,6 +22,7 @@
 		E847B1F72C6004BB0084CD13 /* CookbookSheetEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = E847B1F62C6004BB0084CD13 /* CookbookSheetEnum.swift */; };
 		E847B1F92C6005AD0084CD13 /* RecipeTagSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E847B1F82C6005AD0084CD13 /* RecipeTagSheet.swift */; };
 		E847B1FB2C6046A40084CD13 /* RecipeIngredientSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E847B1FA2C6046A40084CD13 /* RecipeIngredientSheet.swift */; };
+		E847B1FF2C63F5860084CD13 /* RecipeItemIngredientSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E847B1FE2C63F5860084CD13 /* RecipeItemIngredientSheet.swift */; };
 		E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */; };
 		E860ACE82C3EFBE8007E65DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACE72C3EFBE8007E65DE /* Assets.xcassets */; };
 		E860ACEB2C3EFBE8007E65DE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */; };
@@ -88,6 +89,7 @@
 		E847B1F62C6004BB0084CD13 /* CookbookSheetEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookbookSheetEnum.swift; sourceTree = "<group>"; };
 		E847B1F82C6005AD0084CD13 /* RecipeTagSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeTagSheet.swift; sourceTree = "<group>"; };
 		E847B1FA2C6046A40084CD13 /* RecipeIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeIngredientSheet.swift; sourceTree = "<group>"; };
+		E847B1FE2C63F5860084CD13 /* RecipeItemIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeItemIngredientSheet.swift; sourceTree = "<group>"; };
 		E860ACDE2C3EFBE5007E65DE /* Persephone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persephone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneApp.swift; sourceTree = "<group>"; };
 		E860ACE72C3EFBE8007E65DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -297,6 +299,7 @@
 				E8D72EF42C470E1E0053CA26 /* RecipeEditor.swift */,
 				E847B1F82C6005AD0084CD13 /* RecipeTagSheet.swift */,
 				E847B1FA2C6046A40084CD13 /* RecipeIngredientSheet.swift */,
+				E847B1FE2C63F5860084CD13 /* RecipeItemIngredientSheet.swift */,
 			);
 			path = Cookbook;
 			sourceTree = "<group>";
@@ -447,6 +450,7 @@
 				E847B1EB2C5AA4D00084CD13 /* InventoryView.swift in Sources */,
 				E8743BAF2C5755E300E1B871 /* FoodGeneralSheet.swift in Sources */,
 				E8D72EF32C4641840053CA26 /* CookbookView.swift in Sources */,
+				E847B1FF2C63F5860084CD13 /* RecipeItemIngredientSheet.swift in Sources */,
 				E8743B9F2C52DC1C00E1B871 /* StoreSheet.swift in Sources */,
 				E8828ED32C4F543A006C7CB3 /* ShoppingList.swift in Sources */,
 				E80E2C462C400B0800D35BE7 /* Schema.swift in Sources */,

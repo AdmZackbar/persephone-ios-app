@@ -18,6 +18,10 @@ enum CookbookSheetEnum: Identifiable, SheetEnum {
             "Add Ingredient"
         case .EditIngredient(_):
             "Edit Ingredient"
+        case .AddInstructions(_):
+            "Add Instructions"
+        case .EditInstructions(_):
+            "Edit Instructions"
         }
     }
     
@@ -25,6 +29,8 @@ enum CookbookSheetEnum: Identifiable, SheetEnum {
     case AddItemIngredient(recipe: Recipe)
     case AddIngredient(recipe: Recipe)
     case EditIngredient(ingredient: RecipeIngredient)
+    case AddInstructions(instructions: Binding<[RecipeSection]>)
+    case EditInstructions(section: RecipeSection)
     
     @ViewBuilder
     func view(coordinator: SheetCoordinator<CookbookSheetEnum>) -> some View {
@@ -37,6 +43,10 @@ enum CookbookSheetEnum: Identifiable, SheetEnum {
             RecipeIngredientSheet(mode: .Add(recipe: recipe))
         case .EditIngredient(let ingredient):
             RecipeIngredientSheet(mode: .Edit(ingredient: ingredient))
+        case .AddInstructions(let instructions):
+            RecipeInstructionsSheet(mode: .Add(instructions: instructions))
+        case .EditInstructions(let section):
+            RecipeInstructionsSheet(mode: .Edit(section: section))
         }
     }
 }

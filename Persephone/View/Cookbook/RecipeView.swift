@@ -14,7 +14,7 @@ struct RecipeView: View {
     let servingFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
+        formatter.maximumFractionDigits = 2
         return formatter
     }()
     
@@ -28,6 +28,9 @@ struct RecipeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                if recipe.metaData.author != nil {
+                    Label(recipe.metaData.author!, systemImage: "person.fill").font(.subheadline).italic()
+                }
                 Text(recipe.metaData.details)
                     .multilineTextAlignment(.leading)
                     .lineSpacing(4)

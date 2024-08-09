@@ -14,8 +14,17 @@ struct RecipeEditor: View {
     
     @StateObject var sheetCoordinator = SheetCoordinator<CookbookSheetEnum>()
     
-    private enum Mode: Equatable {
+    private enum Mode {
         case Add, Edit
+        
+        func computeTitle() -> String {
+            switch self {
+            case .Add:
+                "Create Recipe"
+            case .Edit:
+                "Edit Recipe"
+            }
+        }
     }
     
     private var mode: Mode
@@ -29,6 +38,7 @@ struct RecipeEditor: View {
     }
     
     @State private var name: String = ""
+    @State private var author: String = ""
     @State private var details: String = ""
     @State private var tags: [String] = []
     @State private var servingSize: String = ""
@@ -39,6 +49,7 @@ struct RecipeEditor: View {
     private var totalTime: Double {
         cookTime + prepTime + otherTime
     }
+    @State private var instructions: [RecipeSection] = []
     
     private let timeFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -52,7 +63,15 @@ struct RecipeEditor: View {
         Form {
             HStack {
                 Text("Name:")
-                TextField("required", text: $name).textInputAutocapitalization(.words)
+                TextField("required", text: $name)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+            }
+            HStack {
+                Text("Author:")
+                TextField("optional", text: $author)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
             }
             HStack(alignment: .top) {
                 Text("Tags:")
@@ -70,12 +89,14 @@ struct RecipeEditor: View {
             HStack {
                 Text("Serving Size:")
                 TextField("required", text: $servingSize)
+                    .autocorrectionDisabled()
             }
             Stepper {
                 HStack {
                     Text("Est. Num. Servings:").fixedSize()
                     TextField("", value: $numServings, formatter: timeFormatter)
                         .multilineTextAlignment(.trailing).italic()
+                        .keyboardType(.decimalPad)
                 }
             } onIncrement: {
                 numServings += 1
@@ -85,7 +106,7 @@ struct RecipeEditor: View {
                 }
             }
             Section("Description") {
-                TextField("optional", text: $details, axis: .vertical).textInputAutocapitalization(.sentences).lineLimit(3...5)
+                TextField("optional", text: $details, axis: .vertical).textInputAutocapitalization(.sentences).lineLimit(3...10)
             }
             Section("Times") {
                 Stepper {
@@ -93,6 +114,7 @@ struct RecipeEditor: View {
                         Text("Prep Time:").fixedSize()
                         TextField("", value: $prepTime, formatter: timeFormatter)
                             .multilineTextAlignment(.trailing).italic()
+                            .keyboardType(.decimalPad)
                         Text("min").italic()
                     }
                 } onIncrement: {
@@ -107,6 +129,7 @@ struct RecipeEditor: View {
                         Text("Cook Time:").fixedSize()
                         TextField("", value: $cookTime, formatter: timeFormatter)
                             .multilineTextAlignment(.trailing).italic()
+                            .keyboardType(.decimalPad)
                         Text("min").italic()
                     }
                 } onIncrement: {
@@ -121,6 +144,7 @@ struct RecipeEditor: View {
                         Text("Other:").fixedSize()
                         TextField("", value: $otherTime, formatter: timeFormatter)
                             .multilineTextAlignment(.trailing).italic()
+                            .keyboardType(.decimalPad)
                         Text("min").italic()
                     }
                 } onIncrement: {
@@ -154,7 +178,39 @@ struct RecipeEditor: View {
                     Label("Add Ingredient", systemImage: "plus")
                 }
             }
-        }.navigationTitle(mode == .Add ? "Create Recipe" : "Edit Recipe")
+            Section("Instructions") {
+                List(instructions, id: \.header) { section in
+                    Button {
+                        sheetCoordinator.presentSheet(.EditInstructions(section: section))
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(section.header).font(.headline)
+                                Text(section.details).lineLimit(3).font(.caption)
+                            }
+                            Spacer()
+                        }.contentShape(Rectangle())
+                    }.buttonStyle(.plain)
+                        .swipeActions(allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                instructions.removeAll { s in s == section }
+                            } label: {
+                                Label("Delete", systemImage: "trash.fill")
+                            }
+                            Button {
+                                sheetCoordinator.presentSheet(.EditInstructions(section: section))
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                        }
+                }
+                Button {
+                    sheetCoordinator.presentSheet(.AddInstructions(instructions: $instructions))
+                } label: {
+                    Label("Add Section...", systemImage: "plus")
+                }
+            }
+        }.navigationTitle(mode.computeTitle())
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
             .sheetCoordinating(coordinator: sheetCoordinator)
@@ -173,6 +229,7 @@ struct RecipeEditor: View {
             .onAppear {
                 if mode == .Edit {
                     name = recipe.name
+                    author = recipe.metaData.author ?? ""
                     details = recipe.metaData.details
                     tags = recipe.metaData.tags
                     servingSize = recipe.size.servingSize
@@ -180,12 +237,14 @@ struct RecipeEditor: View {
                     prepTime = recipe.metaData.prepTime
                     cookTime = recipe.metaData.cookTime
                     otherTime = recipe.metaData.otherTime
+                    instructions = recipe.instructions
                 }
             }
     }
     
     private func save() {
         recipe.name = name
+        recipe.metaData.author = author.isEmpty ? nil : author
         recipe.metaData.details = details
         recipe.metaData.tags = tags
         recipe.size.servingSize = servingSize
@@ -193,6 +252,7 @@ struct RecipeEditor: View {
         recipe.metaData.prepTime = prepTime
         recipe.metaData.cookTime = cookTime
         recipe.metaData.otherTime = otherTime
+        recipe.instructions = instructions
         if mode == .Add {
             modelContext.insert(recipe)
         }

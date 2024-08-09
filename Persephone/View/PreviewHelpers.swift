@@ -53,6 +53,7 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
 func createTestRecipeItem(_ context: ModelContext) -> Recipe {
     let recipe = Recipe(name: "Test Recipe",
                         metaData: RecipeMetaData(
+                            author: "Zach Wassynger",
                             details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
                             prepTime: 8,
                             cookTime: 17,

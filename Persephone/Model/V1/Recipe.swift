@@ -65,6 +65,7 @@ extension SchemaV1 {
     }
     
     struct RecipeMetaData: Codable {
+        var author: String?
         // The description of the recipe
         var details: String
         // The amount of time to prep this recipe (min)

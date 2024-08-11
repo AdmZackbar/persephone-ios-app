@@ -11,8 +11,8 @@ struct RecipeInstructionsSheet: View {
     @Environment(\.dismiss) var dismiss
     
     enum Mode {
-        case Add(instructions: Binding<[RecipeSection]>)
-        case Edit(section: RecipeSection)
+        case Add(instructions: Binding<[Recipe.Section]>)
+        case Edit(section: Recipe.Section)
         
         func computeTitle() -> String {
             switch self {
@@ -64,7 +64,7 @@ struct RecipeInstructionsSheet: View {
                         switch mode {
                         case .Add(let instructions):
                             Button("Add") {
-                                instructions.wrappedValue.append(RecipeSection(header: header, details: details))
+                                instructions.wrappedValue.append(Recipe.Section(header: header, details: details))
                                 dismiss()
                             }.disabled(header.isEmpty || details.isEmpty)
                         case .Edit(var section):

@@ -9,9 +9,6 @@ import Foundation
 import SwiftData
 
 typealias Recipe = SchemaV1.Recipe
-typealias RecipeMetaData = SchemaV1.RecipeMetaData
-typealias RecipeSection = SchemaV1.RecipeSection
-typealias RecipeSize = SchemaV1.RecipeSize
 typealias RecipeIngredient = SchemaV1.RecipeIngredient
 
 extension SchemaV1 {
@@ -20,11 +17,11 @@ extension SchemaV1 {
         // The name of the recipe
         var name: String
         // Metadata of the recipe
-        var metaData: RecipeMetaData
+        var metaData: MetaData
         // Instructions (header -> details list)
-        var instructions: [RecipeSection]
+        var instructions: [Section]
         // Size info of the recipe
-        var size: RecipeSize
+        var size: Size
         // Nutrient information (nutrient -> amount per serving)
         var nutrients: [Nutrient : FoodAmount]
         
@@ -33,12 +30,53 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstance.recipe)
         var instances: [RecipeInstance] = []
         
-        init(name: String, metaData: RecipeMetaData, instructions: [RecipeSection], size: RecipeSize, nutrients: [Nutrient : FoodAmount]) {
+        init(name: String, metaData: MetaData, instructions: [Section], size: Size, nutrients: [Nutrient : FoodAmount]) {
             self.name = name
             self.metaData = metaData
             self.instructions = instructions
             self.size = size
             self.nutrients = nutrients
+        }
+        
+        struct MetaData: Codable {
+            var author: String?
+            // The description of the recipe
+            var details: String
+            // The amount of time to prep this recipe (min)
+            var prepTime: Double
+            // The amount of time to cook this recipe (min)
+            var cookTime: Double
+            // Any additional time used in this recipe (min)
+            var otherTime: Double
+            // The total time used for this entire recipe (min)
+            var totalTime: Double {
+                get {
+                    prepTime + cookTime + otherTime
+                }
+                set(value) {
+                    otherTime = value - prepTime - cookTime
+                }
+            }
+            // Any tags used to describe this recipe
+            var tags: [String]
+            // Personal rating of the recipe [0,10] worst -> best
+            var rating: Double?
+            // Estimated difficulty to make the recipe [0,10] easiest -> hardest
+            var difficulty: Double?
+        }
+        
+        struct Section: Codable, Equatable, Hashable {
+            // The header of the instruction section
+            var header: String
+            // The details of the instruction section
+            var details: String
+        }
+        
+        struct Size: Codable {
+            // The total number of servings that the item contains
+            var numServings: Double
+            // The friendly serving size amount (e.g. 1 waffle, 2 portions, etc.)
+            var servingSize: String
         }
     }
     
@@ -61,55 +99,6 @@ extension SchemaV1 {
             self.recipe = recipe
             self.amount = amount
             self.notes = notes
-        }
-    }
-    
-    struct RecipeMetaData: Codable {
-        var author: String?
-        // The description of the recipe
-        var details: String
-        // The amount of time to prep this recipe (min)
-        var prepTime: Double
-        // The amount of time to cook this recipe (min)
-        var cookTime: Double
-        // Any additional time used in this recipe (min)
-        var otherTime: Double
-        // The total time used for this entire recipe (min)
-        var totalTime: Double {
-            get {
-                prepTime + cookTime + otherTime
-            }
-            set(value) {
-                otherTime = value - prepTime - cookTime
-            }
-        }
-        // Any tags used to describe this recipe
-        var tags: [String]
-    }
-    
-    struct RecipeSection: Codable, Equatable, Hashable {
-        // The header of the instruction section
-        var header: String
-        // The details of the instruction section
-        var details: String
-    }
-    
-    struct RecipeSize: Codable {
-        // The empirical net weight/volume (e.g. net wt 10 lb)
-        var totalAmount: FoodAmount
-        // The total number of servings that the item contains
-        var numServings: Double
-        // The friendly serving size amount (e.g. 1 waffle, 2 portions, etc.)
-        var servingSize: String
-        // The empirical serving size (e.g. 54 g)
-        var servingAmount: FoodAmount {
-            get {
-                FoodAmount(value: totalAmount.value / numServings, unit: totalAmount.unit)
-            }
-            set(value) {
-                // Update number of servings instead of total amount
-                numServings = totalAmount.value / value.value
-            }
         }
     }
 }

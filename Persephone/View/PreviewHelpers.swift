@@ -52,7 +52,7 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
 @discardableResult
 func createTestRecipeItem(_ context: ModelContext) -> Recipe {
     let recipe = Recipe(name: "Test Recipe",
-                        metaData: RecipeMetaData(
+                        metaData: Recipe.MetaData(
                             author: "Zach Wassynger",
                             details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
                             prepTime: 8,
@@ -60,11 +60,10 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                             otherTime: 0,
                             tags: ["Breakfast", "Bread"]),
                         instructions: [
-                            RecipeSection(header: "Prep", details: "1. Put the mix with the water\n2. Mix until barely combined"),
-                            RecipeSection(header: "Cook", details: "1. Put mix into the iron\n2. Wait until iron signals completion\n3. Remove and allow to cool")
+                            Recipe.Section(header: "Prep", details: "1. Put the mix with the water\n2. Mix until barely combined"),
+                            Recipe.Section(header: "Cook", details: "1. Put mix into the iron\n2. Wait until iron signals completion\n3. Remove and allow to cool")
                         ],
-                        size: RecipeSize(
-                            totalAmount: FoodAmount.grams(350),
+                        size: Recipe.Size(
                             numServings: 6,
                             servingSize: "1 waffle"),
                         nutrients: [

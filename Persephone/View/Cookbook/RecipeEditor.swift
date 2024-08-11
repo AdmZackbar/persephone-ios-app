@@ -33,7 +33,7 @@ struct RecipeEditor: View {
     
     init(recipe: Recipe? = nil) {
         self.mode = recipe == nil ? .Add : .Edit
-        self.recipe = recipe ?? Recipe(name: "", metaData: RecipeMetaData(details: "", prepTime: 0, cookTime: 0, otherTime: 0, tags: []), instructions: [], size: RecipeSize(totalAmount: FoodAmount(value: 0, unit: .Gram), numServings: 1, servingSize: ""), nutrients: [:])
+        self.recipe = recipe ?? Recipe(name: "", metaData: Recipe.MetaData(details: "", prepTime: 0, cookTime: 0, otherTime: 0, tags: []), instructions: [], size: Recipe.Size(numServings: 1, servingSize: ""), nutrients: [:])
         self.ingredientsBackup = recipe?.ingredients ?? []
     }
     
@@ -41,6 +41,8 @@ struct RecipeEditor: View {
     @State private var author: String = ""
     @State private var details: String = ""
     @State private var tags: [String] = []
+    @State private var rating: Double? = nil
+    @State private var difficulty: Double? = nil
     @State private var servingSize: String = ""
     @State private var numServings: Double = 1
     @State private var cookTime: Double = 0
@@ -49,7 +51,7 @@ struct RecipeEditor: View {
     private var totalTime: Double {
         cookTime + prepTime + otherTime
     }
-    @State private var instructions: [RecipeSection] = []
+    @State private var instructions: [Recipe.Section] = []
     
     private let timeFormatter: NumberFormatter = {
         let formatter = NumberFormatter()

@@ -94,7 +94,7 @@ struct RecipeIngredientSheet: View {
         case "tsp", "teaspoon", "teaspoons":
             return .Teaspoon
         default:
-            return nil
+            return .Custom(name: unitName)
         }
     }
     
@@ -104,11 +104,13 @@ struct RecipeIngredientSheet: View {
                 HStack {
                     Text("Name:")
                     TextField("required", text: $name)
+                        .textInputAutocapitalization(.words)
                 }
                 // TODO add link to food item
                 HStack {
                     Text("Amount:")
                     TextField("required", text: $amount)
+                        .textInputAutocapitalization(.never)
                 }
                 Section("Notes") {
                     TextField("optional", text: $notes, axis: .vertical).textInputAutocapitalization(.sentences).lineLimit(3...5)
@@ -137,7 +139,7 @@ struct RecipeIngredientSheet: View {
                         Button("Save") {
                             switch mode {
                             case .Add(let recipe):
-                                recipe.ingredients.append(RecipeIngredient(name: name, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: amountUnit!)))
+                                recipe.ingredients.append(RecipeIngredient(name: name, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: amountUnit!), notes: notes))
                             case .Edit(let ingredient):
                                 ingredient.name = name
                                 ingredient.amount = FoodAmount(value: amountValue!, unit: amountUnit!)

@@ -164,10 +164,14 @@ struct RecipeEditor: View {
             }
             Section("Ingredients") {
                 List(recipe.ingredients, id: \.name) { ingredient in
-                    Text("\(timeFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
-                        .onTapGesture {
-                            sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(timeFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
+                        if !(ingredient.notes ?? "").isEmpty {
+                            Text(ingredient.notes!).font(.caption).italic()
                         }
+                    }.onTapGesture {
+                        sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
+                    }
                 }
                 Menu {
                     Button("Food Item Ingredient...") {
@@ -177,7 +181,7 @@ struct RecipeEditor: View {
                         sheetCoordinator.presentSheet(.AddIngredient(recipe: recipe))
                     }
                 } label: {
-                    Label("Add Ingredient", systemImage: "plus")
+                    Label("Add Ingredient...", systemImage: "plus")
                 }
             }
             Section("Instructions") {

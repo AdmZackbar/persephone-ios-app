@@ -27,7 +27,7 @@ struct RecipeView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
                 if recipe.metaData.author != nil {
                     Label(recipe.metaData.author!, systemImage: "person.fill").font(.subheadline).italic()
                 }
@@ -64,13 +64,19 @@ struct RecipeView: View {
                 }
                 Divider()
                 if (!recipe.ingredients.isEmpty) {
-                    ForEach(recipe.ingredients.sorted(by: { x, y in
-                        x.name.caseInsensitiveCompare(y.name).rawValue < 0
-                    }), id: \.name) { ingredient in
-                        HStack(spacing: 8) {
-                            Text("\(servingFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation())").bold()
-                            Text("·")
-                            Text(ingredient.name).fontWeight(.light)
+                    ForEach(recipe.ingredients, id: \.name) { ingredient in
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 6) {
+                                Text("\(servingFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation())").bold()
+                                Text("·")
+                                Text(ingredient.name)
+                            }
+                            if !(ingredient.notes ?? "").isEmpty {
+                                Text(ingredient.notes!).font(.caption)
+                                    .fontWeight(.light)
+                                    .italic()
+                                    .lineLimit(2)
+                            }
                         }
                     }
                     Divider()

@@ -77,7 +77,7 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                         ])
     context.insert(recipe)
     recipe.ingredients.append(contentsOf: [
-        RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: 1.2, unit: .Liter)),
+        RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: 1.2, unit: .Liter), notes: "Tap water or else"),
         RecipeIngredient(name: "Salt", recipe: recipe, amount: FoodAmount(value: 600, unit: .Milligram))
     ])
     return recipe

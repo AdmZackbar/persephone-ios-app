@@ -181,8 +181,6 @@ private struct PreviewRecipe: View {
                 createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime)!) min", lower: "COOK")
                 Spacer()
             }.fixedSize(horizontal: false, vertical: true)
-            Divider()
-            NutrientView(recipe: recipe, nutrients: recipe.nutrients)
             Spacer()
         }.padding()
     }
@@ -196,53 +194,6 @@ private struct PreviewRecipe: View {
     
     init(recipe: Recipe) {
         self.recipe = recipe
-    }
-}
-
-private struct NutrientView: View {
-    let recipe: Recipe
-    let nutrients: [Nutrient : FoodAmount]
-    
-    let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-        return formatter
-    }()
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Per Serving:").font(.headline).bold()
-            createNutrientRow(name: "Calories", nutrient: .Energy).fontWeight(.semibold)
-            createNutrientRow(name: "Total Fat", nutrient: .TotalFat)
-            if nutrients[.SaturatedFat] != nil {
-                createNutrientRow(name: "Saturated Fat", nutrient: .SaturatedFat).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
-            }
-            if nutrients[.TransFat] != nil {
-                createNutrientRow(name: "Trans Fat", nutrient: .TransFat).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
-            }
-            createNutrientRow(name: "Total Carbohydrates", nutrient: .TotalCarbs)
-            if nutrients[.DietaryFiber] != nil {
-                createNutrientRow(name: "Dietary Fiber", nutrient: .DietaryFiber).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
-            }
-            if nutrients[.TotalSugars] != nil {
-                createNutrientRow(name: "Total Sugars", nutrient: .TotalSugars).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
-            }
-            if nutrients[.AddedSugars] != nil {
-                createNutrientRow(name: "Added Sugars", nutrient: .AddedSugars).padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)).italic()
-            }
-            createNutrientRow(name: "Cholesterol", nutrient: .Cholesterol)
-            createNutrientRow(name: "Sodium", nutrient: .Sodium)
-            createNutrientRow(name: "Protein", nutrient: .Protein)
-        }.font(.subheadline)
-    }
-    
-    private func createNutrientRow(name: String, nutrient: Nutrient) -> some View {
-        HStack {
-            Text(name)
-            Spacer()
-            Text("\(formatter.string(for: nutrients[nutrient]?.value ?? 0)!) \(nutrient.getCommonUnit().getAbbreviation())")
-        }
     }
 }
 

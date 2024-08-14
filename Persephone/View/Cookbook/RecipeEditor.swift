@@ -95,7 +95,7 @@ struct RecipeEditor: View {
             }
             Stepper {
                 HStack {
-                    Text("Est. Num. Servings:").fixedSize()
+                    Text("Num. Servings:").fixedSize()
                     TextField("", value: $numServings, formatter: timeFormatter)
                         .multilineTextAlignment(.trailing).italic()
                         .keyboardType(.decimalPad)
@@ -105,6 +105,26 @@ struct RecipeEditor: View {
             } onDecrement: {
                 if numServings > 1 {
                     numServings -= 1
+                }
+            }
+            HStack {
+                Picker("Rating:", selection: $rating) {
+                    Text("N/A").tag(nil as Double?)
+                    Text("S").tag(9.5 as Double?)
+                    Text("A").tag(8 as Double?)
+                    Text("B").tag(6.5 as Double?)
+                    Text("C").tag(5 as Double?)
+                    Text("D").tag(3.5 as Double?)
+                    Text("F").tag(1 as Double?)
+                }
+                Divider()
+                Picker("Skill:", selection: $difficulty) {
+                    Text("N/A").tag(nil as Double?)
+                    Text("Trivial").tag(1 as Double?)
+                    Text("Easy").tag(3 as Double?)
+                    Text("Medium").tag(5 as Double?)
+                    Text("Hard").tag(7 as Double?)
+                    Text("Insane").tag(9 as Double?)
                 }
             }
             Section("Description") {
@@ -268,20 +288,6 @@ struct RecipeEditor: View {
     private func discard() {
         recipe.ingredients = ingredientsBackup
         dismiss()
-    }
-}
-
-private struct Ingredient: Equatable, Hashable {
-    var name: String
-    var food: FoodItem?
-    var amount: Double
-    var unit: FoodUnit
-    
-    init(name: String, food: FoodItem? = nil, amount: Double, unit: FoodUnit) {
-        self.name = name
-        self.food = food
-        self.amount = amount
-        self.unit = unit
     }
 }
 

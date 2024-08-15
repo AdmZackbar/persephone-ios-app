@@ -19,7 +19,7 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
     }
     
     static func lookup(query: String, maxResults: Int) async throws -> [FoodItem] {
-        guard let url = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(query)&pageSize=\(maxResults)&dataType=Branded&sortBy=publishedDate&sortOrder=desc") else {
+        guard let url = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(query)&pageSize=\(maxResults)&dataType=Branded") else {
             return []
         }
         

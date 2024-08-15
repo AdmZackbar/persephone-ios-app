@@ -74,14 +74,48 @@ struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
     }
     
     static func lookup(query: String, maxResults: Int) async throws -> [FoodItem] {
-        // TODO
-        return []
+        let str = "https://us.openfoodfacts.org/cgi/search.pl?action=process&search_terms=\(query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!)&sort_by=unique_scans_n&page_size=\(maxResults)&json=true"
+        guard let url = URL(string: str) else {
+            return []
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.addValue("Persephone - iOS - Version 0.1.0", forHTTPHeaderField: "User-Agent")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                // TODO throw error
+                return []
+            }
+        return parseQueryResult(data)
+    }
+    
+    private static func parseQueryResult(_ data: Data) -> [FoodItem] {
+        let decoder = JSONDecoder()
+        do {
+            let jsonData = try decoder.decode(QueryResult.self, from: data)
+            return jsonData.products.map { product in
+                parseProduct(product)
+            }
+        } catch {
+            print("Unable to decode result: \(error)")
+            print(String(decoding: data, as: UTF8.self))
+            return []
+        }
     }
 }
 
 private struct BarcodeResult: Codable {
     var code: String
     var product: Product
+}
+
+private struct QueryResult: Codable {
+    var products: [Product]
 }
 
 private struct Product: Codable {
@@ -125,15 +159,16 @@ private struct Nutriments: Codable {
         case monoFat = "monounsaturated-fat_serving"
         case polyFat = "polyunsaturated-fat_serving"
         case cholesterol = "cholesterol_serving"
-        case sodium = "sodium_serving"
+        // For some reason sodium_serving returns a string
+        case sodium = "sodium_value_a"
         case totalCarbs = "carbohydrates_serving"
         case dietaryFiber = "fiber_serving"
         case totalSugars = "sugars_serving"
         case protein = "proteins_serving"
-        case calcium = "calcium_serving"
-        case iron = "iron_serving"
-        case potassium = "potassium_serving"
-        case vitaminA = "vitamin-a_serving"
-        case vitaminC = "vitamin-c_serving"
+        case calcium = "calcium_serving_a"
+        case iron = "iron_serving_a"
+        case potassium = "potassium_serving_a"
+        case vitaminA = "vitamin-a_serving_a"
+        case vitaminC = "vitamin-c_serving_a"
     }
 }

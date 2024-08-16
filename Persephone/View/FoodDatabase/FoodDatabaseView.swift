@@ -67,6 +67,11 @@ struct FoodDatabaseView: View {
                             Label("Scan Food", systemImage: "barcode.viewfinder")
                         }
                         NavigationLink {
+                            LookupFoodView()
+                        } label: {
+                            Label("Lookup Food", systemImage: "magnifyingglass")
+                        }
+                        NavigationLink {
                             FoodItemEditor(item: nil)
                         } label: {
                             Label("Add Custom Food", systemImage: "plus")

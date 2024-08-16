@@ -28,7 +28,7 @@ struct LookupFoodView: View {
             switch viewState {
             case .GetQuery:
                 Form {
-                    TextField("query", text: $query)
+                    TextField("Query...", text: $query)
                     Button("Search", action: onSearch)
                 }.navigationTitle("Search Foods")
                     .navigationBarTitleDisplayMode(.inline)
@@ -200,8 +200,13 @@ private struct ConfirmFoodScanView: View {
                             Label("Edit", systemImage: "pencil")
                         }
                     }
-                Button("Adjust Values...") {
-                    sheetCoordinator.presentSheet(.Nutrients(item: item))
+                Menu("Edit...") {
+                    Button("Individual Values...") {
+                        sheetCoordinator.presentSheet(.Nutrients(item: item))
+                    }
+                    Button("Scale All...") {
+                        sheetCoordinator.presentSheet(.NutrientsScale(item: item))
+                    }
                 }
             }
             Section("Ingredients") {

@@ -16,6 +16,8 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
             return f.name
         case .Nutrients(let f):
             return f.name
+        case .NutrientsScale(let f):
+            return f.name
         case .StoreItem(_, let i):
             return i?.store.name ?? "item editor"
         case .Store(let s):
@@ -26,6 +28,7 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
     case General(item: FoodItem)
     case Tags(item: FoodItem)
     case Nutrients(item: FoodItem)
+    case NutrientsScale(item: FoodItem)
     case StoreItem(foodItem: FoodItem, item: StoreItem?)
     case Store(store: Store?)
     
@@ -38,6 +41,8 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
             FoodTagSheet(item: f)
         case .Nutrients(let f):
             NutrientSheet(item: f)
+        case .NutrientsScale(let f):
+            NutrientScaleSheet(item: f)
         case .StoreItem(let f, let i):
             StoreItemSheet(foodItem: f, item: i)
         case .Store(let s):

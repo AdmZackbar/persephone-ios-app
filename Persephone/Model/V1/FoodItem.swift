@@ -60,14 +60,17 @@ extension SchemaV1 {
         @Attribute(.externalStorage) var imageData: Data?
         // Set of tags that describe this item
         var tags: [String]
+        // Personal rating of the food [0,10] worst -> best
+        var rating: Double?
         
-        init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, imageData: Data? = nil, tags: [String] = []) {
+        init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, imageData: Data? = nil, tags: [String] = [], rating: Double? = nil) {
             self.timestamp = timestamp
             self.barcode = barcode
             self.brand = brand
             self.icon = icon
             self.imageData = imageData
             self.tags = tags
+            self.rating = rating
         }
     }
 

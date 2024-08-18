@@ -105,15 +105,18 @@ struct RecipeIngredientSheet: View {
                     Text("Name:")
                     TextField("required", text: $name)
                         .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
                 }
                 // TODO add link to food item
                 HStack {
                     Text("Amount:")
                     TextField("required", text: $amount)
                         .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
                 }
                 Section("Notes") {
-                    TextField("optional", text: $notes, axis: .vertical).textInputAutocapitalization(.sentences).lineLimit(3...5)
+                    TextField("optional", text: $notes, axis: .vertical)
+                        .textInputAutocapitalization(.sentences).lineLimit(3...5)
                 }
             }.navigationTitle(mode.computeTitle())
                 .navigationBarTitleDisplayMode(.inline)

@@ -42,6 +42,7 @@ struct RecipeEditor: View {
     @State private var details: String = ""
     @State private var tags: [String] = []
     @State private var rating: Double? = nil
+    @State private var ratingLeftover: Double? = nil
     @State private var difficulty: Double? = nil
     @State private var servingSize: String = ""
     @State private var numServings: Double = 1
@@ -63,124 +64,34 @@ struct RecipeEditor: View {
     
     var body: some View {
         Form {
-            HStack {
-                Text("Name:")
-                TextField("required", text: $name)
-                    .textInputAutocapitalization(.words)
-                    .autocorrectionDisabled()
-            }
-            HStack {
-                Text("Author:")
-                TextField("optional", text: $author)
-                    .textInputAutocapitalization(.words)
-                    .autocorrectionDisabled()
-            }
-            HStack(alignment: .top) {
-                Text("Tags:")
-                if tags.isEmpty {
-                    Text("None").italic().fontWeight(.light)
-                }
-                else {
-                    Text(tags.joined(separator: ", "))
-                }
-                Spacer()
-                Button("Edit") {
-                    sheetCoordinator.presentSheet(.Tags(tags: $tags))
-                }
-            }
-            HStack {
-                Text("Serving Size:")
-                TextField("required", text: $servingSize)
-                    .autocorrectionDisabled()
-            }
-            Stepper {
-                HStack {
-                    Text("Num. Servings:").fixedSize()
-                    TextField("", value: $numServings, formatter: timeFormatter)
-                        .multilineTextAlignment(.trailing).italic()
-                        .keyboardType(.decimalPad)
-                }
-            } onIncrement: {
-                numServings += 1
-            } onDecrement: {
-                if numServings > 1 {
-                    numServings -= 1
-                }
-            }
-            HStack {
-                Picker("Rating:", selection: $rating) {
-                    Text("N/A").tag(nil as Double?)
-                    Text("S").tag(9.5 as Double?)
-                    Text("A").tag(8 as Double?)
-                    Text("B").tag(6.5 as Double?)
-                    Text("C").tag(5 as Double?)
-                    Text("D").tag(3.5 as Double?)
-                    Text("F").tag(1 as Double?)
-                }
-                Divider()
-                Picker("Skill:", selection: $difficulty) {
-                    Text("N/A").tag(nil as Double?)
-                    Text("Trivial").tag(1 as Double?)
-                    Text("Easy").tag(3 as Double?)
-                    Text("Medium").tag(5 as Double?)
-                    Text("Hard").tag(7 as Double?)
-                    Text("Insane").tag(9 as Double?)
-                }
-            }
             Section("Description") {
-                TextField("optional", text: $details, axis: .vertical).textInputAutocapitalization(.sentences).lineLimit(3...10)
-            }
-            Section("Times") {
-                Stepper {
-                    HStack {
-                        Text("Prep Time:").fixedSize()
-                        TextField("", value: $prepTime, formatter: timeFormatter)
-                            .multilineTextAlignment(.trailing).italic()
-                            .keyboardType(.decimalPad)
-                        Text("min").italic()
-                    }
-                } onIncrement: {
-                    prepTime += 1
-                } onDecrement: {
-                    if prepTime > 0 {
-                        prepTime -= 1
-                    }
-                }
-                Stepper {
-                    HStack {
-                        Text("Cook Time:").fixedSize()
-                        TextField("", value: $cookTime, formatter: timeFormatter)
-                            .multilineTextAlignment(.trailing).italic()
-                            .keyboardType(.decimalPad)
-                        Text("min").italic()
-                    }
-                } onIncrement: {
-                    cookTime += 1
-                } onDecrement: {
-                    if cookTime > 0 {
-                        cookTime -= 1
-                    }
-                }
-                Stepper {
-                    HStack {
-                        Text("Other:").fixedSize()
-                        TextField("", value: $otherTime, formatter: timeFormatter)
-                            .multilineTextAlignment(.trailing).italic()
-                            .keyboardType(.decimalPad)
-                        Text("min").italic()
-                    }
-                } onIncrement: {
-                    otherTime += 1
-                } onDecrement: {
-                    if otherTime > 0 {
-                        otherTime -= 1
-                    }
+                HStack {
+                    Text("Name:")
+                    TextField("required", text: $name)
+                        .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
                 }
                 HStack {
-                    Text("Total Time:")
-                    Spacer()
-                    Text("\(timeFormatter.string(for: totalTime)!) min").italic()
+                    Text("Author:")
+                    TextField("optional", text: $author)
+                        .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
                 }
+                HStack(alignment: .top) {
+                    Text("Tags:")
+                    if tags.isEmpty {
+                        Text("None").italic().fontWeight(.light)
+                    }
+                    else {
+                        Text(tags.joined(separator: ", "))
+                    }
+                    Spacer()
+                    Button("Edit") {
+                        sheetCoordinator.presentSheet(.Tags(tags: $tags))
+                    }
+                }
+                TextField("description", text: $details, axis: .vertical)
+                    .textInputAutocapitalization(.sentences).lineLimit(3...10)
             }
             Section("Ingredients") {
                 List(recipe.ingredients, id: \.name) { ingredient in
@@ -236,6 +147,99 @@ struct RecipeEditor: View {
                     Label("Add Section...", systemImage: "plus")
                 }
             }
+            Section("Size") {
+                HStack {
+                    Text("Serving Size:")
+                    TextField("required", text: $servingSize)
+                        .autocorrectionDisabled()
+                }
+                Stepper {
+                    HStack {
+                        Text("Num. Servings:").fixedSize()
+                        TextField("", value: $numServings, formatter: timeFormatter)
+                            .multilineTextAlignment(.trailing).italic()
+                            .keyboardType(.decimalPad)
+                    }
+                } onIncrement: {
+                    numServings += 1
+                } onDecrement: {
+                    if numServings > 1 {
+                        numServings -= 1
+                    }
+                }
+            }
+            Section("Times") {
+                Stepper {
+                    HStack {
+                        Text("Prep Time:").fixedSize()
+                        TextField("", value: $prepTime, formatter: timeFormatter)
+                            .multilineTextAlignment(.trailing).italic()
+                            .keyboardType(.decimalPad)
+                        Text("min").italic()
+                    }
+                } onIncrement: {
+                    prepTime += 1
+                } onDecrement: {
+                    if prepTime > 0 {
+                        prepTime -= 1
+                    }
+                }
+                Stepper {
+                    HStack {
+                        Text("Cook Time:").fixedSize()
+                        TextField("", value: $cookTime, formatter: timeFormatter)
+                            .multilineTextAlignment(.trailing).italic()
+                            .keyboardType(.decimalPad)
+                        Text("min").italic()
+                    }
+                } onIncrement: {
+                    cookTime += 1
+                } onDecrement: {
+                    if cookTime > 0 {
+                        cookTime -= 1
+                    }
+                }
+                Stepper {
+                    HStack {
+                        Text("Other:").fixedSize()
+                        TextField("", value: $otherTime, formatter: timeFormatter)
+                            .multilineTextAlignment(.trailing).italic()
+                            .keyboardType(.decimalPad)
+                        Text("min").italic()
+                    }
+                } onIncrement: {
+                    otherTime += 1
+                } onDecrement: {
+                    if otherTime > 0 {
+                        otherTime -= 1
+                    }
+                }
+                HStack {
+                    Text("Total Time:")
+                    Spacer()
+                    Text("\(timeFormatter.string(for: totalTime)!) min").italic()
+                }
+            }
+            Section("Rating") {
+                Picker("Rating (Fresh):", selection: $rating) {
+                    Text("N/A").tag(nil as Double?)
+                    ForEach(FoodTier.allCases) { tier in
+                        Text(tier.rawValue).tag(tier.getRating() as Double?)
+                    }
+                }
+                Picker("Rating (Leftover):", selection: $ratingLeftover) {
+                    Text("N/A").tag(nil as Double?)
+                    ForEach(FoodTier.allCases) { tier in
+                        Text(tier.rawValue).tag(tier.getRating() as Double?)
+                    }
+                }
+                Picker("Skill Level:", selection: $difficulty) {
+                    Text("N/A").tag(nil as Double?)
+                    ForEach(Recipe.DifficultyLevel.allCases) { difficulty in
+                        Text(difficulty.rawValue).tag(difficulty.getValue() as Double?)
+                    }
+                }
+            }
         }.navigationTitle(mode.computeTitle())
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
@@ -258,6 +262,9 @@ struct RecipeEditor: View {
                     author = recipe.metaData.author ?? ""
                     details = recipe.metaData.details
                     tags = recipe.metaData.tags
+                    rating = recipe.metaData.rating
+                    ratingLeftover = recipe.metaData.ratingLeftover
+                    difficulty = recipe.metaData.difficulty
                     servingSize = recipe.size.servingSize
                     numServings = recipe.size.numServings
                     prepTime = recipe.metaData.prepTime
@@ -273,6 +280,9 @@ struct RecipeEditor: View {
         recipe.metaData.author = author.isEmpty ? nil : author
         recipe.metaData.details = details
         recipe.metaData.tags = tags
+        recipe.metaData.rating = rating
+        recipe.metaData.ratingLeftover = ratingLeftover
+        recipe.metaData.difficulty = difficulty
         recipe.size.servingSize = servingSize
         recipe.size.numServings = numServings
         recipe.metaData.prepTime = prepTime

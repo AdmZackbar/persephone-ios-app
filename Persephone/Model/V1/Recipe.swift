@@ -61,6 +61,8 @@ extension SchemaV1 {
             var tags: [String]
             // Personal rating of the recipe [0,10] worst -> best
             var rating: Double?
+            // Personal rating of the recipe (after being frozen or eaten later)
+            var ratingLeftover: Double?
             // Estimated difficulty to make the recipe [0,10] easiest -> hardest
             var difficulty: Double?
         }
@@ -77,6 +79,51 @@ extension SchemaV1 {
             var numServings: Double
             // The friendly serving size amount (e.g. 1 waffle, 2 portions, etc.)
             var servingSize: String
+        }
+        
+        enum DifficultyLevel: String, CaseIterable, Codable, Identifiable {
+            var id: String {
+                get {
+                    rawValue
+                }
+            }
+            
+            case Trivial, Easy, Medium, Hard, Insane
+            
+            func getValue() -> Double {
+                switch self {
+                case .Trivial:
+                    1
+                case .Easy:
+                    3
+                case .Medium:
+                    5
+                case .Hard:
+                    7
+                case .Insane:
+                    9
+                }
+            }
+            
+            static func fromValue(value: Double?) -> DifficultyLevel? {
+                if value == nil {
+                    return nil
+                }
+                let value = value!
+                if value > 8 {
+                    return .Insane
+                }
+                if value > 6 {
+                    return .Hard
+                }
+                if value > 4 {
+                    return .Medium
+                }
+                if value > 2 {
+                    return .Easy
+                }
+                return .Trivial
+            }
         }
     }
     

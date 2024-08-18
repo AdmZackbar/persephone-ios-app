@@ -131,7 +131,7 @@ private struct StoreItemsTabView: View {
                             Text("per Serving").font(.caption).fontWeight(.light)
                         }
                         VStack(alignment: .leading) {
-                            if storeItem.foodItem.getNutrient(.Energy)?.value ?? 0 != 0 {
+                            if storeItem.foodItem.getNutrient(.Energy)?.value.toValue() ?? 0 != 0 {
                                 Text(computeCostPerCalories(storeItem)).bold()
                                 Text("per 100 cal").font(.caption).fontWeight(.light)
                                 Spacer()
@@ -173,13 +173,13 @@ private struct StoreItemsTabView: View {
     }
     
     private func computeCostPerCalories(_ storeItem: StoreItem) -> String {
-        let caloriesPerServing = storeItem.foodItem.getNutrient(.Energy)!.value
+        let caloriesPerServing = storeItem.foodItem.getNutrient(.Energy)!.value.toValue()
         let totalCal = storeItem.foodItem.size.numServings * caloriesPerServing
         return currencyFormatter.string(for: computeUnitCost(storeItem) / (totalCal / 100))!
     }
     
     private func computeCostPerUnitTotal(_ storeItem: StoreItem) -> String {
-        currencyFormatter.string(for: computeUnitCost(storeItem) / storeItem.foodItem.size.totalAmount.value * 100)!
+        currencyFormatter.string(for: computeUnitCost(storeItem) / storeItem.foodItem.size.totalAmount.value.toValue() * 100)!
     }
 }
 
@@ -292,10 +292,10 @@ private struct NutritionView: View {
     
     private func format(_ nutrient: Nutrient) -> String {
         if nutrient == .Energy {
-            return "\(formatter.string(for: (item.getNutrient(.Energy)?.value ?? 0) * modifier)!) Cal"
+            return "\(formatter.string(for: (item.getNutrient(.Energy)?.value.toValue() ?? 0) * modifier)!) Cal"
         }
         let amount = try? item.getNutrient(nutrient)?.toGrams()
-        return "\(formatter.string(for: (amount?.value ?? 0) * modifier)!)g"
+        return "\(formatter.string(for: (amount?.value.toValue() ?? 0) * modifier)!)g"
     }
 }
 
@@ -380,7 +380,7 @@ private struct MacroChartView: View {
     }
     
     private func computeAmount(_ nutrient: Nutrient) -> Double {
-        return (try? item.getNutrient(nutrient)?.toGrams())?.value ?? 0
+        return (try? item.getNutrient(nutrient)?.toGrams())?.value.toValue() ?? 0
     }
 }
 

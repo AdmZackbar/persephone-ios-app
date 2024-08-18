@@ -28,12 +28,13 @@ struct RecipeIngredientSheet: View {
     
     @State private var name: String = ""
     @State private var amount: String = ""
-    private var amountValue: Double? {
+    private var amountValue: FoodAmount.Value? {
         get {
             if let match = amount.wholeMatch(of: /([\d.]+)\s+(.+)/) {
-                return Double(match.1)
+                let v = Double(match.1)
+                return v != nil ? .Raw(v!) : nil
             } else if !amount.trimmingCharacters(in: .whitespaces).isEmpty {
-                return 1
+                return .Raw(1)
             }
             return nil
         }

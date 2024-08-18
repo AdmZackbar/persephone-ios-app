@@ -69,17 +69,17 @@ struct NutrientSheet: View {
         HStack(spacing: 8) {
             Text(getFieldName(nutrient))
             TextField("", value: Binding<Double>(get: {
-                nutrientAmounts[nutrient]?.value ?? 0
+                nutrientAmounts[nutrient]?.value.toValue() ?? 0
             }, set: { value in
-                nutrientAmounts[nutrient] = FoodAmount(value: value, unit: nutrient.getCommonUnit())
+                nutrientAmounts[nutrient] = FoodAmount(value: .Raw(value), unit: nutrient.getCommonUnit())
             }), formatter: formatter)
                 .multilineTextAlignment(.trailing)
                 .keyboardType(.decimalPad)
-            if (nutrient != .Energy && nutrientAmounts[nutrient]?.value ?? 0 > 0) {
+            if (nutrient != .Energy && nutrientAmounts[nutrient]?.value.toValue() ?? 0 > 0) {
                 Text(nutrient.getCommonUnit().getAbbreviation())
             }
         }.swipeActions(allowsFullSwipe: false) {
-            if nutrientAmounts[nutrient]?.value ?? 0 > 0 {
+            if nutrientAmounts[nutrient]?.value.toValue() ?? 0 > 0 {
                 Button("Clear") {
                     clearEntry(nutrient)
                 }.tint(.red)
@@ -89,7 +89,7 @@ struct NutrientSheet: View {
                     revertEntry(nutrient)
                 }
             }
-            if nutrientAmounts[nutrient]?.value ?? 0 > 0 {
+            if nutrientAmounts[nutrient]?.value.toValue() ?? 0 > 0 {
                 Button("Round") {
                     roundEntry(nutrient)
                 }.tint(.blue)
@@ -97,19 +97,19 @@ struct NutrientSheet: View {
         }.contextMenu {
             Button("Clear") {
                 clearEntry(nutrient)
-            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0)
+            }.disabled(nutrientAmounts[nutrient]?.value.toValue() ?? 0 <= 0)
             Button("Revert") {
                 revertEntry(nutrient)
             }.disabled(nutrientAmounts[nutrient] == item.getNutrient(nutrient))
             Button("Round") {
                 roundEntry(nutrient)
-            }.disabled(nutrientAmounts[nutrient]?.value ?? 0 <= 0)
+            }.disabled(nutrientAmounts[nutrient]?.value.toValue() ?? 0 <= 0)
         }
     }
     
     private func roundEntry(_ nutrient: Nutrient) {
         if let amount = nutrientAmounts[nutrient] {
-            nutrientAmounts[nutrient] = FoodAmount(value: round(amount.value), unit: amount.unit)
+            nutrientAmounts[nutrient] = FoodAmount(value: .Raw(round(amount.value.toValue())), unit: amount.unit)
         }
     }
     

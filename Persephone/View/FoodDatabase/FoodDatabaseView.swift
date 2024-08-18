@@ -153,22 +153,22 @@ private struct NutritionView: View {
             }
             HStack(alignment: .top) {
                 VStack(alignment: .leading) {
-                    Text("\(format(item.getNutrient(.Energy)?.value ?? 0)) Calories")
+                    Text("\(format(item.getNutrient(.Energy)?.value)) Calories")
                         .font(.title2).bold()
-                    Text("\(format(item.getNutrient(.TotalFat)?.value ?? 0))g Fat")
+                    Text("\(format(item.getNutrient(.TotalFat)?.value))g Fat")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Text("\(format(item.getNutrient(.TotalCarbs)?.value ?? 0))g Carbs")
+                    Text("\(format(item.getNutrient(.TotalCarbs)?.value))g Carbs")
                         .font(.subheadline)
                         .fontWeight(.light)
-                    Text("\(format(item.getNutrient(.Protein)?.value ?? 0))g Protein")
+                    Text("\(format(item.getNutrient(.Protein)?.value))g Protein")
                         .font(.subheadline)
                         .fontWeight(.light)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("\(item.size.servingSize) (\(format(item.size.servingAmount.value))\(item.size.servingAmount.unit.getAbbreviation()))").font(.headline).bold()
-                    Text("\(format(item.size.numServings)) servings").font(.subheadline)
+                    Text("\(formatter.string(for: item.size.numServings)!) servings").font(.subheadline)
                     Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(format(item.size.totalAmount.value)) \(item.size.totalAmount.unit.getAbbreviation())")
                         .font(.subheadline).fontWeight(.light)
                 }
@@ -181,8 +181,8 @@ private struct NutritionView: View {
         .padding()
     }
     
-    private func format(_ value: Double?) -> String {
-        formatter.string(for: value ?? 0.0)!
+    private func format(_ value: FoodAmount.Value?) -> String {
+        formatter.string(for: value?.toValue() ?? 0.0)!
     }
     
     private func formatVolume(_ volume: Double) -> String {

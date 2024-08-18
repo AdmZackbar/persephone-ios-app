@@ -77,15 +77,15 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                         ])
     context.insert(recipe)
     recipe.ingredients.append(contentsOf: [
-        RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: 1.2, unit: .Liter), notes: "Tap water or else"),
-        RecipeIngredient(name: "Salt", recipe: recipe, amount: FoodAmount(value: 600, unit: .Milligram))
+        RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: .Raw(1.2), unit: .Liter), notes: "Tap water or else"),
+        RecipeIngredient(name: "Salt", recipe: recipe, amount: FoodAmount(value: .Raw(600), unit: .Milligram))
     ])
     return recipe
 }
 
 @discardableResult
 func createTestFoodInstance(_ context: ModelContext) -> FoodInstance {
-    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", price: Price(cents: 530)), amount: .Single(total: FoodAmount(value: 530, unit: .Gram), remaining: FoodAmount(value: 420, unit: .Gram)), dates: FoodInstanceDates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
+    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", price: Price(cents: 530)), amount: .Single(total: FoodAmount(value: .Raw(530), unit: .Gram), remaining: FoodAmount(value: .Raw(420), unit: .Gram)), dates: FoodInstanceDates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
     context.insert(item)
     return item
 }

@@ -72,7 +72,7 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
             let adjValue = nutrient.value * ratio
             // Round to nearest half
             if let nutrient = getNutrient(nutrient.nutrientName) {
-                nutrientMap[nutrient] = FoodAmount(value: round(adjValue * 2.0) / 2.0, unit: nutrient.getCommonUnit())
+                nutrientMap[nutrient] = FoodAmount(value: .Raw(round(adjValue * 2.0) / 2.0), unit: nutrient.getCommonUnit())
             }
         })
         let metaData = FoodMetaData(

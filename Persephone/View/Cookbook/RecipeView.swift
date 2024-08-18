@@ -172,9 +172,9 @@ private struct NutrientView: View {
             Text(name)
             Spacer()
             if nutrient == .Energy {
-                Text(formatter.string(for: modifyAmountIfNeeded(nutrients[.Energy]?.value))!)
+                Text(formatter.string(for: modifyAmountIfNeeded(nutrients[.Energy]?.value.toValue()))!)
             } else {
-                Text("\(formatter.string(for: modifyAmountIfNeeded(nutrients[nutrient]?.value))!) \(nutrient.getCommonUnit().getAbbreviation())")
+                Text("\(formatter.string(for: modifyAmountIfNeeded(nutrients[nutrient]?.value.toValue()))!) \(nutrient.getCommonUnit().getAbbreviation())")
             }
         }
     }

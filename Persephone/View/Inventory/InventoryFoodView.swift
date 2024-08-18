@@ -41,7 +41,7 @@ struct InventoryFoodView: View {
             }
             switch item.amount {
             case .Single(let total, let remaining):
-                Gauge(value: remaining.value, in: 0...total.value) {
+                Gauge(value: remaining.value.toValue(), in: 0...total.value.toValue()) {
                     
                 } currentValueLabel: {
                     Text("\(formatter.string(for: remaining.value)!) \(remaining.unit.getAbbreviation())")

@@ -96,7 +96,7 @@ struct RecipeEditor: View {
             Section("Ingredients") {
                 List(recipe.ingredients, id: \.name) { ingredient in
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(timeFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
+                        Text("\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
                         if !(ingredient.notes ?? "").isEmpty {
                             Text(ingredient.notes!).font(.caption).italic()
                         }

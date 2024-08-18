@@ -38,13 +38,13 @@ struct FoodItemEditor: View {
     @State private var amountUnit: FoodUnit = .Gram
     @State private var numServings: Double = 0.0
     @State private var servingSize: String = ""
-    @State private var totalAmount: Double = 0.0
+    @State private var totalAmount: FoodAmount.Value = .Raw(0)
     private var servingAmount: Double? {
         get {
-            if (totalAmount <= 0 || numServings <= 0) {
+            if (totalAmount.toValue() <= 0 || numServings <= 0) {
                 return nil
             }
-            return totalAmount / numServings
+            return totalAmount.toValue() / numServings
         }
     }
     // Ingredients
@@ -224,11 +224,11 @@ struct FoodItemEditor: View {
     }
     
     private func isSizeInvalid() -> Bool {
-        return servingSize.isEmpty || numServings <= 0 || totalAmount <= 0
+        return servingSize.isEmpty || numServings <= 0 || totalAmount.toValue() <= 0
     }
     
     init(item: FoodItem? = nil, mode: Mode? = nil) {
-        self.item = item ?? FoodItem(name: "", metaData: FoodMetaData(), ingredients: FoodIngredients(nutrients: [:]), size: FoodSize(totalAmount: FoodAmount(value: 0, unit: .Gram), numServings: 1, servingSize: ""))
+        self.item = item ?? FoodItem(name: "", metaData: FoodMetaData(), ingredients: FoodIngredients(nutrients: [:]), size: FoodSize(totalAmount: FoodAmount(value: .Raw(0), unit: .Gram), numServings: 1, servingSize: ""))
         self.mode = mode ?? (item == nil ? .Add : .Edit)
     }
 }

@@ -115,7 +115,7 @@ struct RecipeItemIngredientSheet: View {
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button("Save") {
-                            recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: amount, unit: unit)))
+                            recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: .Raw(amount), unit: unit)))
                             dismiss()
                         }
                     }

@@ -88,7 +88,7 @@ extension SchemaV1 {
             }
             set(value) {
                 // Update number of servings instead of total amount
-                numServings = totalAmount.value / value.value
+                numServings = totalAmount.value.toValue() / value.value.toValue()
             }
         }
         

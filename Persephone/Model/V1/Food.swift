@@ -13,20 +13,68 @@ typealias FoodTier = SchemaV1.FoodTier
 
 extension SchemaV1 {
     struct FoodAmount: Codable, Equatable, Hashable {
+        enum Value: Codable, Equatable, Hashable {
+            case Raw(_ value: Double)
+            case Rational(num: Double, den: Double)
+            
+            static func * (left: Value, right: Double) -> Value {
+                switch left {
+                case .Raw(let value):
+                    return .Raw(value * right)
+                case .Rational(let num, let den):
+                    return right > 1 ? .Rational(num: num * right, den: den) : .Rational(num: num, den: den / right)
+                }
+            }
+            
+            static func / (left: Value, right: Double) -> Value {
+                switch left {
+                case .Raw(let value):
+                    return .Raw(value / right)
+                case .Rational(let num, let den):
+                    return right > 1 ? .Rational(num: num, den: den * right) : .Rational(num: num / right, den: den)
+                }
+            }
+            
+            func toValue() -> Double {
+                switch self {
+                case .Raw(let value):
+                    return value
+                case .Rational(let num, let den):
+                    return num / den
+                }
+            }
+            
+            func toString() -> String {
+                let formatter: NumberFormatter = {
+                    let formatter = NumberFormatter()
+                    formatter.numberStyle = .decimal
+                    formatter.maximumFractionDigits = 2
+                    formatter.groupingSeparator = ""
+                    return formatter
+                }()
+                switch self {
+                case .Raw(let raw):
+                    return formatter.string(for: raw)!
+                case .Rational(let num, let den):
+                    return "\(formatter.string(for: num)!)/\(formatter.string(for: den)!)"
+                }
+            }
+        }
+        
         static func calories(_ value: Double) -> FoodAmount {
-            FoodAmount(value: value, unit: .Calorie)
+            FoodAmount(value: .Raw(value), unit: .Calorie)
         }
         
         static func grams(_ value: Double) -> FoodAmount {
-            FoodAmount(value: value, unit: .Gram)
+            FoodAmount(value: .Raw(value), unit: .Gram)
         }
         
         static func milligrams(_ value: Double) -> FoodAmount {
-            FoodAmount(value: value, unit: .Milligram)
+            FoodAmount(value: .Raw(value), unit: .Milligram)
         }
         
         // The raw value of the amount
-        var value: Double
+        var value: Value
         // The unit of the amount
         var unit: FoodUnit
         

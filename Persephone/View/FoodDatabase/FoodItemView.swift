@@ -62,38 +62,8 @@ struct FoodItemView: View {
                         .frame(maxHeight: .infinity)
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Menu {
-                        Button {
-                            sheetCoordinator.presentSheet(.General(item: item))
-                        } label: {
-                            Label("General", systemImage: "pencil")
-                        }
-                        Menu {
-                            ForEach(item.storeItems.sorted(by: { x, y in x.store.name < y.store.name }), id: \.store.name) { storeItem in
-                                Button(storeItem.store.name) {
-                                    sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: storeItem))
-                                }
-                            }
-                            Button {
-                                sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: nil))
-                            } label: {
-                                Label("Add Listing", systemImage: "plus")
-                            }
-                        } label: {
-                            Label("Store Listings", systemImage: "storefront")
-                        }
-                        Button {
-                            sheetCoordinator.presentSheet(.Nutrients(item: item))
-                        } label: {
-                            Label("Nutrition", systemImage: "tablecells")
-                        }
-                        Button {
-                            sheetCoordinator.presentSheet(.Tags(item: item))
-                        } label: {
-                            Label("Tags", systemImage: "tag")
-                        }
-                    } label: {
-                        Label("Edit", systemImage: "pencil").labelStyle(.titleOnly)
+                    NavigationLink("Edit") {
+                        FoodItemEditor(item: item)
                     }
                 }
             }.background(Color(UIColor.secondarySystemBackground))
@@ -198,10 +168,10 @@ private struct SizeTabView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Serving Size").font(.subheadline)
                 Text(item.size.servingSize).font(.title2).bold()
-                Text("\(formatter.string(for: item.size.servingAmount.value)!)\(item.size.servingAmount.unit.getAbbreviation())").fontWeight(.light)
+                Text("\(item.size.servingAmount.value.toString())\(item.size.servingAmount.unit.getAbbreviation())").fontWeight(.light)
                 Spacer()
                 Text("\(formatter.string(for: item.size.numServings)!) servings").lineLimit(1)
-                Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(formatter.string(for: item.size.totalAmount.value)!)\(item.size.totalAmount.unit.getAbbreviation())").font(.subheadline).fontWeight(.light).lineLimit(1)
+                Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.getAbbreviation())").font(.subheadline).fontWeight(.light).lineLimit(1)
                 
             }
             Spacer()
@@ -328,7 +298,7 @@ private struct MacroChartView: View {
                     "None": Color.gray
                 ])
             VStack(spacing: 2) {
-                Text(formatter.string(for: item.getNutrient(.Energy)?.value ?? 0)!).font(.title3).fontWeight(.heavy)
+                Text(item.getNutrient(.Energy)?.value.toString() ?? "").font(.title3).fontWeight(.heavy)
                 Text("Cal").font(.caption).bold()
             }
             VStack(spacing: 0) {

@@ -54,7 +54,7 @@ struct NutrientTableView: View {
     }
     
     private func format(_ nutrient: Nutrient) -> String {
-        formatter.string(for: nutrients[nutrient]?.value ?? 0)!
+        nutrients[nutrient]?.value.toString() ?? ""
     }
 }
 

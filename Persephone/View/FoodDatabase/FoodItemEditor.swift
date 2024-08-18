@@ -38,13 +38,13 @@ struct FoodItemEditor: View {
     @State private var amountUnit: FoodUnit = .Gram
     @State private var numServings: Double = 0.0
     @State private var servingSize: String = ""
-    @State private var totalAmount: FoodAmount.Value = .Raw(0)
+    @State private var totalAmount: Double = 0
     private var servingAmount: Double? {
         get {
-            if (totalAmount.toValue() <= 0 || numServings <= 0) {
+            if (totalAmount <= 0 || numServings <= 0) {
                 return nil
             }
-            return totalAmount.toValue() / numServings
+            return totalAmount / numServings
         }
     }
     // Ingredients
@@ -183,7 +183,7 @@ struct FoodItemEditor: View {
                     amountUnit = item.size.totalAmount.unit
                     numServings = item.size.numServings
                     servingSize = item.size.servingSize
-                    totalAmount = item.size.totalAmount.value
+                    totalAmount = item.size.totalAmount.value.toValue()
                     ingredients = item.ingredients.all
                     allergens = item.ingredients.allergens
                 default:
@@ -200,7 +200,7 @@ struct FoodItemEditor: View {
                     Button("Save") {
                         item.name = name
                         item.metaData.brand = brand
-                        item.size = FoodSize(totalAmount: FoodAmount(value: totalAmount, unit: amountUnit), numServings: numServings, servingSize: servingSize)
+                        item.size = FoodSize(totalAmount: FoodAmount(value: .Raw(totalAmount), unit: amountUnit), numServings: numServings, servingSize: servingSize)
                         item.ingredients.all = ingredients
                         item.ingredients.allergens = allergens
                         switch mode {
@@ -224,7 +224,7 @@ struct FoodItemEditor: View {
     }
     
     private func isSizeInvalid() -> Bool {
-        return servingSize.isEmpty || numServings <= 0 || totalAmount.toValue() <= 0
+        return servingSize.isEmpty || numServings <= 0 || totalAmount <= 0
     }
     
     init(item: FoodItem? = nil, mode: Mode? = nil) {

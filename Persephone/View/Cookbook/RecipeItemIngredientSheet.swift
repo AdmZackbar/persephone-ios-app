@@ -78,17 +78,21 @@ struct RecipeItemIngredientSheet: View {
         
         @Binding private var viewState: ViewState
         
-        @State private var amount: Double = 0
+        @State private var amount: String = ""
+        private var amountValue: FoodAmount.Value? {
+            get {
+                if let match = amount.wholeMatch(of: /([\d.]+)\s*\/\s*([\d.]+)/),
+                    let num = Double(match.1),
+                    let den = Double(match.2) {
+                    return .Rational(num: num, den: den)
+                } else if let match = amount.wholeMatch(of: /([\d.]+)/),
+                          let value = Double(match.1) {
+                    return .Raw(value)
+                }
+                return nil
+            }
+        }
         @State private var unit: FoodUnit = .Custom(name: "Serving")
-        
-        private let formatter: NumberFormatter = {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.maximumFractionDigits = 3
-            formatter.groupingSeparator = ""
-            formatter.zeroSymbol = ""
-            return formatter
-        }()
         
         var body: some View {
             Form {
@@ -102,7 +106,7 @@ struct RecipeItemIngredientSheet: View {
                         Text("fl oz").tag(FoodUnit.FluidOunce)
                     }
                 } label: {
-                    TextField("amount", value: $amount, formatter: formatter)
+                    TextField("amount", text: $amount)
                 }
             }.navigationTitle(foodItem.name)
                 .navigationBarTitleDisplayMode(.inline)
@@ -115,9 +119,9 @@ struct RecipeItemIngredientSheet: View {
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button("Save") {
-                            recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: .Raw(amount), unit: unit)))
+                            recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: unit)))
                             dismiss()
-                        }
+                        }.disabled(amountValue == nil)
                     }
                 }
         }

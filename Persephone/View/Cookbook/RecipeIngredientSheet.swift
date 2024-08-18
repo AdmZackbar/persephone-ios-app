@@ -30,9 +30,13 @@ struct RecipeIngredientSheet: View {
     @State private var amount: String = ""
     private var amountValue: FoodAmount.Value? {
         get {
-            if let match = amount.wholeMatch(of: /([\d.]+)\s+(.+)/) {
-                let v = Double(match.1)
-                return v != nil ? .Raw(v!) : nil
+            if let match = amount.wholeMatch(of: /([\d.]+)\s*\/\s*([\d.]+)\s+(.+)/),
+                let num = Double(match.1),
+                let den = Double(match.2) {
+                return .Rational(num: num, den: den)
+            } else if let match = amount.wholeMatch(of: /([\d.]+)\s+(.+)/),
+                      let value = Double(match.1) {
+                return .Raw(value)
             } else if !amount.trimmingCharacters(in: .whitespaces).isEmpty {
                 return .Raw(1)
             }
@@ -42,7 +46,9 @@ struct RecipeIngredientSheet: View {
     private var amountUnit: FoodUnit? {
         get {
             var unitName: String?
-            if let match = amount.wholeMatch(of: /([\d.]+)\s+(.+)/) {
+            if let match = amount.wholeMatch(of: /([\d.]+)\s*\/\s*([\d.]+)\s+(.+)/) {
+                unitName = match.3.string
+            } else if let match = amount.wholeMatch(of: /([\d.]+)\s+(.+)/) {
                 unitName = match.2.string
             } else if !amount.trimmingCharacters(in: .whitespaces).isEmpty {
                 unitName = amount.trimmingCharacters(in: .whitespaces)
@@ -126,7 +132,7 @@ struct RecipeIngredientSheet: View {
                     switch mode {
                     case .Edit(let ingredient):
                         name = ingredient.name
-                        amount = "\(formatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation())"
+                        amount = "\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation())"
                         notes = ingredient.notes ?? ""
                     default:
                         // Do nothing

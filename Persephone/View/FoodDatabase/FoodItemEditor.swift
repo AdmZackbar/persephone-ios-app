@@ -34,6 +34,7 @@ struct FoodItemEditor: View {
     // Name details
     @State private var name: String = ""
     @State private var brand: String = ""
+    @State private var details: String = ""
     // Size
     @State private var amountUnit: FoodUnit = .Gram
     @State private var numServings: Double = 0.0
@@ -50,6 +51,7 @@ struct FoodItemEditor: View {
     // Ingredients
     @State private var ingredients: String = ""
     @State private var allergens: String = ""
+    @State private var storeItems: [StoreItem] = []
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -57,13 +59,6 @@ struct FoodItemEditor: View {
         formatter.maximumFractionDigits = 2
         formatter.zeroSymbol = ""
         formatter.groupingSeparator = ""
-        return formatter
-    }()
-    
-    let currencyFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 2
         return formatter
     }()
     
@@ -77,15 +72,15 @@ struct FoodItemEditor: View {
         Form {
             Section(item.metaData.barcode ?? "") {
                 HStack {
-                    Text("Name:").fontWeight(.light).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                    Text("Name:").fontWeight(.light)
                     TextField("required", text: $name)
                 }
                 HStack {
-                    Text("Brand:").fontWeight(.light).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                    Text("Brand:").fontWeight(.light)
                     TextField("optional", text: $brand)
                 }
                 HStack {
-                    Text(amountUnit.isWeight() ? "Net Wt:" : "Net Vol:").fontWeight(.light).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                    Text(amountUnit.isWeight() ? "Net Wt:" : "Net Vol:").fontWeight(.light)
                     Picker(selection: $amountUnit) {
                         createAmountUnitOption(.Gram)
                         createAmountUnitOption(.Ounce)
@@ -97,12 +92,12 @@ struct FoodItemEditor: View {
                     }.gridCellAnchor(UnitPoint(x: 0, y: 0.5))
                 }
                 HStack {
-                    Text("Num Servings:").fontWeight(.light).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                    Text("Num Servings:").fontWeight(.light)
                     TextField("required", value: $numServings, formatter: formatter)
                         .keyboardType(.decimalPad)
                 }
                 HStack {
-                    Text("Serving Size:").fontWeight(.light).gridCellAnchor(UnitPoint(x: 0, y: 0.5))
+                    Text("Serving Size:").fontWeight(.light)
                     if servingAmount != nil {
                         HStack {
                             TextField("required", text: $servingSize)
@@ -145,6 +140,11 @@ struct FoodItemEditor: View {
                         .textInputAutocapitalization(.words)
                 }.bold()
             }
+            Section("Description") {
+                TextField("optional", text: $details, axis: .vertical)
+                    .textInputAutocapitalization(.sentences)
+                    .lineLimit(1...8)
+            }
             Section("Tags") {
                 Text(item.metaData.tags.isEmpty ? "No tags" : item.metaData.tags.joined(separator: ", "))
                     .italic(item.metaData.tags.isEmpty)
@@ -152,29 +152,35 @@ struct FoodItemEditor: View {
                     sheetCoordinator.presentSheet(.Tags(item: item))
                 }
             }
-            Section("Store Listings") {
-                List(item.storeItems) { storeItem in
-                    HStack {
-                        Text(storeItem.store.name).bold()
-                        Spacer()
-                        VStack(alignment: .trailing) {
-                            Text("\(formatter.string(for: storeItem.quantity)!) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100.0)!)")
-                            if !storeItem.available {
-                                Text("(retired)").font(.caption).fontWeight(.thin)
+            // Can only add store items if the item is already inserted
+            // TODO find workaround
+            if mode != .Add {
+                Section("Store Listings") {
+                    List(storeItems) { storeItem in
+                        Button {
+                            sheetCoordinator.presentSheet(.EditStoreItem(item: storeItem))
+                        } label: {
+                            HStack {
+                                Text(mode == .Edit ? storeItem.store.name : "Store").bold()
+                                Spacer()
+                                VStack(alignment: .trailing) {
+                                    Text("\(formatter.string(for: storeItem.quantity)!) for \(storeItem.price.toString())")
+                                    if !storeItem.available {
+                                        Text("(retired)").font(.caption).fontWeight(.thin)
+                                    }
+                                }
+                            }.contentShape(Rectangle())
+                        }.buttonStyle(.plain).swipeActions(allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                storeItems.removeAll(where: { s in s == storeItem })
+                            } label: {
+                                Label("Delete", systemImage: "trash.fill")
                             }
                         }
-                    }.onTapGesture {
-                        sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: storeItem))
-                    }.swipeActions(allowsFullSwipe: false) {
-                        Button(role: .destructive) {
-                            item.storeItems.removeAll(where: { s in s == storeItem })
-                        } label: {
-                            Label("Delete", systemImage: "trash.fill")
-                        }
                     }
-                }
-                Button("Add Listing...") {
-                    sheetCoordinator.presentSheet(.StoreItem(foodItem: item, item: nil))
+                    Button("Add Listing...") {
+                        sheetCoordinator.presentSheet(.AddStoreItem(foodItem: item, storeItems: $storeItems))
+                    }
                 }
             }
         }.navigationTitle(mode.getTitle())
@@ -186,12 +192,14 @@ struct FoodItemEditor: View {
                 case .Confirm, .Edit:
                     name = item.name
                     brand = item.metaData.brand ?? ""
+                    details = item.details ?? ""
                     amountUnit = item.size.totalAmount.unit
                     numServings = item.size.numServings
                     servingSize = item.size.servingSize
                     totalAmount = item.size.totalAmount.value.toValue()
                     ingredients = item.ingredients.all
                     allergens = item.ingredients.allergens
+                    storeItems = item.storeItems
                 default:
                     break
                 }
@@ -200,20 +208,21 @@ struct FoodItemEditor: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         path.removeLast()
-                    }
+                    }.disabled(path.isEmpty)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button("Save") {
                         item.name = name
                         item.metaData.brand = brand
+                        item.details = details.isEmpty ? nil : details
                         item.size = FoodSize(totalAmount: FoodAmount(value: .Raw(totalAmount), unit: amountUnit), numServings: numServings, servingSize: servingSize)
                         item.ingredients.all = ingredients
                         item.ingredients.allergens = allergens
                         switch mode {
                         case .Add, .Confirm:
                             modelContext.insert(item)
-                        default:
-                            break
+                        case .Edit:
+                            item.storeItems = storeItems
                         }
                         switch mode {
                         case .Confirm:
@@ -222,7 +231,7 @@ struct FoodItemEditor: View {
                         default:
                             path.removeLast()
                         }
-                    }
+                    }.disabled(path.isEmpty || isMainInfoInvalid() || isSizeInvalid())
                 }
             }
     }

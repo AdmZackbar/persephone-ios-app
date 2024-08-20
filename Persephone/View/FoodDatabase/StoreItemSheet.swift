@@ -15,8 +15,39 @@ struct StoreItemSheet: View {
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     @Query(sort: \Store.name) private var stores: [Store]
     
-    let foodItem: FoodItem
-    let item: StoreItem?
+    enum Mode {
+        case Add(foodItem: FoodItem, items: Binding<[StoreItem]>)
+        case Edit(item: StoreItem)
+        
+        func getTitle() -> String {
+            switch self {
+            case .Add:
+                "Add Entry"
+            case .Edit:
+                "Edit Entry"
+            }
+        }
+        
+        func getHeader() -> String {
+            switch self {
+            case .Add(let item, _):
+                item.name
+            case .Edit(let item):
+                item.foodItem.name
+            }
+        }
+        
+        func getBackAction() -> String {
+            switch self {
+            case .Add:
+                "Back"
+            case .Edit:
+                "Revert"
+            }
+        }
+    }
+    
+    let mode: Mode
     
     @State private var store: Store? = nil
     @State private var quantity: Int = 1
@@ -40,7 +71,7 @@ struct StoreItemSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(foodItem.name) {
+                Section(mode.getHeader()) {
                     if !stores.isEmpty {
                         HStack {
                             Text("Store:")
@@ -84,12 +115,12 @@ struct StoreItemSheet: View {
                         Text("Available:")
                     }
                 }
-            }.navigationTitle(item == nil ? "Add Store Entry" : "Edit Store Entry")
+            }.navigationTitle(mode.getTitle())
                 .navigationBarBackButtonHidden()
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button(item == nil ? "Cancel" : "Revert") {
+                        Button(mode.getBackAction()) {
                             dismiss()
                         }
                     }
@@ -103,29 +134,28 @@ struct StoreItemSheet: View {
                 .sheetCoordinating(coordinator: sheetCoordinator)
         }.presentationDetents([.medium])
             .onAppear {
-                if let item {
+                switch mode {
+                case .Edit(let item):
                     store = item.store
                     quantity = item.quantity
                     price = item.price.cents
                     available = item.available
+                default:
+                    break
                 }
             }
     }
     
     private func save() {
-        if let item {
+        switch mode {
+        case .Add(let item, let items):
+            items.wrappedValue.append(StoreItem(store: store!, foodItem: item, quantity: quantity, price: Price(cents: price), available: available))
+        case .Edit(let item):
             item.store = store!
             item.quantity = quantity
             item.price = Price(cents: price)
             item.available = available
-        } else {
-            foodItem.storeItems.append(StoreItem(store: store!, foodItem: foodItem, quantity: quantity, price: Price(cents: price), available: available))
         }
-    }
-    
-    init(foodItem: FoodItem, item: StoreItem? = nil) {
-        self.foodItem = foodItem
-        self.item = item
     }
 }
 
@@ -134,6 +164,6 @@ struct StoreItemSheet: View {
     let item = createTestFoodItem(container.mainContext)
     container.mainContext.insert(Store(name: "Publix"))
     container.mainContext.insert(Store(name: "Target"))
-    return StoreItemSheet(foodItem: item, item: item.storeItems.first)
+    return StoreItemSheet(mode: .Add(foodItem: item, items: .constant([])))
         .modelContainer(container)
 }

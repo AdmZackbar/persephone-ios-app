@@ -18,8 +18,10 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
             return f.name
         case .NutrientsScale(let f):
             return f.name
-        case .StoreItem(_, let i):
-            return i?.store.name ?? "item editor"
+        case .AddStoreItem(let i, _):
+            return i.name
+        case .EditStoreItem(let i):
+            return i.foodItem.name
         case .Store(let s):
             return s?.name ?? "store editor"
         }
@@ -29,7 +31,8 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
     case Tags(item: FoodItem)
     case Nutrients(item: FoodItem)
     case NutrientsScale(item: FoodItem)
-    case StoreItem(foodItem: FoodItem, item: StoreItem?)
+    case AddStoreItem(foodItem: FoodItem, storeItems: Binding<[StoreItem]>)
+    case EditStoreItem(item: StoreItem)
     case Store(store: Store?)
     
     @ViewBuilder
@@ -43,8 +46,10 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
             NutrientSheet(item: f)
         case .NutrientsScale(let f):
             NutrientScaleSheet(item: f)
-        case .StoreItem(let f, let i):
-            StoreItemSheet(foodItem: f, item: i)
+        case .AddStoreItem(let foodItem, let storeItems):
+            StoreItemSheet(mode: .Add(foodItem: foodItem, items: storeItems))
+        case .EditStoreItem(let item):
+            StoreItemSheet(mode: .Edit(item: item))
         case .Store(let s):
             StoreSheet(store: s)
         }

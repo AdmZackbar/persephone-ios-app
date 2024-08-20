@@ -30,7 +30,7 @@ struct FoodItemView: View {
     }
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             if !(item.metaData.brand ?? "").isEmpty || !item.metaData.tags.isEmpty {
                 HStack {
                     if !(item.metaData.brand ?? "").isEmpty {
@@ -43,17 +43,32 @@ struct FoodItemView: View {
                         } icon: {
                             Image(systemName: "tag.fill").font(.system(size: 12))
                         }.labelStyle(.titleAndIcon)
+                            .contentShape(Rectangle())
+                            .contextMenu {
+                                Button {
+                                    sheetCoordinator.presentSheet(.Tags(item: item))
+                                } label: {
+                                    Label("Edit Tags", systemImage: "pencil")
+                                }
+                            }
                     }
                 }
             }
-            Grid(horizontalSpacing: 12) {
+            Grid(horizontalSpacing: 16) {
                 GridRow {
                     SizeTabView(item: item)
                     NutritionTabView(item: item)
+                        .contextMenu {
+                            Button {
+                                sheetCoordinator.presentSheet(.Nutrients(item: item))
+                            } label: {
+                                Label("Edit Nutrients", systemImage: "pencil")
+                            }
+                        }
                 }
             }.frame(height: 140)
             if !item.storeItems.isEmpty {
-                StoreItemsTabView(storeItems: item.storeItems.sorted(by: { x, y in
+                StoreItemsTabView(sheetCoordinator: sheetCoordinator, storeItems: item.storeItems.sorted(by: { x, y in
                     let unitX = Double(x.price.cents) / Double(x.quantity)
                     let unitY = Double(y.price.cents) / Double(y.quantity)
                     return unitX < unitY
@@ -61,7 +76,7 @@ struct FoodItemView: View {
             }
             MainTabView(sheetCoordinator: sheetCoordinator, item: item)
         }.navigationBarTitleDisplayMode(.inline)
-            .padding(EdgeInsets(top: 4, leading: 12, bottom: 12, trailing: 12))
+            .padding(EdgeInsets(top: 4, leading: 16, bottom: 16, trailing: 16))
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(item.name).font(.headline)
@@ -79,11 +94,13 @@ struct FoodItemView: View {
 }
 
 private struct StoreItemsTabView: View {
+    @ObservedObject var sheetCoordinator: SheetCoordinator<FoodSheetEnum>
     @State private var tabSelection: String
     
     var storeItems: [StoreItem]
     
-    init(storeItems: [StoreItem]) {
+    init(sheetCoordinator: SheetCoordinator<FoodSheetEnum>, storeItems: [StoreItem]) {
+        self.sheetCoordinator = sheetCoordinator
         self.tabSelection = storeItems.first!.store.name
         self.storeItems = storeItems
     }
@@ -92,31 +109,15 @@ private struct StoreItemsTabView: View {
         ZStack(alignment: .bottom) {
             TabView(selection: $tabSelection) {
                 ForEach(storeItems) { storeItem in
-                    HStack(spacing: 18) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(storeItem.store.name).font(.title2).bold()
-                            Text("\(storeItem.quantity) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100)!)")
-                            Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
-                            Spacer()
-                        }
-                        Spacer()
-                        VStack(alignment: .leading) {
-                            Text(computeCostPerUnit(storeItem)).bold()
-                            Text("per Unit").font(.caption).fontWeight(.light)
-                            Spacer()
-                            Text(computeCostPerServing(storeItem)).bold()
-                            Text("per Serving").font(.caption).fontWeight(.light)
-                        }
-                        VStack(alignment: .leading) {
-                            if storeItem.foodItem.getNutrient(.Energy)?.value.toValue() ?? 0 != 0 {
-                                Text(computeCostPerCalories(storeItem)).bold()
-                                Text("per 100 cal").font(.caption).fontWeight(.light)
-                                Spacer()
+                    StoreItemView(storeItem: storeItem)
+                        .contentShape(Rectangle())
+                        .contextMenu {
+                            Button {
+                                sheetCoordinator.presentSheet(.EditStoreItem(item: storeItem))
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
                             }
-                            Text(computeCostPerUnitTotal(storeItem)).bold()
-                            Text("per 100 \(storeItem.foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
                         }
-                    }.padding(12).tag(storeItem.store.name)
                 }
             }.frame(maxWidth: .infinity)
                 .tabViewStyle(.page(indexDisplayMode: .never))
@@ -135,6 +136,38 @@ private struct StoreItemsTabView: View {
             }
         }.background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+private struct StoreItemView: View {
+    let storeItem: StoreItem
+    
+    var body: some View {
+        HStack(spacing: 18) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(storeItem.store.name).font(.title2).bold()
+                Text("\(storeItem.quantity) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100)!)")
+                Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
+                Spacer()
+            }
+            Spacer()
+            VStack(alignment: .leading) {
+                Text(computeCostPerUnit(storeItem)).bold()
+                Text("per Unit").font(.caption).fontWeight(.light)
+                Spacer()
+                Text(computeCostPerServing(storeItem)).bold()
+                Text("per Serving").font(.caption).fontWeight(.light)
+            }
+            VStack(alignment: .leading) {
+                if storeItem.foodItem.getNutrient(.Energy)?.value.toValue() ?? 0 != 0 {
+                    Text(computeCostPerCalories(storeItem)).bold()
+                    Text("per 100 cal").font(.caption).fontWeight(.light)
+                    Spacer()
+                }
+                Text(computeCostPerUnitTotal(storeItem)).bold()
+                Text("per 100 \(storeItem.foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
+            }
+        }.padding(12).tag(storeItem.store.name)
     }
     
     private func computeUnitCost(_ storeItem: StoreItem) -> Double {
@@ -200,7 +233,7 @@ private struct NutritionTabView: View {
     
     var item: FoodItem
     
-    @State private var tabSelection: ViewType = .Main
+    @State private var tabSelection: ViewType = .Macro
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -402,7 +435,14 @@ private struct MainTabView: View {
                             }
                         }.padding(12)
                 }.tag(ViewType.Nutrients)
-                if !item.ingredients.all.isEmpty || !item.ingredients.allergens.isEmpty {
+                    .contextMenu {
+                        Button {
+                            sheetCoordinator.presentSheet(.Nutrients(item: item))
+                        } label: {
+                            Label("Edit Nutrients", systemImage: "pencil")
+                        }
+                    }
+                if isShowing(viewType: .Ingredients) {
                     ScrollView(.vertical) {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Ingredients").font(.title2).bold()
@@ -424,13 +464,24 @@ private struct MainTabView: View {
             // Tab indicators
             HStack(spacing: 6) {
                 ForEach(ViewType.allCases) { type in
-                    Image(systemName: "circle.fill")
-                        .font(.system(size: 8))
-                        .foregroundStyle(tabSelection == type ? Color.accentColor : .gray)
+                    if isShowing(viewType: type) {
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 8))
+                            .foregroundStyle(tabSelection == type ? Color.accentColor : .gray)
+                    }
                 }
             }.padding(.bottom, 6)
         }.background(Color("BackgroundColor"))
             .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+    
+    private func isShowing(viewType: ViewType) -> Bool {
+        switch viewType {
+        case .Description, .Nutrients:
+            true
+        case .Ingredients:
+            !item.ingredients.all.isEmpty || !item.ingredients.allergens.isEmpty
+        }
     }
 }
 

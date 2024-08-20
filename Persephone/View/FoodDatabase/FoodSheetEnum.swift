@@ -10,8 +10,6 @@ import SwiftUI
 enum FoodSheetEnum: Identifiable, SheetEnum {
     var id: String {
         switch self {
-        case .Confirm(let f):
-            return f.name
         case .General(let f):
             return f.name
         case .Tags(let f):
@@ -27,7 +25,6 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
         }
     }
     
-    case Confirm(item: FoodItem)
     case General(item: FoodItem)
     case Tags(item: FoodItem)
     case Nutrients(item: FoodItem)
@@ -38,10 +35,6 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
     @ViewBuilder
     func view(coordinator: SheetCoordinator<FoodSheetEnum>) -> some View {
         switch self {
-        case .Confirm(let f):
-            NavigationStack {
-                FoodItemEditor(item: f, mode: .Confirm)
-            }.presentationDetents([.large])
         case .General(let f):
             FoodGeneralSheet(item: f)
         case .Tags(let f):

@@ -9,7 +9,6 @@ import SwiftData
 import SwiftUI
 
 struct LookupFoodView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
@@ -20,8 +19,13 @@ struct LookupFoodView: View {
         case ResultList(items: [FoodItem])
     }
     
+    @Binding private var path: [FoodDatabaseView.ViewType]
     @State private var viewState: ViewState = .GetQuery
     @State private var query: String = ""
+    
+    init(path: Binding<[FoodDatabaseView.ViewType]>) {
+        self._path = path
+    }
     
     var body: some View {
         VStack {
@@ -31,6 +35,7 @@ struct LookupFoodView: View {
                     TextField("Query...", text: $query)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
+                        .onSubmit(onSearch)
                     Button("Search", action: onSearch)
                 }.navigationTitle("Search Foods")
                     .navigationBarTitleDisplayMode(.inline)
@@ -50,7 +55,7 @@ struct LookupFoodView: View {
             case .ResultList(let items):
                 List(items, id: \.name) { item in
                     Button {
-                        sheetCoordinator.presentSheet(.Confirm(item: item))
+                        path.append(.ItemConfirm(item: item))
                     } label: {
                         HStack {
                             VStack(alignment: .leading) {
@@ -102,6 +107,6 @@ struct LookupFoodView: View {
 #Preview {
     let container = createTestModelContainer()
     return NavigationStack {
-        LookupFoodView()
+        LookupFoodView(path: .constant([]))
     }.modelContainer(container)
 }

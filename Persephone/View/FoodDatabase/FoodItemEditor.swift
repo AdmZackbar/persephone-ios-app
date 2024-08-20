@@ -9,7 +9,6 @@ import SwiftData
 import SwiftUI
 
 struct FoodItemEditor: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
@@ -31,6 +30,7 @@ struct FoodItemEditor: View {
     let item: FoodItem
     let mode: Mode
     
+    @Binding private var path: [FoodDatabaseView.ViewType]
     // Name details
     @State private var name: String = ""
     @State private var brand: String = ""
@@ -66,6 +66,12 @@ struct FoodItemEditor: View {
         formatter.maximumFractionDigits = 2
         return formatter
     }()
+    
+    init(path: Binding<[FoodDatabaseView.ViewType]>, item: FoodItem? = nil, mode: Mode? = nil) {
+        self._path = path
+        self.item = item ?? FoodItem(name: "", metaData: FoodMetaData(), ingredients: FoodIngredients(nutrients: [:]), size: FoodSize(totalAmount: FoodAmount(value: .Raw(0), unit: .Gram), numServings: 1, servingSize: ""))
+        self.mode = mode ?? (item == nil ? .Add : .Edit)
+    }
     
     var body: some View {
         Form {
@@ -193,7 +199,7 @@ struct FoodItemEditor: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                        dismiss()
+                        path.removeLast()
                     }
                 }
                 ToolbarItem(placement: .primaryAction) {
@@ -209,7 +215,13 @@ struct FoodItemEditor: View {
                         default:
                             break
                         }
-                        dismiss()
+                        switch mode {
+                        case .Confirm:
+                            path.removeAll()
+                            path.append(.ItemView(item: item))
+                        default:
+                            path.removeLast()
+                        }
                     }
                 }
             }
@@ -226,17 +238,12 @@ struct FoodItemEditor: View {
     private func isSizeInvalid() -> Bool {
         return servingSize.isEmpty || numServings <= 0 || totalAmount <= 0
     }
-    
-    init(item: FoodItem? = nil, mode: Mode? = nil) {
-        self.item = item ?? FoodItem(name: "", metaData: FoodMetaData(), ingredients: FoodIngredients(nutrients: [:]), size: FoodSize(totalAmount: FoodAmount(value: .Raw(0), unit: .Gram), numServings: 1, servingSize: ""))
-        self.mode = mode ?? (item == nil ? .Add : .Edit)
-    }
 }
 
 #Preview {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
     return NavigationStack {
-        FoodItemEditor(item: item)
+        FoodItemEditor(path: .constant([]), item: item)
     }.modelContainer(container)
 }

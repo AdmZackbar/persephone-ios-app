@@ -10,7 +10,6 @@ import SwiftData
 import SwiftUI
 
 struct ScanFoodView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) var modelContext
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
@@ -21,8 +20,13 @@ struct ScanFoodView: View {
         case ResultList(items: [FoodItem])
     }
     
+    @Binding private var path: [FoodDatabaseView.ViewType]
     @State private var viewState: ViewState = .Scan
     @State private var torchOn: Bool = false
+    
+    init(path: Binding<[FoodDatabaseView.ViewType]>) {
+        self._path = path
+    }
     
     var body: some View {
         ZStack {
@@ -35,7 +39,7 @@ struct ScanFoodView: View {
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                dismiss()
+                                path.removeLast()
                             }
                         }
                         ToolbarItem(placement: .primaryAction) {
@@ -66,14 +70,14 @@ struct ScanFoodView: View {
                         }
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                dismiss()
+                                path.removeLast()
                             }
                         }
                     }
             case .ResultList(let items):
                 List(items) { item in
                     Button(item.name) {
-                        sheetCoordinator.presentSheet(.Confirm(item: item))
+                        path.append(.ItemConfirm(item: item))
                     }
                 }.navigationTitle("Select Scanned Item")
                     .toolbarTitleDisplayMode(.inline)
@@ -87,7 +91,7 @@ struct ScanFoodView: View {
                         }
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                dismiss()
+                                path.removeLast()
                             }
                         }
                     }

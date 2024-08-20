@@ -12,21 +12,31 @@ struct FoodDatabaseView: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
     
+    enum ViewType: Hashable {
+        case ItemView(item: FoodItem)
+        case ItemAdd
+        case ItemEdit(item: FoodItem)
+        case ItemConfirm(item: FoodItem)
+        case ScanItem
+        case LookupItem
+    }
+    
+    @State private var path: [ViewType] = []
     @State private var showDeleteDialog = false
     @State private var searchText = ""
     
     var body: some View {
         let filteredItems = foodItems.filter(isItemFiltered)
-        return NavigationStack {
+        return NavigationStack(path: $path) {
             List(filteredItems) { item in
-                NavigationLink {
-                    FoodItemView(item: item)
+                Button {
+                    path.append(.ItemView(item: item))
                 } label: {
-                    createListItem(item)
+                    createListItem(item).tint(.primary)
                 }
                 .contextMenu {
-                    NavigationLink {
-                        FoodItemView(item: item)
+                    Button {
+                        path.append(.ItemView(item: item))
                     } label: {
                         Label("View", systemImage: "magnifyingglass")
                     }
@@ -61,18 +71,18 @@ struct FoodDatabaseView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
-                        NavigationLink {
-                            ScanFoodView()
+                        Button {
+                            path.append(.ScanItem)
                         } label: {
                             Label("Scan Food", systemImage: "barcode.viewfinder")
                         }
-                        NavigationLink {
-                            LookupFoodView()
+                        Button {
+                            path.append(.LookupItem)
                         } label: {
                             Label("Lookup Food", systemImage: "magnifyingglass")
                         }
-                        NavigationLink {
-                            FoodItemEditor(item: nil)
+                        Button {
+                            path.append(.ItemAdd)
                         } label: {
                             Label("Add Custom Food", systemImage: "plus")
                         }
@@ -81,6 +91,7 @@ struct FoodDatabaseView: View {
                     }
                 }
             }
+            .navigationDestination(for: ViewType.self, destination: handleNavigation)
         }
         .searchable(text: $searchText, prompt: "Filter...")
     }
@@ -100,8 +111,8 @@ struct FoodDatabaseView: View {
     }
     
     private func editLink(item: FoodItem) -> some View {
-        NavigationLink {
-            FoodItemEditor(item: item)
+        Button {
+            path.append(.ItemEdit(item: item))
         } label: {
             Label("Edit", systemImage: "pencil.circle").tint(.blue)
         }
@@ -115,6 +126,26 @@ struct FoodDatabaseView: View {
     
     private func delete() {
         showDeleteDialog = true
+    }
+    
+    private func handleNavigation(viewType: ViewType) -> some View {
+        // TODO improve this
+        VStack {
+            switch viewType {
+            case .ItemView(let item):
+                FoodItemView(path: $path, item: item)
+            case .ItemAdd:
+                FoodItemEditor(path: $path)
+            case .ItemEdit(let item):
+                FoodItemEditor(path: $path, item: item)
+            case .ItemConfirm(let item):
+                FoodItemEditor(path: $path, item: item, mode: .Confirm)
+            case .ScanItem:
+                ScanFoodView(path: $path)
+            case .LookupItem:
+                LookupFoodView(path: $path)
+            }
+        }
     }
 }
 

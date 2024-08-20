@@ -22,6 +22,13 @@ struct FoodItemView: View {
     
     var item: FoodItem
     
+    @Binding private var path: [FoodDatabaseView.ViewType]
+    
+    init(path: Binding<[FoodDatabaseView.ViewType]>, item: FoodItem) {
+        self._path = path
+        self.item = item
+    }
+    
     var body: some View {
         VStack(spacing: 12) {
             if !(item.metaData.brand ?? "").isEmpty || !item.metaData.tags.isEmpty {
@@ -62,8 +69,8 @@ struct FoodItemView: View {
                         .frame(maxHeight: .infinity)
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    NavigationLink("Edit") {
-                        FoodItemEditor(item: item)
+                    Button("Edit") {
+                        path.append(.ItemEdit(item: item))
                     }
                 }
             }.background(Color(UIColor.secondarySystemBackground))
@@ -431,6 +438,6 @@ private struct MainTabView: View {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
     return NavigationStack {
-        FoodItemView(item: item)
+        FoodItemView(path: .constant([]), item: item)
     }.modelContainer(container)
 }

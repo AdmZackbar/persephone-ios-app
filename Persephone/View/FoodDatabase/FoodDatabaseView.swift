@@ -204,8 +204,8 @@ private struct NutritionView: View {
                         .font(.subheadline).fontWeight(.light)
                 }
             }
-            if item.details != nil {
-                Text(item.details!).italic()
+            if !item.details.isEmpty {
+                Text(item.details).italic()
             }
             Spacer()
         }

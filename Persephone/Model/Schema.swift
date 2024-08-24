@@ -15,6 +15,6 @@ enum SchemaV1: VersionedSchema {
     }
 
     static var models: [any PersistentModel.Type] {
-        [FoodItem.self, FoodInstance.self, LogEntry.self, Recipe.self, RecipeInstance.self, ShoppingList.self, Store.self]
+        [FoodItem.self, FoodInstance.self, LogEntry.self, Recipe.self, RecipeInstance.self]
     }
 }

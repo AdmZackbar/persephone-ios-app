@@ -67,12 +67,8 @@ struct FoodItemView: View {
                         }
                 }
             }.frame(height: 140)
-            if !item.storeItems.isEmpty {
-                StoreItemsTabView(sheetCoordinator: sheetCoordinator, storeItems: item.storeItems.sorted(by: { x, y in
-                    let unitX = Double(x.price.cents) / Double(x.quantity)
-                    let unitY = Double(y.price.cents) / Double(y.quantity)
-                    return unitX < unitY
-                })).frame(height: 112)
+            if !item.storeEntries.isEmpty {
+                StoreItemsTabView(sheetCoordinator: sheetCoordinator, foodItem: item, storeItems: item.storeEntries).frame(height: 112)
             }
             MainTabView(sheetCoordinator: sheetCoordinator, item: item)
         }.navigationBarTitleDisplayMode(.inline)
@@ -97,19 +93,21 @@ private struct StoreItemsTabView: View {
     @ObservedObject var sheetCoordinator: SheetCoordinator<FoodSheetEnum>
     @State private var tabSelection: String
     
-    var storeItems: [StoreItem]
+    var foodItem: FoodItem
+    var storeItems: [FoodItem.StoreEntry]
     
-    init(sheetCoordinator: SheetCoordinator<FoodSheetEnum>, storeItems: [StoreItem]) {
+    init(sheetCoordinator: SheetCoordinator<FoodSheetEnum>, foodItem: FoodItem, storeItems: [FoodItem.StoreEntry]) {
         self.sheetCoordinator = sheetCoordinator
-        self.tabSelection = storeItems.first!.store.name
+        self.foodItem = foodItem
+        self.tabSelection = storeItems.first!.storeName
         self.storeItems = storeItems
     }
     
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $tabSelection) {
-                ForEach(storeItems) { storeItem in
-                    StoreItemView(storeItem: storeItem)
+                ForEach(storeItems, id: \.storeName) { storeItem in
+                    StoreItemView(foodItem: foodItem, storeItem: storeItem)
                         .contentShape(Rectangle())
                         .contextMenu {
                             Button {
@@ -125,10 +123,10 @@ private struct StoreItemsTabView: View {
             if storeItems.count > 1 {
                 HStack {
                     HStack(spacing: 6) {
-                        ForEach(storeItems) { storeItem in
+                        ForEach(storeItems, id: \.storeName) { storeItem in
                             Image(systemName: "circle.fill")
                                 .font(.system(size: 8))
-                                .foregroundStyle(tabSelection == storeItem.store.name ? Color.accentColor : .gray)
+                                .foregroundStyle(tabSelection == storeItem.storeName ? Color.accentColor : .gray)
                         }
                     }
                     Spacer()
@@ -140,56 +138,78 @@ private struct StoreItemsTabView: View {
 }
 
 private struct StoreItemView: View {
-    let storeItem: StoreItem
+    let foodItem: FoodItem
+    let storeItem: FoodItem.StoreEntry
     
     var body: some View {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(storeItem.store.name).font(.title2).bold()
-                Text("\(storeItem.quantity) for \(currencyFormatter.string(for: Double(storeItem.price.cents) / 100)!)")
+                Text(storeItem.storeName).font(.title2).bold()
+                Text(computeCostSummary())
                 Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
                 Spacer()
             }
             Spacer()
             VStack(alignment: .leading) {
-                Text(computeCostPerUnit(storeItem)).bold()
+                Text(computeCostPerUnit()).bold()
                 Text("per Unit").font(.caption).fontWeight(.light)
                 Spacer()
-                Text(computeCostPerServing(storeItem)).bold()
+                Text(computeCostPerServing()).bold()
                 Text("per Serving").font(.caption).fontWeight(.light)
             }
             VStack(alignment: .leading) {
-                if storeItem.foodItem.getNutrient(.Energy)?.value.toValue() ?? 0 != 0 {
-                    Text(computeCostPerCalories(storeItem)).bold()
+                if foodItem.getNutrient(.Energy)?.value.toValue() ?? 0 != 0 {
+                    Text(computeCostPerCalories()).bold()
                     Text("per 100 cal").font(.caption).fontWeight(.light)
                     Spacer()
                 }
-                Text(computeCostPerUnitTotal(storeItem)).bold()
-                Text("per 100 \(storeItem.foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
+                Text(computeCostPerUnitTotal()).bold()
+                Text("per 100 \(foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
             }
-        }.padding(12).tag(storeItem.store.name)
+        }.padding(12).tag(storeItem.storeName)
     }
     
-    private func computeUnitCost(_ storeItem: StoreItem) -> Double {
-        Double(storeItem.price.cents) / 100 / Double(storeItem.quantity)
+    private func computeCostSummary() -> String {
+        switch storeItem.costType {
+        case .Collection(let cost, let quantity):
+            "\(quantity) for \(cost.toString())"
+        case .PerAmount(let cost, let amount):
+            "\(cost.toString()) / \(amount.value.toValue() == 1 ? "" : amount.value.toString())\(amount.unit.getAbbreviation())"
+        }
     }
     
-    private func computeCostPerUnit(_ storeItem: StoreItem) -> String {
-        currencyFormatter.string(for: computeUnitCost(storeItem))!
+    private func computeUnitCost() -> Double {
+        switch storeItem.costType {
+        case .Collection(let cost, let quantity):
+            cost.toUsd() / Double(quantity)
+        case .PerAmount(let cost, let amount):
+            if amount.unit.isWeight() && foodItem.size.totalAmount.unit.isWeight() {
+                cost.toUsd() / Double(amount.value.toValue()) * (try! foodItem.size.totalAmount.toGrams().value.toValue() / amount.toGrams().value.toValue())
+            } else if amount.unit.isVolume() && foodItem.size.totalAmount.unit.isVolume() {
+                cost.toUsd() / Double(amount.value.toValue()) * (try! foodItem.size.totalAmount.toMilliliters().value.toValue() / amount.toMilliliters().value.toValue())
+            } else {
+                // TODO handle case
+                cost.toUsd() / Double(amount.value.toValue())
+            }
+        }
     }
     
-    private func computeCostPerServing(_ storeItem: StoreItem) -> String {
-        currencyFormatter.string(for: computeUnitCost(storeItem) / storeItem.foodItem.size.numServings)!
+    private func computeCostPerUnit() -> String {
+        currencyFormatter.string(for: computeUnitCost())!
     }
     
-    private func computeCostPerCalories(_ storeItem: StoreItem) -> String {
-        let caloriesPerServing = storeItem.foodItem.getNutrient(.Energy)!.value.toValue()
-        let totalCal = storeItem.foodItem.size.numServings * caloriesPerServing
-        return currencyFormatter.string(for: computeUnitCost(storeItem) / (totalCal / 100))!
+    private func computeCostPerServing() -> String {
+        currencyFormatter.string(for: computeUnitCost() / foodItem.size.numServings)!
     }
     
-    private func computeCostPerUnitTotal(_ storeItem: StoreItem) -> String {
-        currencyFormatter.string(for: computeUnitCost(storeItem) / storeItem.foodItem.size.totalAmount.value.toValue() * 100)!
+    private func computeCostPerCalories() -> String {
+        let caloriesPerServing = foodItem.getNutrient(.Energy)!.value.toValue()
+        let totalCal = foodItem.size.numServings * caloriesPerServing
+        return currencyFormatter.string(for: computeUnitCost() / (totalCal / 100))!
+    }
+    
+    private func computeCostPerUnitTotal() -> String {
+        currencyFormatter.string(for: computeUnitCost() / foodItem.size.totalAmount.value.toValue() * 100)!
     }
 }
 
@@ -415,7 +435,7 @@ private struct MainTabView: View {
                 ScrollView(.vertical) {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Description").font(.title2).bold()
-                        Text(item.details ?? "No description set.").multilineTextAlignment(.leading)
+                        Text(item.details.isEmpty ? "No description set." : item.details).multilineTextAlignment(.leading)
                         Spacer(minLength: 20)
                         Text("Barcode: \(item.metaData.barcode ?? "None")").font(.caption)
                         Text("Created On: \(item.metaData.timestamp.formatted(date: .abbreviated, time: .standard))").font(.caption)

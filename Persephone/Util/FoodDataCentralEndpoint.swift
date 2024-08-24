@@ -75,10 +75,10 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
                 nutrientMap[nutrient] = FoodAmount(value: .Raw(round(adjValue * 2.0) / 2.0), unit: nutrient.getCommonUnit())
             }
         })
-        let metaData = FoodMetaData(
+        let metaData = FoodItem.MetaData(
             barcode: food.gtinUpc,
             brand: food.brandName?.capitalized)
-        let size = FoodSize(
+        let size = FoodItem.Size(
             totalAmount: FoodAmount.grams(totalAmount ?? 0),
             numServings: numServings ?? 0,
             servingSize: food.householdServingFullText?.capitalized ?? "")
@@ -87,9 +87,11 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
             all: food.ingredients?.capitalized ?? "")
         return FoodItem(
             name: food.description?.capitalized ?? "",
+            details: "",
             metaData: metaData,
             ingredients: ingredients,
-            size: size)
+            size: size,
+            storeEntries: [])
     }
     
     private static func getNutrient(_ name: String) -> Nutrient? {

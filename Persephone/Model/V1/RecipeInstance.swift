@@ -9,7 +9,6 @@ import Foundation
 import SwiftData
 
 typealias RecipeInstance = SchemaV1.RecipeInstance
-typealias RecipeInstanceDates = SchemaV1.RecipeInstanceDates
 typealias RecipeInstanceIngredient = SchemaV1.RecipeInstanceIngredient
 
 extension SchemaV1 {
@@ -18,9 +17,9 @@ extension SchemaV1 {
         // The recipe this is based on
         var recipe: Recipe!
         // The amount of food remaining from this batch
-        var amount: FoodInstanceAmount
+        var amount: FoodInstance.Amount
         // The relevant dates for this instance
-        var dates: RecipeInstanceDates
+        var dates: Dates
         // Any notes on how it was made
         var prepNotes: String
         // Any notes on its quality or anything after it was made
@@ -29,22 +28,22 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.recipeInstance)
         var ingredients: [RecipeInstanceIngredient] = []
         
-        init(recipe: Recipe, amount: FoodInstanceAmount, dates: RecipeInstanceDates, prepNotes: String, postNotes: String) {
+        init(recipe: Recipe, amount: FoodInstance.Amount, dates: Dates, prepNotes: String, postNotes: String) {
             self.recipe = recipe
             self.amount = amount
             self.dates = dates
             self.prepNotes = prepNotes
             self.postNotes = postNotes
         }
-    }
-    
-    struct RecipeInstanceDates: Codable {
-        // The date it was created
-        var creationDate: Date
-        // The nominal expiration date
-        var expDate: Date
-        // The date this was frozen (if applicable)
-        var freezeDate: Date?
+        
+        struct Dates: Codable {
+            // The date it was created
+            var creationDate: Date
+            // The nominal expiration date
+            var expDate: Date
+            // The date this was frozen (if applicable)
+            var freezeDate: Date?
+        }
     }
     
     @Model

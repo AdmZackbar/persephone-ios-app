@@ -52,25 +52,27 @@ struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
         let rawServingSize = product.serving_size
         let servingSize = rawServingSize?.replacing(/\(.+\)/, with: "").trimmingCharacters(in: .whitespacesAndNewlines).capitalized
         return FoodItem(name: product.product_name?.capitalized ?? "Unknown",
-                 metaData: FoodMetaData(barcode: product.code, brand: product.brands?.capitalized),
-                 ingredients: FoodIngredients(nutrients: [
-                    .Energy: FoodAmount.calories(product.nutriments?.calories ?? 0),
-                    .TotalFat: FoodAmount.grams(product.nutriments?.totalFat ?? 0),
-                    .SaturatedFat: FoodAmount.grams(product.nutriments?.satFat ?? 0),
-                    .TransFat: FoodAmount.grams(product.nutriments?.transFat ?? 0),
-                    .PolyunsaturatedFat: FoodAmount.grams(product.nutriments?.polyFat ?? 0),
-                    .MonounsaturatedFat: FoodAmount.grams(product.nutriments?.monoFat ?? 0),
-                    .Cholesterol: try! FoodAmount.grams(product.nutriments?.cholesterol ?? 0).toMilligrams(),
-                    .Sodium: try! FoodAmount.grams(product.nutriments?.sodium ?? 0).toMilligrams(),
-                    .TotalCarbs: FoodAmount.grams(product.nutriments?.totalCarbs ?? 0),
-                    .DietaryFiber: FoodAmount.grams(product.nutriments?.dietaryFiber ?? 0),
-                    .TotalSugars: FoodAmount.grams(product.nutriments?.totalSugars ?? 0),
-                    .Protein: FoodAmount.grams(product.nutriments?.protein ?? 0),
-                    .Calcium: try! FoodAmount.grams(product.nutriments?.calcium ?? 0).toMilligrams(),
-                    .Iron: try! FoodAmount.grams(product.nutriments?.iron ?? 0).toMilligrams(),
-                    .Potassium: try! FoodAmount.grams(product.nutriments?.potassium ?? 0).toMilligrams(),
-                 ], all: product.ingredients_text?.capitalized ?? "", allergens: allergens ?? ""),
-                 size: FoodSize(totalAmount: FoodAmount.grams(0), numServings: 0, servingSize: servingSize ?? ""))
+                        details: "",
+                        metaData: FoodItem.MetaData(barcode: product.code, brand: product.brands?.capitalized),
+                        ingredients: FoodIngredients(nutrients: [
+                            .Energy: FoodAmount.calories(product.nutriments?.calories ?? 0),
+                            .TotalFat: FoodAmount.grams(product.nutriments?.totalFat ?? 0),
+                            .SaturatedFat: FoodAmount.grams(product.nutriments?.satFat ?? 0),
+                            .TransFat: FoodAmount.grams(product.nutriments?.transFat ?? 0),
+                            .PolyunsaturatedFat: FoodAmount.grams(product.nutriments?.polyFat ?? 0),
+                            .MonounsaturatedFat: FoodAmount.grams(product.nutriments?.monoFat ?? 0),
+                            .Cholesterol: try! FoodAmount.grams(product.nutriments?.cholesterol ?? 0).toMilligrams(),
+                            .Sodium: try! FoodAmount.grams(product.nutriments?.sodium ?? 0).toMilligrams(),
+                            .TotalCarbs: FoodAmount.grams(product.nutriments?.totalCarbs ?? 0),
+                            .DietaryFiber: FoodAmount.grams(product.nutriments?.dietaryFiber ?? 0),
+                            .TotalSugars: FoodAmount.grams(product.nutriments?.totalSugars ?? 0),
+                            .Protein: FoodAmount.grams(product.nutriments?.protein ?? 0),
+                            .Calcium: try! FoodAmount.grams(product.nutriments?.calcium ?? 0).toMilligrams(),
+                            .Iron: try! FoodAmount.grams(product.nutriments?.iron ?? 0).toMilligrams(),
+                            .Potassium: try! FoodAmount.grams(product.nutriments?.potassium ?? 0).toMilligrams()
+                        ], all: product.ingredients_text?.capitalized ?? "", allergens: allergens ?? ""),
+                        size: FoodItem.Size(totalAmount: FoodAmount.grams(0), numServings: 0, servingSize: servingSize ?? ""),
+                storeEntries: [])
     }
     
     static func lookup(query: String, maxResults: Int) async throws -> [FoodItem] {

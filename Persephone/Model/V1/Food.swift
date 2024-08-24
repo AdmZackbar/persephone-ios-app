@@ -119,6 +119,33 @@ extension SchemaV1 {
             }
             return FoodAmount(value: value * modifier, unit: .Milligram)
         }
+        
+        func toMilliliters() throws -> FoodAmount {
+            var modifier: Double!
+            switch unit {
+            case .Milliliter:
+                modifier = 1
+            case .Liter:
+                modifier = 1000
+            case .Teaspoon:
+                modifier = 4.92892
+            case .Tablespoon:
+                modifier = 14.7868
+            case .FluidOunce:
+                modifier = 29.5735
+            case .Cup:
+                modifier = 240
+            case .Pint:
+                modifier = 473.176
+            case .Quart:
+                modifier = 946.353
+            case .Gallon:
+                modifier = 3785.41
+            default:
+                throw FoodError.invalidUnit(unit: unit)
+            }
+            return FoodAmount(value: value * modifier, unit: .Milligram)
+        }
     }
     
     enum FoodUnit: Codable, Equatable, Hashable {
@@ -147,6 +174,15 @@ extension SchemaV1 {
         func isWeight() -> Bool {
             switch self {
             case .Ounce, .Pound, .Microgram, .Milligram, .Gram, .Kilogram:
+                return true
+            default:
+                return false
+            }
+        }
+        
+        func isVolume() -> Bool {
+            switch self {
+            case .Milliliter, .Liter, .Teaspoon, .Tablespoon, .FluidOunce, .Cup, .Pint, .Quart, .Gallon:
                 return true
             default:
                 return false

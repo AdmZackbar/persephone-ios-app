@@ -34,7 +34,7 @@ struct FoodGeneralSheet: View {
                 .onAppear {
                     name = item.name
                     brand = item.metaData.brand ?? ""
-                    details = item.details ?? ""
+                    details = item.details
                 }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {

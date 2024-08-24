@@ -13,11 +13,10 @@ struct StoreItemSheet: View {
     @Environment(\.modelContext) private var modelContext
     
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
-    @Query(sort: \Store.name) private var stores: [Store]
     
     enum Mode {
-        case Add(foodItem: FoodItem, items: Binding<[StoreItem]>)
-        case Edit(item: StoreItem)
+        case Add(items: Binding<[FoodItem.StoreEntry]>)
+        case Edit(item: FoodItem.StoreEntry)
         
         func getTitle() -> String {
             switch self {
@@ -30,10 +29,10 @@ struct StoreItemSheet: View {
         
         func getHeader() -> String {
             switch self {
-            case .Add(let item, _):
-                item.name
+            case .Add(_):
+                "Add New Item"
             case .Edit(let item):
-                item.foodItem.name
+                item.storeName
             }
         }
         
@@ -49,7 +48,7 @@ struct StoreItemSheet: View {
     
     let mode: Mode
     
-    @State private var store: Store? = nil
+    @State private var storeName: String = ""
     @State private var quantity: Int = 1
     @State private var price: Int = 0
     @State private var available: Bool = true
@@ -72,27 +71,9 @@ struct StoreItemSheet: View {
         NavigationStack {
             Form {
                 Section(mode.getHeader()) {
-                    if !stores.isEmpty {
-                        HStack {
-                            Text("Store:")
-                            Menu(store?.name ?? "Select Store...") {
-                                ForEach(stores, id: \.name) { s in
-                                    Button(s.name) {
-                                        store = s
-                                    }
-                                }
-                                Divider()
-                                Button {
-                                    sheetCoordinator.presentSheet(.Store(store: nil))
-                                } label: {
-                                    Label("Add Store", systemImage: "plus")
-                                }
-                            }
-                        }
-                    } else {
-                        Button("Add Store...") {
-                            sheetCoordinator.presentSheet(.Store(store: nil))
-                        }
+                    HStack {
+                        Text("Store:")
+                        TextField("required", text: $storeName)
                     }
                     HStack {
                         Text("Total Price:")
@@ -128,7 +109,7 @@ struct StoreItemSheet: View {
                         Button("Save") {
                             save()
                             dismiss()
-                        }.disabled(store == nil || quantity < 1 || price <= 0)
+                        }.disabled(storeName.isEmpty || quantity < 1 || price <= 0)
                     }
                 }
                 .sheetCoordinating(coordinator: sheetCoordinator)
@@ -136,10 +117,18 @@ struct StoreItemSheet: View {
             .onAppear {
                 switch mode {
                 case .Edit(let item):
-                    store = item.store
-                    quantity = item.quantity
-                    price = item.price.cents
-                    available = item.available
+                    self.storeName = item.storeName
+                    switch item.costType {
+                    case .Collection(let cost, let quantity):
+                        switch cost {
+                        case .Cents(let amount):
+                            self.price = amount
+                        }
+                        self.quantity = quantity
+                    default:
+                        break
+                    }
+                    self.available = item.available
                 default:
                     break
                 }
@@ -148,12 +137,11 @@ struct StoreItemSheet: View {
     
     private func save() {
         switch mode {
-        case .Add(let item, let items):
-            items.wrappedValue.append(StoreItem(store: store!, foodItem: item, quantity: quantity, price: Price(cents: price), available: available))
-        case .Edit(let item):
-            item.store = store!
-            item.quantity = quantity
-            item.price = Price(cents: price)
+        case .Add(let items):
+            items.wrappedValue.append(FoodItem.StoreEntry(storeName: storeName, costType: .Collection(cost: .Cents(price), quantity: quantity), available: available))
+        case .Edit(var item):
+            item.storeName = storeName
+            item.costType = .Collection(cost: .Cents(price), quantity: quantity)
             item.available = available
         }
     }
@@ -162,8 +150,6 @@ struct StoreItemSheet: View {
 #Preview {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
-    container.mainContext.insert(Store(name: "Publix"))
-    container.mainContext.insert(Store(name: "Target"))
-    return StoreItemSheet(mode: .Add(foodItem: item, items: .constant([])))
+    return StoreItemSheet(mode: .Edit(item: item.storeEntries.first!))
         .modelContainer(container)
 }

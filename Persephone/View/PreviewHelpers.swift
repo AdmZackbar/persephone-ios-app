@@ -19,7 +19,7 @@ func createTestModelContainer() -> ModelContainer {
 func createTestFoodItem(_ context: ModelContext) -> FoodItem {
     let item = FoodItem(name: "Test Food",
                         details: "Preparation: cook at 375 F for 12-14 minutes.",
-                        metaData: FoodMetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"]),
+                        metaData: FoodItem.MetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"]),
                         ingredients: FoodIngredients(
                             nutrients: [
                                 .Energy: FoodAmount.calories(120),
@@ -38,14 +38,13 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
                             all: "Salt, Milk, Water, Pectin (for something or other).",
                             allergens: "Milk"
                         ),
-                        size: FoodSize(totalAmount: FoodAmount.grams(450), numServings: 5, servingSize: "1 unit"))
+                        size: FoodItem.Size(totalAmount: FoodAmount.grams(225), numServings: 5, servingSize: "1 unit"),
+                        storeEntries: [
+                            FoodItem.StoreEntry(storeName: "Store 1", costType: .Collection(cost: .Cents(599), quantity: 2), available: true),
+                            FoodItem.StoreEntry(storeName: "Store 2", costType: .Collection(cost: .Cents(1099), quantity: 3), available: true),
+                            FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: FoodAmount(value: .Raw(1), unit: .Pound)), available: true)
+                        ])
     context.insert(item)
-    let store = Store(name: "Costco")
-    context.insert(store)
-    item.storeItems.append(StoreItem(store: store, foodItem: item, quantity: 2, price: Price(cents: 699), available: true))
-    let store2 = Store(name: "Publix")
-    context.insert(store2)
-    item.storeItems.append(StoreItem(store: store2, foodItem: item, quantity: 3, price: Price(cents: 1099), available: true))
     return item
 }
 
@@ -85,7 +84,7 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
 
 @discardableResult
 func createTestFoodInstance(_ context: ModelContext) -> FoodInstance {
-    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", price: Price(cents: 530)), amount: .Single(total: FoodAmount(value: .Raw(530), unit: .Gram), remaining: FoodAmount(value: .Raw(420), unit: .Gram)), dates: FoodInstanceDates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
+    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", cost: .Cents(530)), amount: .Single(total: FoodAmount(value: .Raw(530), unit: .Gram), remaining: FoodAmount(value: .Raw(420), unit: .Gram)), dates: FoodInstance.Dates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
     context.insert(item)
     return item
 }

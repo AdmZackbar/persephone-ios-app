@@ -88,10 +88,16 @@ struct FoodItemEditor: View {
                     .lineLimit(1...8)
             }
             Section("Tags") {
-                Text(item.metaData.tags.isEmpty ? "No tags" : item.metaData.tags.joined(separator: ", "))
-                    .italic(item.metaData.tags.isEmpty)
-                Button("Edit Tags...") {
-                    sheetCoordinator.presentSheet(.Tags(item: item))
+                if !item.metaData.tags.isEmpty {
+                    Text(item.metaData.tags.joined(separator: ", "))
+                        .italic(item.metaData.tags.isEmpty)
+                        .onTapGesture {
+                            sheetCoordinator.presentSheet(.Tags(item: item))
+                        }
+                } else {
+                    Button("Add Tag(s)") {
+                        sheetCoordinator.presentSheet(.Tags(item: item))
+                    }
                 }
             }
             storeSection()
@@ -117,10 +123,14 @@ struct FoodItemEditor: View {
             HStack {
                 Text("Name:").fontWeight(.light)
                 TextField("required", text: $name)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
             }
             HStack {
                 Text("Brand:").fontWeight(.light)
                 TextField("optional", text: $brand)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
             }
             HStack {
                 Text(amountUnit.isWeight() ? "Net Wt:" : "Net Vol:").fontWeight(.light)
@@ -145,6 +155,7 @@ struct FoodItemEditor: View {
                     HStack {
                         TextField("required", text: $servingSize)
                             .textInputAutocapitalization(.words)
+                            .autocorrectionDisabled()
                         Spacer()
                         Text("(\(formatter.string(for: servingAmount)!)\(amountUnit.getAbbreviation()))")
                             .fontWeight(.light)
@@ -152,6 +163,8 @@ struct FoodItemEditor: View {
                     }
                 } else {
                     TextField("required", text: $servingSize)
+                        .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
                 }
             }
         }
@@ -161,20 +174,17 @@ struct FoodItemEditor: View {
         Section("Nutrients") {
             NutrientTableView(nutrients: item.ingredients.nutrients)
                 .contextMenu {
-                    Button {
+                    Button("Edit Individual Nutrients") {
                         sheetCoordinator.presentSheet(.Nutrients(item: item))
-                    } label: {
-                        Label("Edit", systemImage: "pencil")
+                    }
+                    Button("Scale All") {
+                        sheetCoordinator.presentSheet(.NutrientsScale(item: item))
                     }
                 }
-            Menu("Edit...") {
-                Button("Individual Nutrients...") {
+                .onTapGesture {
                     sheetCoordinator.presentSheet(.Nutrients(item: item))
                 }
-                Button("Scale All...") {
-                    sheetCoordinator.presentSheet(.NutrientsScale(item: item))
-                }
-            }
+            
         }
     }
     

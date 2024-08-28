@@ -14,6 +14,8 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
             return f.name
         case .Tags(let f):
             return f.name
+        case .ServingAmount(_, _):
+            return "Serving Amount"
         case .Nutrients(let f):
             return f.name
         case .NutrientsScale(let f):
@@ -27,6 +29,7 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
     
     case General(item: FoodItem)
     case Tags(item: FoodItem)
+    case ServingAmount(totalAmount: Binding<Double>, numServings: Binding<Double>)
     case Nutrients(item: FoodItem)
     case NutrientsScale(item: FoodItem)
     case AddStoreItem(storeItems: Binding<[FoodItem.StoreEntry]>)
@@ -39,6 +42,8 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
             FoodGeneralSheet(item: f)
         case .Tags(let f):
             FoodTagSheet(item: f)
+        case .ServingAmount(let totalAmount, let numServings):
+            ServingAmountSheet(totalAmount: totalAmount, numServings: numServings)
         case .Nutrients(let f):
             NutrientSheet(item: f)
         case .NutrientsScale(let f):

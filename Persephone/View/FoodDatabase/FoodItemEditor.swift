@@ -160,6 +160,9 @@ struct FoodItemEditor: View {
                         Text("(\(formatter.string(for: servingAmount)!)\(amountUnit.getAbbreviation()))")
                             .fontWeight(.light)
                             .italic()
+                            .onTapGesture {
+                                sheetCoordinator.presentSheet(.ServingAmount(totalAmount: $totalAmount, numServings: $numServings))
+                            }
                     }
                 } else {
                     TextField("required", text: $servingSize)

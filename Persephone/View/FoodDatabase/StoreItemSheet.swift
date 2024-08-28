@@ -16,7 +16,7 @@ struct StoreItemSheet: View {
     
     enum Mode {
         case Add(items: Binding<[FoodItem.StoreEntry]>)
-        case Edit(item: FoodItem.StoreEntry)
+        case Edit(item: Binding<FoodItem.StoreEntry>)
         
         func getTitle() -> String {
             switch self {
@@ -24,15 +24,6 @@ struct StoreItemSheet: View {
                 "Add Entry"
             case .Edit:
                 "Edit Entry"
-            }
-        }
-        
-        func getHeader() -> String {
-            switch self {
-            case .Add(_):
-                "Add New Item"
-            case .Edit(let item):
-                item.storeName
             }
         }
         
@@ -70,31 +61,29 @@ struct StoreItemSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(mode.getHeader()) {
+                HStack {
+                    Text("Store:")
+                    TextField("required", text: $storeName)
+                }
+                HStack {
+                    Text("Total Price:")
+                    CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
+                }
+                Stepper {
                     HStack {
-                        Text("Store:")
-                        TextField("required", text: $storeName)
+                        Text("Quantity:")
+                        TextField("", value: $quantity, formatter: formatter)
+                            .keyboardType(.numberPad)
                     }
-                    HStack {
-                        Text("Total Price:")
-                        CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
+                } onIncrement: {
+                    quantity += 1
+                } onDecrement: {
+                    if quantity > 1 {
+                        quantity -= 1
                     }
-                    Stepper {
-                        HStack {
-                            Text("Quantity:")
-                            TextField("", value: $quantity, formatter: formatter)
-                                .keyboardType(.numberPad)
-                        }
-                    } onIncrement: {
-                        quantity += 1
-                    } onDecrement: {
-                        if quantity > 1 {
-                            quantity -= 1
-                        }
-                    }
-                    Toggle(isOn: $available) {
-                        Text("Available:")
-                    }
+                }
+                Toggle(isOn: $available) {
+                    Text("Available:")
                 }
             }.navigationTitle(mode.getTitle())
                 .navigationBarBackButtonHidden()
@@ -117,8 +106,8 @@ struct StoreItemSheet: View {
             .onAppear {
                 switch mode {
                 case .Edit(let item):
-                    self.storeName = item.storeName
-                    switch item.costType {
+                    self.storeName = item.wrappedValue.storeName
+                    switch item.wrappedValue.costType {
                     case .Collection(let cost, let quantity):
                         switch cost {
                         case .Cents(let amount):
@@ -128,7 +117,7 @@ struct StoreItemSheet: View {
                     default:
                         break
                     }
-                    self.available = item.available
+                    self.available = item.wrappedValue.available
                 default:
                     break
                 }
@@ -139,10 +128,10 @@ struct StoreItemSheet: View {
         switch mode {
         case .Add(let items):
             items.wrappedValue.append(FoodItem.StoreEntry(storeName: storeName, costType: .Collection(cost: .Cents(price), quantity: quantity), available: available))
-        case .Edit(var item):
-            item.storeName = storeName
-            item.costType = .Collection(cost: .Cents(price), quantity: quantity)
-            item.available = available
+        case .Edit(let item):
+            item.wrappedValue.storeName = storeName
+            item.wrappedValue.costType = .Collection(cost: .Cents(price), quantity: quantity)
+            item.wrappedValue.available = available
         }
     }
 }
@@ -150,6 +139,6 @@ struct StoreItemSheet: View {
 #Preview {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
-    return StoreItemSheet(mode: .Edit(item: item.storeEntries.first!))
+    return StoreItemSheet(mode: .Edit(item: .constant(item.storeEntries.first!)))
         .modelContainer(container)
 }

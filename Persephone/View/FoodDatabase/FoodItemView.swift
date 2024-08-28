@@ -68,7 +68,7 @@ struct FoodItemView: View {
                 }
             }.frame(height: 140)
             if !item.storeEntries.isEmpty {
-                StoreItemsTabView(sheetCoordinator: sheetCoordinator, foodItem: item, storeItems: item.storeEntries).frame(height: 112)
+                StoreItemsTabView(sheetCoordinator: sheetCoordinator, foodItem: item).frame(height: 112)
             }
             MainTabView(sheetCoordinator: sheetCoordinator, item: item)
         }.navigationBarTitleDisplayMode(.inline)
@@ -93,25 +93,23 @@ private struct StoreItemsTabView: View {
     @ObservedObject var sheetCoordinator: SheetCoordinator<FoodSheetEnum>
     @State private var tabSelection: String
     
-    var foodItem: FoodItem
-    var storeItems: [FoodItem.StoreEntry]
+    @State var foodItem: FoodItem
     
-    init(sheetCoordinator: SheetCoordinator<FoodSheetEnum>, foodItem: FoodItem, storeItems: [FoodItem.StoreEntry]) {
+    init(sheetCoordinator: SheetCoordinator<FoodSheetEnum>, foodItem: FoodItem) {
         self.sheetCoordinator = sheetCoordinator
         self.foodItem = foodItem
-        self.tabSelection = storeItems.first!.storeName
-        self.storeItems = storeItems
+        self.tabSelection = foodItem.storeEntries.first!.storeName
     }
     
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $tabSelection) {
-                ForEach(storeItems, id: \.storeName) { storeItem in
+                ForEach($foodItem.storeEntries, id: \.storeName) { $storeItem in
                     StoreItemView(foodItem: foodItem, storeItem: storeItem)
                         .contentShape(Rectangle())
                         .contextMenu {
                             Button {
-                                sheetCoordinator.presentSheet(.EditStoreItem(item: storeItem))
+                                sheetCoordinator.presentSheet(.EditStoreItem(item: $storeItem))
                             } label: {
                                 Label("Edit", systemImage: "pencil")
                             }
@@ -120,10 +118,10 @@ private struct StoreItemsTabView: View {
             }.frame(maxWidth: .infinity)
                 .tabViewStyle(.page(indexDisplayMode: .never))
             // Tab indicators (only need to show if there's more than 1 listing
-            if storeItems.count > 1 {
+            if foodItem.storeEntries.count > 1 {
                 HStack {
                     HStack(spacing: 6) {
-                        ForEach(storeItems, id: \.storeName) { storeItem in
+                        ForEach(foodItem.storeEntries, id: \.storeName) { storeItem in
                             Image(systemName: "circle.fill")
                                 .font(.system(size: 8))
                                 .foregroundStyle(tabSelection == storeItem.storeName ? Color.accentColor : .gray)

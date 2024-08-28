@@ -52,6 +52,7 @@ struct FoodItemEditor: View {
     @State private var ingredients: String = ""
     @State private var allergens: String = ""
     @State private var storeItems: [FoodItem.StoreEntry] = []
+    @State private var rating: Double? = nil
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -87,10 +88,15 @@ struct FoodItemEditor: View {
                     .textInputAutocapitalization(.sentences)
                     .lineLimit(1...8)
             }
+            storeSection()
             Section("Tags") {
                 if !item.metaData.tags.isEmpty {
-                    Text(item.metaData.tags.joined(separator: ", "))
-                        .italic(item.metaData.tags.isEmpty)
+                    HStack {
+                        Text(item.metaData.tags.joined(separator: ", "))
+                            .italic(item.metaData.tags.isEmpty)
+                            .lineLimit(1...3)
+                        Spacer()
+                    }.contentShape(Rectangle())
                         .onTapGesture {
                             sheetCoordinator.presentSheet(.Tags(item: item))
                         }
@@ -100,7 +106,14 @@ struct FoodItemEditor: View {
                     }
                 }
             }
-            storeSection()
+            Section("Rating") {
+                Picker("Rating:", selection: $rating) {
+                    Text("N/A").tag(nil as Double?)
+                    ForEach(FoodTier.allCases) { tier in
+                        Text(tier.rawValue).tag(tier.getRating() as Double?)
+                    }
+                }.pickerStyle(.segmented)
+            }
         }.navigationTitle(mode.getTitle())
             .toolbarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
@@ -193,9 +206,9 @@ struct FoodItemEditor: View {
     
     private func storeSection() -> some View {
         Section("Store Listings") {
-            List(storeItems, id: \.storeName) { storeItem in
+            List($storeItems, id: \.storeName) { $storeItem in
                 Button {
-                    sheetCoordinator.presentSheet(.EditStoreItem(item: storeItem))
+                    sheetCoordinator.presentSheet(.EditStoreItem(item: $storeItem))
                 } label: {
                     HStack {
                         Text(storeItem.storeName).bold()
@@ -256,6 +269,7 @@ struct FoodItemEditor: View {
             ingredients = item.ingredients.all
             allergens = item.ingredients.allergens
             storeItems = item.storeEntries
+            rating = item.metaData.rating
         default:
             break
         }
@@ -269,6 +283,7 @@ struct FoodItemEditor: View {
         item.ingredients.all = ingredients
         item.ingredients.allergens = allergens
         item.storeEntries = storeItems
+        item.metaData.rating = rating
         switch mode {
         case .Add, .Confirm:
             modelContext.insert(item)

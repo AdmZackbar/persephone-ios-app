@@ -23,7 +23,7 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
         case .AddStoreItem(_):
             return "Add Store Item"
         case .EditStoreItem(let i):
-            return i.storeName
+            return i.wrappedValue.storeName
         }
     }
     
@@ -33,7 +33,7 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
     case Nutrients(item: FoodItem)
     case NutrientsScale(item: FoodItem)
     case AddStoreItem(storeItems: Binding<[FoodItem.StoreEntry]>)
-    case EditStoreItem(item: FoodItem.StoreEntry)
+    case EditStoreItem(item: Binding<FoodItem.StoreEntry>)
     
     @ViewBuilder
     func view(coordinator: SheetCoordinator<FoodSheetEnum>) -> some View {

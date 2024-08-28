@@ -47,6 +47,8 @@
 		E8828EE32C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828EE22C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift */; };
 		E8828EE52C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828EE42C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift */; };
 		E8828EE72C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828EE62C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift */; };
+		E89D08C32C7B896C005AE1EF /* FoodDatabaseExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08C22C7B896C005AE1EF /* FoodDatabaseExportView.swift */; };
+		E89D08C72C7CFFDF005AE1EF /* FoodDatabaseDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */; };
 		E8CE55302C6C76A700D0CB2B /* LookupFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CE552F2C6C76A700D0CB2B /* LookupFoodView.swift */; };
 		E8D72EED2C4381010053CA26 /* ScanFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */; };
 		E8D72EF12C463D3A0053CA26 /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF02C463D3A0053CA26 /* Recipe.swift */; };
@@ -119,6 +121,8 @@
 		E8828EE22C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseEndpoint.swift; sourceTree = "<group>"; };
 		E8828EE42C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDataCentralEndpoint.swift; sourceTree = "<group>"; };
 		E8828EE62C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenFoodFactsEndpoint.swift; sourceTree = "<group>"; };
+		E89D08C22C7B896C005AE1EF /* FoodDatabaseExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseExportView.swift; sourceTree = "<group>"; };
+		E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseDocument.swift; sourceTree = "<group>"; };
 		E8CE552F2C6C76A700D0CB2B /* LookupFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookupFoodView.swift; sourceTree = "<group>"; };
 		E8D72EEC2C4381010053CA26 /* ScanFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanFoodView.swift; sourceTree = "<group>"; };
 		E8D72EF02C463D3A0053CA26 /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
@@ -285,6 +289,7 @@
 				E8743BA22C52DC6300E1B871 /* NutrientSheet.swift */,
 				E81454AA2C6EFDB3009056D2 /* NutrientScaleSheet.swift */,
 				E8743BA02C52DC3A00E1B871 /* StoreItemSheet.swift */,
+				E89D08C22C7B896C005AE1EF /* FoodDatabaseExportView.swift */,
 			);
 			path = FoodDatabase;
 			sourceTree = "<group>";
@@ -310,6 +315,7 @@
 				E8828EE22C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift */,
 				E8828EE42C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift */,
 				E8828EE62C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift */,
+				E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -476,9 +482,11 @@
 				E8D72EED2C4381010053CA26 /* ScanFoodView.swift in Sources */,
 				E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */,
 				E847B1F72C6004BB0084CD13 /* CookbookSheetEnum.swift in Sources */,
+				E89D08C72C7CFFDF005AE1EF /* FoodDatabaseDocument.swift in Sources */,
 				E8743BA32C52DC6300E1B871 /* NutrientSheet.swift in Sources */,
 				E847B2012C66B8360084CD13 /* RecipeInstructionsSheet.swift in Sources */,
 				E8828ED52C4F5871006C7CB3 /* FoodIngredients.swift in Sources */,
+				E89D08C32C7B896C005AE1EF /* FoodDatabaseExportView.swift in Sources */,
 				E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */,
 				E8828ED12C4F529A006C7CB3 /* Food.swift in Sources */,
 				E8D72EF72C478C620053CA26 /* RecipeView.swift in Sources */,

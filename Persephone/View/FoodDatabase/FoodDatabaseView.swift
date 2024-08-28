@@ -19,6 +19,7 @@ struct FoodDatabaseView: View {
         case ItemConfirm(item: FoodItem)
         case ScanItem
         case LookupItem
+        case ExportItems(items: [FoodItem])
     }
     
     @State private var path: [ViewType] = []
@@ -90,6 +91,13 @@ struct FoodDatabaseView: View {
                         Label("Add", systemImage: "plus")
                     }
                 }
+                ToolbarItem(placement: .secondaryAction) {
+                    Button {
+                        path.append(.ExportItems(items: foodItems))
+                    } label: {
+                        Label("Export Database", systemImage: "square.and.arrow.up")
+                    }
+                }
             }
             .navigationDestination(for: ViewType.self, destination: handleNavigation)
         }
@@ -144,6 +152,8 @@ struct FoodDatabaseView: View {
                 ScanFoodView(path: $path)
             case .LookupItem:
                 LookupFoodView(path: $path)
+            case .ExportItems(let items):
+                FoodDatabaseExportView(foodItems: items)
             }
         }
     }

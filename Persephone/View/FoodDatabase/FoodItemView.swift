@@ -149,8 +149,16 @@ private struct StoreItemView: View {
             }
             Spacer()
             VStack(alignment: .leading) {
-                Text(formatCost(storeItem.costPerUnit(size: foodItem.size))).bold()
-                Text("per Unit").font(.caption).fontWeight(.light)
+                // Show unit cost if either of the following hold:
+                // 1. the serving amount couldn't be parsed (or is just 'serving')
+                // 2. the serving amount is the same as '1 serving'
+                if foodItem.size.servingSizeAmount.unit.getAbbreviation().caseInsensitiveCompare("serving") == .orderedSame || foodItem.size.servingSizeAmount.value.toValue() == 1 {
+                    Text(formatCost(storeItem.costPerUnit(size: foodItem.size))).bold()
+                    Text("per Unit").font(.caption).fontWeight(.light)
+                } else {
+                    Text(formatCost(storeItem.costPerServingAmount(size: foodItem.size))).bold()
+                    Text("per \(foodItem.size.servingSizeAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
+                }
                 Spacer()
                 Text(formatCost(storeItem.costPerServing(size: foodItem.size))).bold()
                 Text("per Serving").font(.caption).fontWeight(.light)

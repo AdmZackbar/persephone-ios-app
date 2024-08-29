@@ -89,6 +89,23 @@ extension SchemaV1 {
                     numServings = totalAmount.value.toValue() / value.value.toValue()
                 }
             }
+            var servingSizeAmount: FoodAmount {
+                get {
+                    if let match = try? /^([\d\/.]+)?\s*(.+)$/.wholeMatch(in: servingSize) {
+                        if let rawValue = match.1?.string {
+                            if let value = FoodAmount.Value.parseString(rawValue) {
+                                FoodAmount(value: value, unit: .Custom(name: match.2.string))
+                            } else {
+                                FoodAmount(value: .Raw(1), unit: .Custom(name: "serving"))
+                            }
+                        } else {
+                            FoodAmount(value: .Raw(1), unit: .Custom(name: match.2.string))
+                        }
+                    } else {
+                        FoodAmount(value: .Raw(1), unit: .Custom(name: "serving"))
+                    }
+                }
+            }
         }
         
         struct StoreEntry: Codable, Equatable, Hashable {
@@ -114,6 +131,10 @@ extension SchemaV1 {
             
             func costPerServing(size: Size) -> Double {
                 costPerUnit(size: size) / size.numServings
+            }
+            
+            func costPerServingAmount(size: Size) -> Double {
+                costPerServing(size: size) / size.servingSizeAmount.value.toValue()
             }
             
             func costPerEnergy(foodItem: FoodItem) -> Double? {

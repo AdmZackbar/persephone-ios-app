@@ -17,6 +17,18 @@ extension SchemaV1 {
             case Raw(_ value: Double)
             case Rational(num: Double, den: Double)
             
+            static func parseString(_ str: String) -> Value? {
+                if let match = try? /([\d.]+)\/([\d.]+)/.wholeMatch(in: str) {
+                    if let num = Double(match.1), let den = Double(match.2) {
+                        return .Rational(num: num, den: den)
+                    }
+                }
+                if let value = Double(str) {
+                    return .Raw(value)
+                }
+                return nil
+            }
+            
             static func * (left: Value, right: Double) -> Value {
                 switch left {
                 case .Raw(let value):

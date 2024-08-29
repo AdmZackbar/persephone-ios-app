@@ -114,7 +114,7 @@ struct FoodDatabaseView: View {
                     .italic()
                 Spacer()
                 if !item.storeEntries.isEmpty {
-                    Text("\(bestCostPerServing(item)) / serving")
+                    Text("\(bestCostPerServing(item)) / \(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())")
                         .font(.subheadline)
                         .fontWeight(.light)
                 }
@@ -123,7 +123,7 @@ struct FoodDatabaseView: View {
     }
     
     private func bestCostPerServing(_ item: FoodItem) -> String {
-        currencyFormatter.string(for: item.storeEntries.map({ entry in entry.costPerServing(size: item.size) }).sorted().first!)!
+        currencyFormatter.string(for: item.storeEntries.map({ entry in entry.costPerServingAmount(size: item.size) }).sorted().first!)!
     }
     
     private func isItemFiltered(item: FoodItem) -> Bool {

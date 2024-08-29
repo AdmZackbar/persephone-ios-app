@@ -420,6 +420,16 @@ private struct MainTabView: View {
                         Spacer(minLength: 20)
                         if let rating = FoodTier.fromRating(rating: item.metaData.rating)?.rawValue {
                             Text("\(rating) Tier").font(.subheadline).bold()
+                                .contextMenu {
+                                    Button("N/A") {
+                                        item.metaData.rating = nil
+                                    }
+                                    ForEach(FoodTier.allCases) { tier in
+                                        Button(tier.rawValue) {
+                                            item.metaData.rating = tier.getRating()
+                                        }
+                                    }
+                                }
                         }
                         Text("Barcode: \(item.metaData.barcode ?? "None")").font(.caption)
                         Text("Created On: \(item.metaData.timestamp.formatted(date: .abbreviated, time: .standard))").font(.caption)

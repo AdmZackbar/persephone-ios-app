@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NutrientTableView: View {
     var nutrients: [Nutrient : FoodAmount]
+    var scale: Double
     
     private let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -16,6 +17,11 @@ struct NutrientTableView: View {
         formatter.maximumFractionDigits = 2
         return formatter
     }()
+    
+    init(nutrients: [Nutrient : FoodAmount], scale: Double = 1) {
+        self.nutrients = nutrients
+        self.scale = scale
+    }
     
     var body: some View {
         VStack(spacing: 12) {
@@ -54,7 +60,11 @@ struct NutrientTableView: View {
     }
     
     private func format(_ nutrient: Nutrient) -> String {
-        nutrients[nutrient]?.value.toString() ?? ""
+        if let value = nutrients[nutrient]?.value {
+            (value * scale).toString()
+        } else {
+            ""
+        }
     }
 }
 

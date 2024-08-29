@@ -14,9 +14,26 @@ struct RecipeItemIngredientSheet: View {
         case SetAmount(foodItem: FoodItem)
     }
     
-    let recipe: Recipe
+    enum Mode {
+        case Add
+        case Edit(ingredient: RecipeIngredient)
+    }
     
-    @State private var viewState: ViewState = .SelectFood
+    let recipe: Recipe
+    let mode: Mode
+    
+    @State private var viewState: ViewState
+    
+    init(recipe: Recipe, mode: Mode = .Add) {
+        self.recipe = recipe
+        self.mode = mode
+        switch mode {
+        case .Add:
+            viewState = .SelectFood
+        case .Edit(let ingredient):
+            viewState = .SetAmount(foodItem: ingredient.food!)
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -24,9 +41,9 @@ struct RecipeItemIngredientSheet: View {
             case .SelectFood:
                 SelectFoodView(viewState: $viewState)
             case .SetAmount(let foodItem):
-                SetAmountView(recipe: recipe, foodItem: foodItem, viewState: $viewState)
+                SetAmountView(recipe: recipe, mode: mode, foodItem: foodItem, viewState: $viewState)
             }
-        }.presentationDetents([.medium])
+        }.presentationDetents([.large])
     }
     
     private struct SelectFoodView: View {
@@ -44,8 +61,16 @@ struct RecipeItemIngredientSheet: View {
                     Button {
                         viewState = .SetAmount(foodItem: item)
                     } label: {
-                        Text(item.name)
-                    }
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(item.name)
+                            HStack {
+                                if let brand = item.metaData.brand {
+                                    Text(brand).font(.subheadline).italic()
+                                }
+                                Spacer()
+                            }
+                        }.contentShape(Rectangle())
+                    }.buttonStyle(.plain)
                 }
             }.navigationTitle("Select Food")
                 .navigationBarTitleDisplayMode(.inline)
@@ -74,6 +99,7 @@ struct RecipeItemIngredientSheet: View {
         @Environment(\.dismiss) var dismiss
         
         let recipe: Recipe
+        let mode: Mode
         let foodItem: FoodItem
         
         @Binding private var viewState: ViewState
@@ -81,53 +107,95 @@ struct RecipeItemIngredientSheet: View {
         @State private var amount: String = ""
         private var amountValue: FoodAmount.Value? {
             get {
-                if let match = amount.wholeMatch(of: /([\d.]+)\s*\/\s*([\d.]+)/),
-                    let num = Double(match.1),
-                    let den = Double(match.2) {
-                    return .Rational(num: num, den: den)
-                } else if let match = amount.wholeMatch(of: /([\d.]+)/),
-                          let value = Double(match.1) {
-                    return .Raw(value)
-                }
-                return nil
+                .parseString(amount)
             }
         }
         @State private var unit: FoodUnit = .Custom(name: "Serving")
+        @State private var notes: String = ""
         
         var body: some View {
             Form {
-                Picker(selection: $unit) {
-                    Text("serving").tag(FoodUnit.Custom(name: "Serving"))
-                    if foodItem.size.servingAmount.unit.isWeight() {
-                        Text("g").tag(FoodUnit.Gram)
-                        Text("oz").tag(FoodUnit.Ounce)
-                    } else {
-                        Text("mL").tag(FoodUnit.Milliliter)
-                        Text("fl oz").tag(FoodUnit.FluidOunce)
+                Section {
+                    Picker(selection: $unit) {
+                        Text("serving").tag(FoodUnit.Custom(name: "Serving"))
+                        if foodItem.size.servingAmount.unit.isWeight() {
+                            Text("g").tag(FoodUnit.Gram)
+                            Text("oz").tag(FoodUnit.Ounce)
+                        } else {
+                            Text("mL").tag(FoodUnit.Milliliter)
+                            Text("fl oz").tag(FoodUnit.FluidOunce)
+                        }
+                    } label: {
+                        TextField("amount", text: $amount)
                     }
-                } label: {
-                    TextField("amount", text: $amount)
+                    TextField("notes", text: $notes, axis: .vertical)
+                        .lineLimit(1...3)
+                }
+                Section {
+                    NutrientTableView(nutrients: foodItem.ingredients.nutrients, scale: computeScale())
                 }
             }.navigationTitle(foodItem.name)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden()
+                .onAppear {
+                    switch mode {
+                    case .Edit(let ingredient):
+                        amount = ingredient.amount.value.toString()
+                        unit = ingredient.amount.unit
+                        notes = ingredient.notes ?? ""
+                    default:
+                        break
+                    }
+                }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Back") {
-                            viewState = .SelectFood
+                            switch mode {
+                            case .Add:
+                                viewState = .SelectFood
+                            case .Edit(_):
+                                dismiss()
+                            }
                         }
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button("Save") {
-                            recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: unit)))
+                            switch mode {
+                            case .Add:
+                                recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: unit), notes: notes.isEmpty ? nil : notes))
+                            case .Edit(let ingredient):
+                                ingredient.amount = FoodAmount(value: amountValue!, unit: unit)
+                                ingredient.notes = notes.isEmpty ? nil : notes
+                            }
                             dismiss()
                         }.disabled(amountValue == nil)
                     }
                 }
         }
         
-        init(recipe: Recipe, foodItem: FoodItem, viewState: Binding<ViewState>) {
+        private func computeScale() -> Double {
+            if let amountValue = amountValue {
+                switch unit {
+                case .Custom(_):
+                    return amountValue.toValue()
+                default:
+                    if unit.isWeight() {
+                        if let servingAmount = try? foodItem.size.servingAmount.toGrams().value.toValue() {
+                            return (amountValue / servingAmount).toValue()
+                        }
+                    } else if unit.isVolume() {
+                        if let servingAmount = try? foodItem.size.servingAmount.toMilliliters().value.toValue() {
+                            return (amountValue / servingAmount).toValue()
+                        }
+                    }
+                }
+            }
+            return 1
+        }
+        
+        init(recipe: Recipe, mode: Mode, foodItem: FoodItem, viewState: Binding<ViewState>) {
             self.recipe = recipe
+            self.mode = mode
             self.foodItem = foodItem
             self._viewState = viewState
         }

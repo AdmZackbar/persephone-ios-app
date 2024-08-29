@@ -95,14 +95,31 @@ struct RecipeEditor: View {
             }
             Section("Ingredients") {
                 List(recipe.ingredients, id: \.name) { ingredient in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
-                        if !(ingredient.notes ?? "").isEmpty {
-                            Text(ingredient.notes!).font(.caption).italic()
+                    Button {
+                        editIngredient(ingredient: ingredient)
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
+                                if !(ingredient.notes ?? "").isEmpty {
+                                    Text(ingredient.notes!).font(.caption).italic()
+                                }
+                            }
+                            Spacer()
+                        }.contentShape(Rectangle())
+                    }.buttonStyle(.plain)
+                        .swipeActions(allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                recipe.ingredients.removeAll { i in i == ingredient }
+                            } label: {
+                                Label("Delete", systemImage: "trash.fill")
+                            }
+                            Button {
+                                editIngredient(ingredient: ingredient)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
                         }
-                    }.onTapGesture {
-                        sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
-                    }
                 }
                 Menu {
                     Button("Food Item Ingredient...") {
@@ -246,18 +263,17 @@ struct RecipeEditor: View {
             .sheetCoordinating(coordinator: sheetCoordinator)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button(action: save) {
-                        Text("Save")
-                    }.disabled(name.isEmpty)
+                    Button("Save", action: save).disabled(name.isEmpty)
                 }
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(action: discard) {
-                        Text("Discard")
-                    }
+                    Button(mode == .Add ? "Discard" : "Cancel", action: discard)
                 }
             }
             .onAppear {
-                if mode == .Edit {
+                switch mode {
+                case .Add:
+                    modelContext.insert(recipe)
+                case .Edit:
                     name = recipe.name
                     author = recipe.metaData.author ?? ""
                     details = recipe.metaData.details
@@ -275,6 +291,14 @@ struct RecipeEditor: View {
             }
     }
     
+    private func editIngredient(ingredient: RecipeIngredient) {
+        if ingredient.food == nil {
+            sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
+        } else {
+            sheetCoordinator.presentSheet(.EditItemIngredient(ingredient: ingredient))
+        }
+    }
+    
     private func save() {
         recipe.name = name
         recipe.metaData.author = author.isEmpty ? nil : author
@@ -289,14 +313,16 @@ struct RecipeEditor: View {
         recipe.metaData.cookTime = cookTime
         recipe.metaData.otherTime = otherTime
         recipe.instructions = instructions
-        if mode == .Add {
-            modelContext.insert(recipe)
-        }
         dismiss()
     }
     
     private func discard() {
-        recipe.ingredients = ingredientsBackup
+        switch mode {
+        case .Add:
+            modelContext.delete(recipe)
+        case .Edit:
+            recipe.ingredients = ingredientsBackup
+        }
         dismiss()
     }
 }

@@ -67,7 +67,7 @@ struct RecipeView: View {
                     ForEach(recipe.ingredients, id: \.name) { ingredient in
                         VStack(alignment: .leading, spacing: 2) {
                             HStack(spacing: 6) {
-                                Text("\(servingFormatter.string(for: ingredient.amount.value)!) \(ingredient.amount.unit.getAbbreviation())").bold()
+                                Text("\(servingFormatter.string(for: ingredient.amount.value.toValue())!) \(ingredient.amount.unit.getAbbreviation())").bold()
                                 Text("·")
                                 Text(ingredient.name)
                             }

@@ -57,7 +57,10 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                             prepTime: 8,
                             cookTime: 17,
                             otherTime: 0,
-                            tags: ["Breakfast", "Bread"]),
+                            tags: ["Breakfast", "Bread"],
+                            rating: 7.5,
+                            ratingLeftover: 5,
+                            difficulty: 5),
                         instructions: [
                             Recipe.Section(header: "Prep", details: "1. Put the mix with the water\n2. Mix until barely combined"),
                             Recipe.Section(header: "Cook", details: "1. Put mix into the iron\n2. Wait until iron signals completion\n3. Remove and allow to cool")

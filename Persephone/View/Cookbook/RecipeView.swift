@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct RecipeView: View {
-    var recipe: Recipe
+    @State var recipe: Recipe
     
     let servingFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -62,6 +62,7 @@ struct RecipeView: View {
                     createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime)!) min", lower: "COOK")
                     Spacer()
                 }
+                skillRatingRow()
                 Divider()
                 if (!recipe.ingredients.isEmpty) {
                     ForEach(recipe.ingredients, id: \.name) { ingredient in
@@ -110,6 +111,67 @@ struct RecipeView: View {
                     }
                 }
             }
+    }
+    
+    private func skillRatingRow() -> some View {
+        HStack(spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: computeImage(Recipe.DifficultyLevel.fromValue(value: recipe.metaData.difficulty) ?? .Trivial))
+                createStackedText(upper: Recipe.DifficultyLevel.fromValue(value: recipe.metaData.difficulty)?.rawValue ?? "N/A", lower: "SKILL LEVEL")
+            }.contextMenu {
+                Button("N/A") {
+                    recipe.metaData.difficulty = nil
+                }
+                ForEach(Recipe.DifficultyLevel.allCases) { level in
+                    Button(level.rawValue) {
+                        recipe.metaData.difficulty = level.getValue()
+                    }
+                }
+            }
+            Divider()
+            HStack(spacing: 10) {
+                Image(systemName: "leaf.fill")
+                createStackedText(upper: "\(FoodTier.fromRating(rating: recipe.metaData.rating)?.rawValue ?? "N/A") tier", lower: "FRESH")
+            }.contextMenu {
+                Button("N/A") {
+                    recipe.metaData.rating = nil
+                }
+                ForEach(FoodTier.allCases) { tier in
+                    Button(tier.rawValue) {
+                        recipe.metaData.rating = tier.getRating()
+                    }
+                }
+            }
+            Divider()
+            HStack(spacing: 10) {
+                Image(systemName: "snowflake")
+                createStackedText(upper: "\(FoodTier.fromRating(rating: recipe.metaData.ratingLeftover)?.rawValue ?? "N/A") tier", lower: "LEFTOVER")
+            }.contextMenu {
+                Button("N/A") {
+                    recipe.metaData.ratingLeftover = nil
+                }
+                ForEach(FoodTier.allCases) { tier in
+                    Button(tier.rawValue) {
+                        recipe.metaData.ratingLeftover = tier.getRating()
+                    }
+                }
+            }
+        }
+    }
+    
+    private func computeImage(_ level: Recipe.DifficultyLevel) -> String {
+        switch level {
+        case .Trivial:
+            "gauge.with.dots.needle.0percent"
+        case .Easy:
+            "gauge.with.dots.needle.33percent"
+        case .Medium:
+            "gauge.with.dots.needle.50percent"
+        case .Hard:
+            "gauge.with.dots.needle.66percent"
+        case .Insane:
+            "gauge.with.dots.needle.100percent"
+        }
     }
     
     private func createStackedText(upper: String, lower: String) -> some View {

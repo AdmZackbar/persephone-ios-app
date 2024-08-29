@@ -107,11 +107,23 @@ struct FoodDatabaseView: View {
     private func createListItem(_ item: FoodItem) -> some View {
         VStack(alignment: .leading) {
             Text(item.name)
-            Text(item.metaData.brand ?? "Custom")
-                .font(.subheadline)
-                .fontWeight(.light)
-                .italic()
+            HStack {
+                Text(item.metaData.brand ?? "Custom")
+                    .font(.subheadline)
+                    .fontWeight(.light)
+                    .italic()
+                Spacer()
+                if !item.storeEntries.isEmpty {
+                    Text("\(bestCostPerServing(item)) / serving")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                }
+            }
         }
+    }
+    
+    private func bestCostPerServing(_ item: FoodItem) -> String {
+        currencyFormatter.string(for: item.storeEntries.map({ entry in entry.costPerServing(size: item.size) }).sorted().first!)!
     }
     
     private func isItemFiltered(item: FoodItem) -> Bool {

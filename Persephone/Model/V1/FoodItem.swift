@@ -95,6 +95,43 @@ extension SchemaV1 {
             var storeName: String
             var costType: CostType
             var available: Bool
+            
+            func costPerUnit(size: Size) -> Double {
+                switch costType {
+                case .Collection(let cost, let quantity):
+                    cost.toUsd() / Double(quantity)
+                case .PerAmount(let cost, let amount):
+                    if amount.unit.isWeight() && size.totalAmount.unit.isWeight() {
+                        cost.toUsd() / Double(amount.value.toValue()) * (try! size.totalAmount.toGrams().value.toValue() / amount.toGrams().value.toValue())
+                    } else if amount.unit.isVolume() && size.totalAmount.unit.isVolume() {
+                        cost.toUsd() / Double(amount.value.toValue()) * (try! size.totalAmount.toMilliliters().value.toValue() / amount.toMilliliters().value.toValue())
+                    } else {
+                        // TODO handle case
+                        cost.toUsd() / Double(amount.value.toValue())
+                    }
+                }
+            }
+            
+            func costPerServing(size: Size) -> Double {
+                costPerUnit(size: size) / size.numServings
+            }
+            
+            func costPerEnergy(foodItem: FoodItem) -> Double? {
+                let caloriesPerServing = foodItem.getNutrient(.Energy)?.value.toValue() ?? 0
+                if caloriesPerServing <= 0 {
+                    return nil
+                }
+                let totalCal = foodItem.size.numServings * caloriesPerServing
+                return (costPerUnit(size: foodItem.size) / totalCal) * 100
+            }
+            
+            func costPerWeight(size: Size) -> Double {
+                try! (costPerUnit(size: size) / size.totalAmount.toGrams().value.toValue()) * 100
+            }
+            
+            func costPerVolume(size: Size) -> Double {
+                try! (costPerUnit(size: size) / size.totalAmount.toMilliliters().value.toValue()) * 100
+            }
         }
         
         enum CostType: Codable, Equatable, Hashable {

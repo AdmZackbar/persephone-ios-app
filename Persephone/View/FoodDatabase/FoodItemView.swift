@@ -149,20 +149,25 @@ private struct StoreItemView: View {
             }
             Spacer()
             VStack(alignment: .leading) {
-                Text(computeCostPerUnit()).bold()
+                Text(formatCost(storeItem.costPerUnit(size: foodItem.size))).bold()
                 Text("per Unit").font(.caption).fontWeight(.light)
                 Spacer()
-                Text(computeCostPerServing()).bold()
+                Text(formatCost(storeItem.costPerServing(size: foodItem.size))).bold()
                 Text("per Serving").font(.caption).fontWeight(.light)
             }
             VStack(alignment: .leading) {
-                if foodItem.getNutrient(.Energy)?.value.toValue() ?? 0 != 0 {
-                    Text(computeCostPerCalories()).bold()
+                if let costPerCal = storeItem.costPerEnergy(foodItem: foodItem) {
+                    Text(formatCost(costPerCal)).bold()
                     Text("per 100 cal").font(.caption).fontWeight(.light)
                     Spacer()
                 }
-                Text(computeCostPerUnitTotal()).bold()
-                Text("per 100 \(foodItem.size.totalAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
+                if foodItem.size.totalAmount.unit.isWeight() {
+                    Text(formatCost(storeItem.costPerWeight(size: foodItem.size))).bold()
+                    Text("per 100 g").font(.caption).fontWeight(.light)
+                } else {
+                    Text(formatCost(storeItem.costPerVolume(size: foodItem.size))).bold()
+                    Text("per 100 mL").font(.caption).fontWeight(.light)
+                }
             }
         }.padding(12).tag(storeItem.storeName)
     }
@@ -176,38 +181,8 @@ private struct StoreItemView: View {
         }
     }
     
-    private func computeUnitCost() -> Double {
-        switch storeItem.costType {
-        case .Collection(let cost, let quantity):
-            cost.toUsd() / Double(quantity)
-        case .PerAmount(let cost, let amount):
-            if amount.unit.isWeight() && foodItem.size.totalAmount.unit.isWeight() {
-                cost.toUsd() / Double(amount.value.toValue()) * (try! foodItem.size.totalAmount.toGrams().value.toValue() / amount.toGrams().value.toValue())
-            } else if amount.unit.isVolume() && foodItem.size.totalAmount.unit.isVolume() {
-                cost.toUsd() / Double(amount.value.toValue()) * (try! foodItem.size.totalAmount.toMilliliters().value.toValue() / amount.toMilliliters().value.toValue())
-            } else {
-                // TODO handle case
-                cost.toUsd() / Double(amount.value.toValue())
-            }
-        }
-    }
-    
-    private func computeCostPerUnit() -> String {
-        currencyFormatter.string(for: computeUnitCost())!
-    }
-    
-    private func computeCostPerServing() -> String {
-        currencyFormatter.string(for: computeUnitCost() / foodItem.size.numServings)!
-    }
-    
-    private func computeCostPerCalories() -> String {
-        let caloriesPerServing = foodItem.getNutrient(.Energy)!.value.toValue()
-        let totalCal = foodItem.size.numServings * caloriesPerServing
-        return currencyFormatter.string(for: computeUnitCost() / (totalCal / 100))!
-    }
-    
-    private func computeCostPerUnitTotal() -> String {
-        currencyFormatter.string(for: computeUnitCost() / foodItem.size.totalAmount.value.toValue() * 100)!
+    private func formatCost(_ cost: Double) -> String {
+        currencyFormatter.string(for: cost)!
     }
 }
 
@@ -435,6 +410,9 @@ private struct MainTabView: View {
                         Text("Description").font(.title2).bold()
                         Text(item.details.isEmpty ? "No description set." : item.details).multilineTextAlignment(.leading)
                         Spacer(minLength: 20)
+                        if let rating = FoodTier.fromRating(rating: item.metaData.rating)?.rawValue {
+                            Text("\(rating) Tier").font(.subheadline).bold()
+                        }
                         Text("Barcode: \(item.metaData.barcode ?? "None")").font(.caption)
                         Text("Created On: \(item.metaData.timestamp.formatted(date: .abbreviated, time: .standard))").font(.caption)
                         // Expands to fill horizontally

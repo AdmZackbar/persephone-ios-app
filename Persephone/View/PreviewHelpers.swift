@@ -19,7 +19,7 @@ func createTestModelContainer() -> ModelContainer {
 func createTestFoodItem(_ context: ModelContext) -> FoodItem {
     let item = FoodItem(name: "Test Food",
                         details: "Preparation: cook at 375 F for 12-14 minutes.",
-                        metaData: FoodItem.MetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"]),
+                        metaData: FoodItem.MetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"], rating: 8),
                         ingredients: FoodIngredients(
                             nutrients: [
                                 .Energy: FoodAmount.calories(120),

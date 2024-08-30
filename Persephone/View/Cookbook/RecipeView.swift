@@ -9,6 +9,8 @@ import SwiftData
 import SwiftUI
 
 struct RecipeView: View {
+    @StateObject var sheetCoordinator = SheetCoordinator<CookbookSheetEnum>()
+    
     @State var recipe: Recipe
     @State private var nutrientViewType: NutrientViewType = .PerServing
     
@@ -84,6 +86,12 @@ struct RecipeView: View {
                                     .italic()
                                     .lineLimit(2)
                             }
+                        }.contextMenu {
+                            Button {
+                                sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
                         }
                     }
                     Divider()
@@ -111,6 +119,7 @@ struct RecipeView: View {
             }.padding(EdgeInsets(top: 8, leading: 20, bottom: 12, trailing: 20))
         }.navigationTitle(recipe.name)
             .navigationBarTitleDisplayMode(.inline)
+            .sheetCoordinating(coordinator: sheetCoordinator)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(recipe.name).font(.headline).bold()

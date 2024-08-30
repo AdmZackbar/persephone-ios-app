@@ -14,8 +14,6 @@ enum CookbookSheetEnum: Identifiable, SheetEnum {
             "Tag Editor"
         case .AddItemIngredient(_):
             "Add Item Ingredient"
-        case .EditItemIngredient(_):
-            "Edit Item Ingredient"
         case .AddIngredient(_):
             "Add Ingredient"
         case .EditIngredient(_):
@@ -29,7 +27,6 @@ enum CookbookSheetEnum: Identifiable, SheetEnum {
     
     case Tags(tags: Binding<[String]>)
     case AddItemIngredient(recipe: Recipe)
-    case EditItemIngredient(ingredient: RecipeIngredient)
     case AddIngredient(recipe: Recipe)
     case EditIngredient(ingredient: RecipeIngredient)
     case AddInstructions(instructions: Binding<[Recipe.Section]>)
@@ -42,12 +39,14 @@ enum CookbookSheetEnum: Identifiable, SheetEnum {
             RecipeTagSheet(tags: tags)
         case .AddItemIngredient(let recipe):
             RecipeItemIngredientSheet(recipe: recipe)
-        case .EditItemIngredient(let ingredient):
-            RecipeItemIngredientSheet(recipe: ingredient.recipe, mode: .Edit(ingredient: ingredient))
         case .AddIngredient(let recipe):
             RecipeIngredientSheet(mode: .Add(recipe: recipe))
         case .EditIngredient(let ingredient):
-            RecipeIngredientSheet(mode: .Edit(ingredient: ingredient))
+            if ingredient.food != nil {
+                RecipeItemIngredientSheet(recipe: ingredient.recipe, mode: .Edit(ingredient: ingredient))
+            } else {
+                RecipeIngredientSheet(mode: .Edit(ingredient: ingredient))
+            }
         case .AddInstructions(let instructions):
             RecipeInstructionsSheet(mode: .Add(instructions: instructions))
         case .EditInstructions(let section):

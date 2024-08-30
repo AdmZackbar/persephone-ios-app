@@ -96,7 +96,7 @@ struct RecipeEditor: View {
             Section("Ingredients") {
                 List(recipe.ingredients, id: \.name) { ingredient in
                     Button {
-                        editIngredient(ingredient: ingredient)
+                        editIngredient(ingredient)
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
@@ -115,7 +115,7 @@ struct RecipeEditor: View {
                                 Label("Delete", systemImage: "trash.fill")
                             }
                             Button {
-                                editIngredient(ingredient: ingredient)
+                                editIngredient(ingredient)
                             } label: {
                                 Label("Edit", systemImage: "pencil")
                             }
@@ -291,12 +291,8 @@ struct RecipeEditor: View {
             }
     }
     
-    private func editIngredient(ingredient: RecipeIngredient) {
-        if ingredient.food == nil {
-            sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
-        } else {
-            sheetCoordinator.presentSheet(.EditItemIngredient(ingredient: ingredient))
-        }
+    private func editIngredient(_ ingredient: RecipeIngredient) {
+        sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
     }
     
     private func save() {

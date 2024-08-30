@@ -29,6 +29,25 @@ extension SchemaV1 {
                 return nil
             }
             
+            static func + (left: Value, right: Value) -> Value {
+                switch left {
+                case .Raw(let l):
+                    switch right {
+                    case .Raw(let r):
+                        return .Raw(l + r)
+                    case .Rational(let rNum, let rDen):
+                        return .Rational(num: l * rDen + rNum, den: rDen)
+                    }
+                case .Rational(let lNum, let lDen):
+                    switch right {
+                    case .Raw(let r):
+                        return .Rational(num: r * lDen + lNum, den: lDen)
+                    case .Rational(let rNum, let rDen):
+                        return .Rational(num: rNum * lDen + lNum * rDen, den: lDen * rDen)
+                    }
+                }
+            }
+            
             static func * (left: Value, right: Double) -> Value {
                 switch left {
                 case .Raw(let value):

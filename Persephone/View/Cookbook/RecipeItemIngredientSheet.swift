@@ -121,7 +121,11 @@ struct RecipeItemIngredientSheet: View {
                         if foodItem.size.servingAmount.unit.isWeight() {
                             Text("g").tag(FoodUnit.Gram)
                             Text("oz").tag(FoodUnit.Ounce)
+                            Text("lb").tag(FoodUnit.Pound)
                         } else {
+                            Text("tsp").tag(FoodUnit.Teaspoon)
+                            Text("tbsp").tag(FoodUnit.Tablespoon)
+                            Text("cup").tag(FoodUnit.Cup)
                             Text("mL").tag(FoodUnit.Milliliter)
                             Text("fl oz").tag(FoodUnit.FluidOunce)
                         }
@@ -181,11 +185,11 @@ struct RecipeItemIngredientSheet: View {
                 default:
                     if unit.isWeight() {
                         if let servingAmount = try? foodItem.size.servingAmount.toGrams().value.toValue() {
-                            return (amountValue / servingAmount).toValue()
+                            return try! (FoodAmount(value: amountValue, unit: unit).toGrams().value / servingAmount).toValue()
                         }
                     } else if unit.isVolume() {
                         if let servingAmount = try? foodItem.size.servingAmount.toMilliliters().value.toValue() {
-                            return (amountValue / servingAmount).toValue()
+                            return try! (FoodAmount(value: amountValue, unit: unit).toMilliliters().value / servingAmount).toValue()
                         }
                     }
                 }

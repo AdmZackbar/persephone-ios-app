@@ -247,7 +247,7 @@ private struct NutritionTabView: View {
                 }.scrollTargetBehavior(.paging)
                     .padding(12)
                     .tag(ViewType.Main)
-                MacroChartView(item: item)
+                MacroChartView(nutrients: item.ingredients.nutrients)
                     .padding(12)
                     .tag(ViewType.Macro)
             }.tabViewStyle(.page(indexDisplayMode: .never))
@@ -307,91 +307,6 @@ private struct NutritionView: View {
         }
         let amount = try? item.getNutrient(nutrient)?.toGrams()
         return "\(formatter.string(for: (amount?.value.toValue() ?? 0) * modifier)!)g"
-    }
-}
-
-private struct MacroChartView: View {
-    var item: FoodItem
-    
-    private let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-        return formatter
-    }()
-    
-    var body: some View {
-        let data = createData(item)
-        return ZStack {
-            Chart(data, id: \.name) { name, amount in
-                SectorMark(
-                    angle: .value("Amount", amount),
-                    innerRadius: .ratio(0.65),
-                    outerRadius: .inset(8),
-                    angularInset: 2
-                ).cornerRadius(4)
-                    .foregroundStyle(by: .value("Macro type", name))
-            }.chartLegend(.hidden)
-                .chartForegroundStyleScale([
-                    "Carbs": Color.green,
-                    "Fat": Color.orange,
-                    "Protein": Color.purple,
-                    "None": Color.gray
-                ])
-            VStack(spacing: 2) {
-                Text(item.getNutrient(.Energy)?.value.toString() ?? "").font(.title3).fontWeight(.heavy)
-                Text("Cal").font(.caption).bold()
-            }
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Protein").font(.caption).fontWeight(.heavy).foregroundStyle(.purple)
-                    Spacer()
-                }
-                HStack {
-                    Text("\(formatter.string(for: computeAmount(.Protein))!)g").font(.caption).bold().foregroundStyle(.purple)
-                    Spacer()
-                }
-                Spacer()
-            }
-            VStack(spacing: 0) {
-                HStack {
-                    Spacer()
-                    Text("Carbs").font(.caption).fontWeight(.heavy).foregroundStyle(.green)
-                }
-                HStack {
-                    Spacer()
-                    Text("\(formatter.string(for: computeAmount(.TotalCarbs))!)g").font(.caption).bold().foregroundStyle(.green)
-                }
-                Spacer()
-            }
-            VStack(spacing: 0) {
-                Spacer()
-                HStack {
-                    Text("Fat").font(.caption).fontWeight(.heavy).foregroundStyle(.orange)
-                    Spacer()
-                }
-                HStack {
-                    Text("\(formatter.string(for: computeAmount(.TotalFat))!)g").font(.caption).bold().foregroundStyle(.orange)
-                    Spacer()
-                }
-            }
-        }
-    }
-    
-    private func createData(_ item: FoodItem) -> [(name: String, amount: Double)] {
-        let data = [
-            (name: "Carbs", amount: computeAmount(.TotalCarbs) * 4),
-            (name: "Fat", amount: computeAmount(.TotalFat) * 9),
-            (name: "Protein", amount: computeAmount(.Protein) * 4)
-        ]
-        if data.allSatisfy({ (name: String, amount: Double) in amount <= 0 }) {
-            return [(name: "None", amount: 1)]
-        }
-        return data
-    }
-    
-    private func computeAmount(_ nutrient: Nutrient) -> Double {
-        return (try? item.getNutrient(nutrient)?.toGrams())?.value.toValue() ?? 0
     }
 }
 

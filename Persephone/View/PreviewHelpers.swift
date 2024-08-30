@@ -67,16 +67,7 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                         ],
                         size: Recipe.Size(
                             numServings: 6,
-                            servingSize: "1 waffle"),
-                        nutrients: [
-                            .Energy: FoodAmount.calories(200),
-                            .TotalFat: FoodAmount.grams(4.1),
-                            .SaturatedFat: FoodAmount.grams(2),
-                            .TotalCarbs: FoodAmount.grams(20),
-                            .DietaryFiber: FoodAmount.grams(1),
-                            .TotalSugars: FoodAmount.grams(3),
-                            .Protein: FoodAmount.grams(13.5)
-                        ])
+                            servingSize: "1 waffle"))
     context.insert(recipe)
     recipe.ingredients.append(contentsOf: [
         RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: .Raw(1.2), unit: .Liter), notes: "Tap water or else"),

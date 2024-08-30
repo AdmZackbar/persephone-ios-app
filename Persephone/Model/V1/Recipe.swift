@@ -22,20 +22,47 @@ extension SchemaV1 {
         var instructions: [Section]
         // Size info of the recipe
         var size: Size
-        // Nutrient information (nutrient -> amount per serving)
-        var nutrients: [Nutrient : FoodAmount]
+        var nutrients: [Nutrient : FoodAmount] {
+            get {
+                var nutrients: [Nutrient : FoodAmount] = [:]
+                for ingredient in ingredients {
+                    if let food = ingredient.food {
+                        for nutrient in food.ingredients.nutrients.keys {
+                            var scale: Double = 1
+                            switch ingredient.amount.unit {
+                            case .Custom(_):
+                                // Assume serving
+                                scale = ingredient.amount.value.toValue()
+                            default:
+                                if ingredient.amount.unit.isWeight() {
+                                    try? scale = ingredient.amount.toGrams().value.toValue() / food.size.servingAmount.toGrams().value.toValue()
+                                } else {
+                                    try? scale = ingredient.amount.toMilliliters().value.toValue() / food.size.servingAmount.toMilliliters().value.toValue()
+                                }
+                            }
+                            let foodNutrient = FoodAmount(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
+                            if let n = nutrients[nutrient] {
+                                nutrients[nutrient] = FoodAmount(value: n.value + foodNutrient.value, unit: n.unit)
+                            } else {
+                                nutrients[nutrient] = foodNutrient
+                            }
+                        }
+                    }
+                }
+                return nutrients
+            }
+        }
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.recipe)
         var ingredients: [RecipeIngredient] = []
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstance.recipe)
         var instances: [RecipeInstance] = []
         
-        init(name: String, metaData: MetaData, instructions: [Section], size: Size, nutrients: [Nutrient : FoodAmount]) {
+        init(name: String, metaData: MetaData, instructions: [Section], size: Size) {
             self.name = name
             self.metaData = metaData
             self.instructions = instructions
             self.size = size
-            self.nutrients = nutrients
         }
         
         struct MetaData: Codable {

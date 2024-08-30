@@ -128,7 +128,7 @@ struct CookbookView: View {
     }
     
     private func duplicateRecipe(_ recipe: Recipe) {
-        let duplicateRecipe = Recipe(name: recipe.name, metaData: recipe.metaData, instructions: recipe.instructions, size: recipe.size, nutrients: recipe.nutrients)
+        let duplicateRecipe = Recipe(name: recipe.name, metaData: recipe.metaData, instructions: recipe.instructions, size: recipe.size)
         modelContext.insert(duplicateRecipe)
         for ingredient in recipe.ingredients {
             let duplicateEntry = RecipeIngredient(name: ingredient.name, food: ingredient.food, recipe: duplicateRecipe, amount: ingredient.amount)

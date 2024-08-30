@@ -33,7 +33,7 @@ struct RecipeEditor: View {
     
     init(recipe: Recipe? = nil) {
         self.mode = recipe == nil ? .Add : .Edit
-        self.recipe = recipe ?? Recipe(name: "", metaData: Recipe.MetaData(details: "", prepTime: 0, cookTime: 0, otherTime: 0, tags: []), instructions: [], size: Recipe.Size(numServings: 1, servingSize: ""), nutrients: [:])
+        self.recipe = recipe ?? Recipe(name: "", metaData: Recipe.MetaData(details: "", prepTime: 0, cookTime: 0, otherTime: 0, tags: []), instructions: [], size: Recipe.Size(numServings: 1, servingSize: ""))
         self.ingredientsBackup = recipe?.ingredients ?? []
     }
     

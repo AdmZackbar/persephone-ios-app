@@ -53,9 +53,7 @@ struct FoodDatabaseView: View {
                     }
                     deleteButton(item: item)
                 } preview: {
-                    NavigationStack {
-                        NutritionView(item: item)
-                    }
+                    FoodItemPreview(item: item)
                 }
                 .swipeActions {
                     deleteButton(item: item)
@@ -178,92 +176,12 @@ struct FoodDatabaseView: View {
     }
 }
 
-private let formatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
-    formatter.maximumFractionDigits = 2
-    return formatter
-}()
-
 private let currencyFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.numberStyle = .currency
     formatter.maximumFractionDigits = 2
     return formatter
 }()
-
-private struct NutritionView: View {
-    let item: FoodItem
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(item.name)
-                .font(.title)
-                .fontWeight(.semibold)
-                .fixedSize(horizontal: false, vertical: true)
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 6) {
-                    if item.metaData.brand != nil {
-                        Text(item.metaData.brand ?? "").font(.headline).italic()
-                    }
-                    if !item.metaData.tags.isEmpty {
-                        Label(item.metaData.tags.joined(separator: ", "), systemImage: "tag.fill").font(.subheadline)
-                    }
-                }
-                Spacer()
-                if let rating = item.metaData.rating {
-                    Text("\(FoodTier.fromRating(rating: rating)!.rawValue) Tier")
-                        .bold().italic()
-                }
-            }
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    Text("\(format(item.getNutrient(.Energy)?.value)) Calories")
-                        .font(.title2).bold()
-                    Text("\(format(item.getNutrient(.TotalFat)?.value))g Fat")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Text("\(format(item.getNutrient(.TotalCarbs)?.value))g Carbs")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                    Text("\(format(item.getNutrient(.Protein)?.value))g Protein")
-                        .font(.subheadline)
-                        .fontWeight(.light)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(item.size.servingSize) (\(format(item.size.servingAmount.value))\(item.size.servingAmount.unit.getAbbreviation()))").font(.headline).bold()
-                    Text("\(formatter.string(for: item.size.numServings)!) servings").font(.subheadline)
-                    Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(format(item.size.totalAmount.value)) \(item.size.totalAmount.unit.getAbbreviation())")
-                        .font(.subheadline).fontWeight(.light)
-                }
-            }
-            if !item.details.isEmpty {
-                Text(item.details).italic()
-            }
-            Spacer()
-        }
-        .padding()
-    }
-    
-    private func format(_ value: FoodAmount.Value?) -> String {
-        formatter.string(for: value?.toValue() ?? 0.0)!
-    }
-    
-    private func formatVolume(_ volume: Double) -> String {
-        if (volume > 500.0) {
-            return "\(formatter.string(for: volume / 1000.0)!)L"
-        }
-        return "\(formatter.string(for: volume)!)mL"
-    }
-    
-    private func formatWeight(_ weight: Double) -> String {
-        if (weight > 500.0) {
-            return "\(formatter.string(for: weight / 1000.0)!)kg"
-        }
-        return "\(formatter.string(for: weight)!)g"
-    }
-}
 
 #Preview {
     let container = createTestModelContainer()

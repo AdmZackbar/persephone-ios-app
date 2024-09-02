@@ -41,6 +41,16 @@ struct FoodDatabaseView: View {
                         Label("View", systemImage: "magnifyingglass")
                     }
                     editLink(item: item)
+                    Menu("Set Rating") {
+                        Button("N/A") {
+                            item.metaData.rating = nil
+                        }
+                        ForEach(FoodTier.allCases) { tier in
+                            Button(tier.rawValue) {
+                                item.metaData.rating = tier.getRating()
+                            }
+                        }
+                    }
                     deleteButton(item: item)
                 } preview: {
                     NavigationStack {
@@ -199,6 +209,11 @@ private struct NutritionView: View {
                     if !item.metaData.tags.isEmpty {
                         Label(item.metaData.tags.joined(separator: ", "), systemImage: "tag.fill").font(.subheadline)
                     }
+                }
+                Spacer()
+                if let rating = item.metaData.rating {
+                    Text("\(FoodTier.fromRating(rating: rating)!.rawValue) Tier")
+                        .bold().italic()
                 }
             }
             HStack(alignment: .top) {

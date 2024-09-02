@@ -37,10 +37,18 @@ struct StoreItemSheet: View {
         }
     }
     
+    enum CostType {
+        case Collection
+        case PerAmount
+    }
+    
     let mode: Mode
     
     @State private var storeName: String = ""
+    @State private var costType: CostType = .Collection
     @State private var quantity: Int = 1
+    @State private var amount: Double = 1
+    @State private var unit: FoodUnit = .Pound
     @State private var price: Int = 0
     @State private var available: Bool = true
     
@@ -69,17 +77,31 @@ struct StoreItemSheet: View {
                     Text("Total Price:")
                     CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
                 }
-                Stepper {
-                    HStack {
-                        Text("Quantity:")
-                        TextField("", value: $quantity, formatter: formatter)
-                            .keyboardType(.numberPad)
+                Picker("", selection: $costType) {
+                    Text("Collection").tag(CostType.Collection)
+                    Text("Per Amount").tag(CostType.PerAmount)
+                }.pickerStyle(.segmented)
+                switch costType {
+                case .Collection:
+                    Stepper {
+                        HStack {
+                            Text("Quantity:")
+                            TextField("", value: $quantity, formatter: formatter)
+                                .keyboardType(.numberPad)
+                        }
+                    } onIncrement: {
+                        quantity += 1
+                    } onDecrement: {
+                        if quantity > 1 {
+                            quantity -= 1
+                        }
                     }
-                } onIncrement: {
-                    quantity += 1
-                } onDecrement: {
-                    if quantity > 1 {
-                        quantity -= 1
+                case .PerAmount:
+                    Picker(selection: $unit) {
+                        Text("lb").tag(FoodUnit.Pound)
+                        Text("oz").tag(FoodUnit.Ounce)
+                    } label: {
+                        TextField("", value: $amount, formatter: formatter)
                     }
                 }
                 Toggle(isOn: $available) {
@@ -127,11 +149,20 @@ struct StoreItemSheet: View {
     private func save() {
         switch mode {
         case .Add(let items):
-            items.wrappedValue.append(FoodItem.StoreEntry(storeName: storeName, costType: .Collection(cost: .Cents(price), quantity: quantity), available: available))
+            items.wrappedValue.append(FoodItem.StoreEntry(storeName: storeName, costType: computeCostType(), available: available))
         case .Edit(let item):
             item.wrappedValue.storeName = storeName
-            item.wrappedValue.costType = .Collection(cost: .Cents(price), quantity: quantity)
+            item.wrappedValue.costType = computeCostType()
             item.wrappedValue.available = available
+        }
+    }
+    
+    private func computeCostType() -> FoodItem.CostType {
+        switch costType {
+        case .Collection:
+            return .Collection(cost: .Cents(price), quantity: quantity)
+        case .PerAmount:
+            return .PerAmount(cost: .Cents(price), amount: FoodAmount(value: .Raw(amount), unit: unit))
         }
     }
 }

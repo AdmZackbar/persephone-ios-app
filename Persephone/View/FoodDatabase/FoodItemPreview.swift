@@ -56,8 +56,23 @@ struct FoodItemPreview: View {
                         .font(.subheadline).bold()
                     Text("\(formatter.string(for: item.size.numServings)!) servings")
                         .font(.subheadline)
-                    Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(item.size.totalAmount.value.toString()) \(item.size.totalAmount.unit.getAbbreviation())")
-                        .font(.subheadline)
+                    if item.size.totalAmount.unit.isWeight() {
+                        if item.size.totalAmount.unit == .Gram && item.size.totalAmount.value.toValue() > 1000 {
+                            Text("Net Wt: \((item.size.totalAmount.value / 1000).toString())kg")
+                                .font(.subheadline)
+                        } else {
+                            Text("Net Wt: \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.getAbbreviation())")
+                                .font(.subheadline)
+                        }
+                    } else if item.size.totalAmount.unit.isVolume() {
+                        if item.size.totalAmount.unit == .Milliliter && item.size.totalAmount.value.toValue() > 1000 {
+                            Text("Net Vol: \((item.size.totalAmount.value / 1000).toString())L")
+                                .font(.subheadline)
+                        } else {
+                            Text("Net Vol: \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.getAbbreviation())")
+                                .font(.subheadline)
+                        }
+                    }
                 }.frame(maxWidth: 120)
             }
             VStack(alignment: .leading, spacing: 8) {

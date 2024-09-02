@@ -44,19 +44,24 @@ struct MacroChartView: View {
                 ])
             VStack(spacing: 2) {
                 if let cal = nutrients[.Energy] {
-                    Text((cal.value * scale).toString()).font(.title3).fontWeight(.heavy)
+                    Text((cal.value * scale).toString(maxDigits: 0))
+                        .font(.title3).fontWeight(.heavy)
                 } else {
-                    Text("0").font(.title3).fontWeight(.heavy)
+                    Text("0")
+                        .font(.title3).fontWeight(.heavy)
                 }
-                Text("Cal").font(.caption).bold()
+                Text("Cal")
+                    .font(.caption).bold()
             }
             VStack(spacing: 0) {
                 HStack {
-                    Text("Protein").font(.caption).fontWeight(.heavy).foregroundStyle(.purple)
+                    Text("Protein")
+                        .font(.caption).fontWeight(.heavy).foregroundStyle(.purple)
                     Spacer()
                 }
                 HStack {
-                    Text("\(formatter.string(for: computeAmount(.Protein))!)g").font(.caption).bold().foregroundStyle(.purple)
+                    Text("\(formatter.string(for: computeAmount(.Protein))!)g")
+                        .font(.caption).bold().foregroundStyle(.purple)
                     Spacer()
                 }
                 Spacer()
@@ -68,18 +73,21 @@ struct MacroChartView: View {
                 }
                 HStack {
                     Spacer()
-                    Text("\(formatter.string(for: computeAmount(.TotalCarbs))!)g").font(.caption).bold().foregroundStyle(.green)
+                    Text("\(formatter.string(for: computeAmount(.TotalCarbs))!)g")
+                        .font(.caption).bold().foregroundStyle(.green)
                 }
                 Spacer()
             }
             VStack(spacing: 0) {
                 Spacer()
                 HStack {
-                    Text("Fat").font(.caption).fontWeight(.heavy).foregroundStyle(.orange)
+                    Text("Fat")
+                        .font(.caption).fontWeight(.heavy).foregroundStyle(.orange)
                     Spacer()
                 }
                 HStack {
-                    Text("\(formatter.string(for: computeAmount(.TotalFat))!)g").font(.caption).bold().foregroundStyle(.orange)
+                    Text("\(formatter.string(for: computeAmount(.TotalFat))!)g")
+                        .font(.caption).bold().foregroundStyle(.orange)
                     Spacer()
                 }
             }

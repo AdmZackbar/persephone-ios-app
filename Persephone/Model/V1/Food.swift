@@ -75,11 +75,11 @@ extension SchemaV1 {
                 }
             }
             
-            func toString() -> String {
+            func toString(maxDigits: Int = 2) -> String {
                 let formatter: NumberFormatter = {
                     let formatter = NumberFormatter()
                     formatter.numberStyle = .decimal
-                    formatter.maximumFractionDigits = 2
+                    formatter.maximumFractionDigits = maxDigits
                     formatter.groupingSeparator = ""
                     return formatter
                 }()

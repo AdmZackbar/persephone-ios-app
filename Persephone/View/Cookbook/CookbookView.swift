@@ -75,9 +75,7 @@ struct CookbookView: View {
                             Label("Delete", systemImage: "trash.fill")
                         }
                     } preview: {
-                        NavigationStack {
-                            PreviewRecipe(recipe: recipe)
-                        }
+                        RecipePreview(recipe: recipe)
                     }
                     .alert("Duplicate Recipe", isPresented: $showDuplicateDialog) {
                         TextField("Name", text: $duplicateName)
@@ -134,66 +132,6 @@ struct CookbookView: View {
             let duplicateEntry = RecipeIngredient(name: ingredient.name, food: ingredient.food, recipe: duplicateRecipe, amount: ingredient.amount)
             modelContext.insert(duplicateEntry)
         }
-    }
-}
-
-private struct PreviewRecipe: View {
-    var recipe: Recipe
-    
-    let servingFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-        return formatter
-    }()
-    
-    let timeFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 0
-        return formatter
-    }()
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(recipe.name).font(.title).bold()
-            Text(recipe.metaData.details).font(.subheadline).italic()
-            HStack(spacing: 12) {
-                HStack {
-                    Image(systemName: "person.2.fill")
-                    createStackedText(upper: "\(servingFormatter.string(for: recipe.size.numServings)!) servings", lower: recipe.size.servingSize.uppercased())
-                }
-                if !recipe.metaData.tags.isEmpty {
-                    Divider()
-                    Label(recipe.metaData.tags.joined(separator: ", "), systemImage: "tag.fill")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                }
-            }.fixedSize(horizontal: false, vertical: true).scrollIndicators(.hidden)
-            HStack(spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: "clock.fill")
-                    createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.totalTime)!) min", lower: "TOTAL")
-                }
-                Divider()
-                createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.prepTime)!) min", lower: "PREP")
-                Divider()
-                createStackedText(upper: "\(timeFormatter.string(for: recipe.metaData.cookTime)!) min", lower: "COOK")
-                Spacer()
-            }.fixedSize(horizontal: false, vertical: true)
-            Spacer()
-        }.padding()
-    }
-    
-    private func createStackedText(upper: String, lower: String) -> some View {
-        VStack(alignment: .leading) {
-            Text(upper).font(.subheadline).bold()
-            Text(lower).font(.caption2).fontWeight(.light).italic()
-        }
-    }
-    
-    init(recipe: Recipe) {
-        self.recipe = recipe
     }
 }
 

@@ -78,7 +78,7 @@ struct FoodItemPreview: View {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(item.storeEntries
                     // Only include non-retired entries
-                    .filter({ e in e.available })
+                    .filter { $0.available }
                     // Sort by best to worst price
                     .sorted { $0.costPerUnit(size: item.size) < $1.costPerUnit(size: item.size) }
                         , id: \.storeName) { storeEntry in

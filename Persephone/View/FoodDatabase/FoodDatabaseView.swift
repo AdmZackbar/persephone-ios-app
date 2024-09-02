@@ -24,12 +24,11 @@ struct FoodDatabaseView: View {
     
     @State private var path: [ViewType] = []
     @State private var showDeleteDialog = false
-    @State private var searchText = ""
+    @State private var selectedItem: FoodItem? = nil
     
     var body: some View {
-        let filteredItems = foodItems.filter(isItemFiltered)
         return NavigationStack(path: $path) {
-            List(filteredItems) { item in
+            List(foodItems) { item in
                 Button {
                     path.append(.ItemView(item: item))
                 } label: {
@@ -42,31 +41,31 @@ struct FoodDatabaseView: View {
                         Label("View", systemImage: "magnifyingglass")
                     }
                     editLink(item: item)
-                    deleteButton()
+                    deleteButton(item: item)
                 } preview: {
                     NavigationStack {
                         NutritionView(item: item)
                     }
                 }
                 .swipeActions {
-                    deleteButton()
+                    deleteButton(item: item)
                     editLink(item: item)
-                }
-                .confirmationDialog("Are you sure?", isPresented: $showDeleteDialog) {
-                    Button("Delete", role: .destructive) {
-                        withAnimation {
-                            modelContext.delete(item)
-                        }
-                    }
-                } message: {
-                    Text("You cannot undo this action.")
                 }
             }
             .overlay(Group {
-                if (filteredItems.isEmpty) {
-                    Text(foodItems.isEmpty ? "No food items in database." : "No food items found.")
+                if (foodItems.isEmpty) {
+                    Text("No food items in database.")
                 }
             })
+            .confirmationDialog("Are you sure?", isPresented: $showDeleteDialog) {
+                Button("Delete", role: .destructive) {
+                    if let selectedItem = selectedItem {
+                        modelContext.delete(selectedItem)
+                    }
+                }
+            } message: {
+                Text("You cannot undo this action.")
+            }
             .navigationTitle("Food Database")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -101,7 +100,6 @@ struct FoodDatabaseView: View {
             }
             .navigationDestination(for: ViewType.self, destination: handleNavigation)
         }
-        .searchable(text: $searchText, prompt: "Filter...")
     }
     
     private func createListItem(_ item: FoodItem) -> some View {
@@ -126,10 +124,6 @@ struct FoodDatabaseView: View {
         currencyFormatter.string(for: item.storeEntries.map({ entry in entry.costPerServingAmount(size: item.size) }).sorted().first!)!
     }
     
-    private func isItemFiltered(item: FoodItem) -> Bool {
-        searchText.isEmpty || item.name.localizedCaseInsensitiveContains(searchText)
-    }
-    
     private func editLink(item: FoodItem) -> some View {
         Button {
             path.append(.ItemEdit(item: item))
@@ -138,14 +132,17 @@ struct FoodDatabaseView: View {
         }
     }
     
-    private func deleteButton() -> some View {
-        Button(action: delete) {
+    private func deleteButton(item: FoodItem) -> some View {
+        Button {
+            delete(item: item)
+        } label: {
             Label("Delete", systemImage: "trash").tint(.red)
         }
     }
     
-    private func delete() {
+    private func delete(item: FoodItem) {
         showDeleteDialog = true
+        selectedItem = item
     }
     
     private func handleNavigation(viewType: ViewType) -> some View {

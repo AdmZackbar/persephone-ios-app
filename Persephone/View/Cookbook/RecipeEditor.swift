@@ -120,6 +120,24 @@ struct RecipeEditor: View {
                                 Label("Edit", systemImage: "pencil")
                             }
                         }
+                        .contextMenu {
+                            Button {
+                                editIngredient(ingredient)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            Button(role: .destructive) {
+                                recipe.ingredients.removeAll { i in i == ingredient }
+                            } label: {
+                                Label("Delete", systemImage: "trash.fill")
+                            }
+                        } preview: {
+                            if let foodItem = ingredient.food {
+                                FoodItemPreview(item: foodItem)
+                            } else {
+                                Text(ingredient.name).padding()
+                            }
+                        }
                 }
                 Menu {
                     Button("Food Item Ingredient...") {

@@ -43,7 +43,7 @@ struct RecipeItemIngredientSheet: View {
             case .SetAmount(let foodItem):
                 SetAmountView(recipe: recipe, mode: mode, foodItem: foodItem, viewState: $viewState)
             }
-        }.presentationDetents([.large])
+        }.presentationDetents([.medium, .large])
     }
     
     private struct SelectFoodView: View {
@@ -71,6 +71,13 @@ struct RecipeItemIngredientSheet: View {
                             }
                         }.contentShape(Rectangle())
                     }.buttonStyle(.plain)
+                        .contextMenu {
+                            Button("Select") {
+                                viewState = .SetAmount(foodItem: item)
+                            }
+                        } preview: {
+                            FoodItemPreview(item: item)
+                        }
                 }
             }.navigationTitle("Select Food")
                 .navigationBarTitleDisplayMode(.inline)
@@ -115,29 +122,25 @@ struct RecipeItemIngredientSheet: View {
         
         var body: some View {
             Form {
-                Section {
-                    Picker(selection: $unit) {
-                        Text("serving").tag(FoodUnit.Custom(name: "Serving"))
-                        if foodItem.size.servingAmount.unit.isWeight() {
-                            Text("g").tag(FoodUnit.Gram)
-                            Text("oz").tag(FoodUnit.Ounce)
-                            Text("lb").tag(FoodUnit.Pound)
-                        } else {
-                            Text("tsp").tag(FoodUnit.Teaspoon)
-                            Text("tbsp").tag(FoodUnit.Tablespoon)
-                            Text("cup").tag(FoodUnit.Cup)
-                            Text("mL").tag(FoodUnit.Milliliter)
-                            Text("fl oz").tag(FoodUnit.FluidOunce)
-                        }
-                    } label: {
-                        TextField("amount", text: $amount)
+                Picker(selection: $unit) {
+                    Text("serving").tag(FoodUnit.Custom(name: "Serving"))
+                    if foodItem.size.servingAmount.unit.isWeight() {
+                        Text("g").tag(FoodUnit.Gram)
+                        Text("oz").tag(FoodUnit.Ounce)
+                        Text("lb").tag(FoodUnit.Pound)
+                    } else {
+                        Text("tsp").tag(FoodUnit.Teaspoon)
+                        Text("tbsp").tag(FoodUnit.Tablespoon)
+                        Text("cup").tag(FoodUnit.Cup)
+                        Text("mL").tag(FoodUnit.Milliliter)
+                        Text("fl oz").tag(FoodUnit.FluidOunce)
                     }
-                    TextField("notes", text: $notes, axis: .vertical)
-                        .lineLimit(1...3)
+                } label: {
+                    TextField("amount", text: $amount)
                 }
-                Section {
-                    NutrientTableView(nutrients: foodItem.ingredients.nutrients, scale: computeScale())
-                }
+                TextField("notes", text: $notes, axis: .vertical)
+                    .lineLimit(1...3)
+                itemPreview(item: foodItem)
             }.navigationTitle(foodItem.name)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden()
@@ -175,6 +178,46 @@ struct RecipeItemIngredientSheet: View {
                         }.disabled(amountValue == nil)
                     }
                 }
+        }
+        
+        private let formatter: NumberFormatter = {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 2
+            return formatter
+        }()
+        
+        private func itemPreview(item: FoodItem) -> some View {
+            let scale = computeScale()
+            return VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.name).font(.headline).bold()
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(3)
+                    HStack(alignment: .top) {
+                        Text(item.metaData.brand ?? "Generic Brand")
+                            .font(.subheadline).italic()
+                        Spacer()
+                        if let tier = FoodTier.fromRating(rating: item.metaData.rating) {
+                            Text("\(tier.rawValue) Tier")
+                                .font(.subheadline).bold()
+                        }
+                    }
+                    Text(item.details)
+                        .font(.subheadline).lineLimit(1...7)
+                }
+                HStack(alignment: .top, spacing: 16) {
+                    MacroChartView(nutrients: item.ingredients.nutrients, scale: scale)
+                        .frame(width: 160, height: 120)
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("\((item.size.servingSizeAmount.value * scale).toString()) \(item.size.servingSizeAmount.unit.getAbbreviation())")
+                            .bold()
+                        Text("\((item.size.servingAmount.value * scale).toString())\(item.size.servingAmount.unit.getAbbreviation())")
+                            .font(.subheadline).bold()
+                    }
+                }
+            }
         }
         
         private func computeScale() -> Double {

@@ -74,25 +74,7 @@ struct RecipeView: View {
                 Divider()
                 if (!recipe.ingredients.isEmpty) {
                     ForEach(recipe.ingredients, id: \.name) { ingredient in
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(spacing: 6) {
-                                Text("\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation())").bold()
-                                Text("·")
-                                Text(ingredient.name)
-                            }
-                            if !(ingredient.notes ?? "").isEmpty {
-                                Text(ingredient.notes!).font(.caption)
-                                    .fontWeight(.light)
-                                    .italic()
-                                    .lineLimit(2)
-                            }
-                        }.contextMenu {
-                            Button {
-                                sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                        }
+                        ingredientRow(ingredient: ingredient)
                     }
                     Divider()
                 }
@@ -198,6 +180,34 @@ struct RecipeView: View {
             "gauge.with.dots.needle.67percent"
         case .Insane:
             "gauge.with.dots.needle.100percent"
+        }
+    }
+    
+    private func ingredientRow(ingredient: RecipeIngredient) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 6) {
+                Text("\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation())").bold()
+                Text("·")
+                Text(ingredient.name)
+            }
+            if !(ingredient.notes ?? "").isEmpty {
+                Text(ingredient.notes!).font(.caption)
+                    .fontWeight(.light)
+                    .italic()
+                    .lineLimit(2)
+            }
+        }.contextMenu {
+            Button {
+                sheetCoordinator.presentSheet(.EditIngredient(ingredient: ingredient))
+            } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+        } preview: {
+            if let foodItem = ingredient.food {
+                FoodItemPreview(item: foodItem)
+            } else {
+                Text(ingredient.name).bold().padding()
+            }
         }
     }
     

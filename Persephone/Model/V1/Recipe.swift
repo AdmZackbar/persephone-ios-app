@@ -52,6 +52,9 @@ extension SchemaV1 {
                 return nutrients
             }
         }
+        var estimatedCost: FoodItem.Cost {
+            ingredients.reduce(FoodItem.Cost.Cents(0), { $0 + ($1.estimatedCost ?? FoodItem.Cost.Cents(0)) })
+        }
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.recipe)
         var ingredients: [RecipeIngredient] = []
@@ -166,6 +169,17 @@ extension SchemaV1 {
         var amount: FoodAmount
         // Optional notes on this ingredient
         var notes: String?
+        var estimatedCost: FoodItem.Cost? {
+            if let food {
+                if let storeEntry = food.storeEntries
+                    .sorted(by: { $0.costPerUnit(size: food.size) < $1.costPerUnit(size: food.size) })
+                    .first {
+                    let costPerServing = storeEntry.costPerServing(size: food.size)
+                    return .Cents(Int(round(costPerServing * computeNumServings(food: food) * 100)))
+                }
+            }
+            return nil
+        }
         
         init(name: String, food: FoodItem? = nil, recipe: Recipe, amount: FoodAmount, notes: String? = nil) {
             self.name = name
@@ -190,6 +204,16 @@ extension SchemaV1 {
                 }
             }
             return "\(amount.value.toString()) \(amount.unit.getAbbreviation())"
+        }
+        
+        func computeNumServings(food: FoodItem) -> Double {
+            if amount.unit.isWeight() {
+                return try! amount.toGrams().value.toValue() / food.size.servingAmount.toGrams().value.toValue()
+            } else if amount.unit.isVolume() {
+                return try! amount.toMilliliters().value.toValue() / food.size.servingAmount.toMilliliters().value.toValue()
+            }
+            // Assume servings
+            return amount.value.toValue()
         }
     }
 }

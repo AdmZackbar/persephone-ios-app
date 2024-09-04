@@ -179,6 +179,40 @@ extension SchemaV1 {
                 }()
                 return formatter.string(for: toUsd())!
             }
+            
+            static func + (left: Cost, right: Cost) -> Cost {
+                switch left {
+                case .Cents(let l):
+                    switch right {
+                    case .Cents(let r):
+                        return .Cents(l + r)
+                    }
+                }
+            }
+            
+            static func - (left: Cost, right: Cost) -> Cost {
+                switch left {
+                case .Cents(let l):
+                    switch right {
+                    case .Cents(let r):
+                        return .Cents(l - r)
+                    }
+                }
+            }
+            
+            static func * (left: Cost, right: Double) -> Cost {
+                switch left {
+                case .Cents(let l):
+                    return .Cents(Int(round(Double(l) * right)))
+                }
+            }
+            
+            static func / (left: Cost, right: Double) -> Cost {
+                switch left {
+                case .Cents(let l):
+                    return .Cents(Int(round(Double(l) / right)))
+                }
+            }
         }
     }
 }

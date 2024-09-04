@@ -93,9 +93,16 @@ struct RecipeView: View {
                         Text("serving").tag(NutrientViewType.PerServing)
                         Text("recipe").tag(NutrientViewType.Whole)
                     }.pickerStyle(.segmented)
-                    MacroChartView(nutrients: recipe.nutrients, scale: computeNutrientScale())
-                        .frame(width: 180, height: 140)
-                        .fixedSize(horizontal: true, vertical: true)
+                    HStack {
+                        MacroChartView(nutrients: recipe.nutrients, scale: computeNutrientScale())
+                            .frame(width: 180, height: 140)
+                            .fixedSize(horizontal: true, vertical: true)
+                        Spacer()
+                        Text(computeEstimatedCostText())
+                            .font(.title)
+                            .bold()
+                        Spacer()
+                    }
                     NutrientTableView(nutrients: recipe.nutrients, scale: computeNutrientScale())
                 }
             }.padding(EdgeInsets(top: 8, leading: 20, bottom: 12, trailing: 20))
@@ -183,12 +190,25 @@ struct RecipeView: View {
         }
     }
     
+    private func computeEstimatedCostText() -> String {
+        switch nutrientViewType {
+        case .PerServing:
+            (recipe.estimatedCost / recipe.size.numServings).toString()
+        case .Whole:
+            recipe.estimatedCost.toString()
+        }
+    }
+    
     private func ingredientRow(ingredient: RecipeIngredient) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 6) {
                 Text(ingredient.amountToString()).bold()
                 Text("·")
                 Text(ingredient.name)
+                if let cost = ingredient.estimatedCost {
+                    Spacer()
+                    Text(cost.toString()).font(.subheadline).italic()
+                }
             }
             if !(ingredient.notes ?? "").isEmpty {
                 Text(ingredient.notes!).font(.caption)

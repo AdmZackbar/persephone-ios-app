@@ -186,7 +186,7 @@ struct RecipeView: View {
     private func ingredientRow(ingredient: RecipeIngredient) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 6) {
-                Text("\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation())").bold()
+                Text(ingredient.amountToString()).bold()
                 Text("·")
                 Text(ingredient.name)
             }
@@ -222,6 +222,8 @@ struct RecipeView: View {
 #Preview {
     let container = createTestModelContainer()
     let recipe = createTestRecipeItem(container.mainContext)
+    let foodItem = createTestFoodItem(container.mainContext)
+    recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: .Raw(3), unit: .Custom(name: "Serving"))))
     return NavigationStack {
         RecipeView(recipe: recipe)
             .modelContainer(container)

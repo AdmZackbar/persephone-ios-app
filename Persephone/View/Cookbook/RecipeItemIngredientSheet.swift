@@ -171,6 +171,7 @@ struct RecipeItemIngredientSheet: View {
                             case .Add:
                                 recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: unit), notes: notes.isEmpty ? nil : notes))
                             case .Edit(let ingredient):
+                                ingredient.name = foodItem.name
                                 ingredient.amount = FoodAmount(value: amountValue!, unit: unit)
                                 ingredient.notes = notes.isEmpty ? nil : notes
                             }

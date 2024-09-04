@@ -100,7 +100,7 @@ struct RecipeEditor: View {
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation()) · \(ingredient.name)")
+                                Text("\(ingredient.amountToString()) · \(ingredient.name)")
                                 if !(ingredient.notes ?? "").isEmpty {
                                     Text(ingredient.notes!).font(.caption).italic()
                                 }

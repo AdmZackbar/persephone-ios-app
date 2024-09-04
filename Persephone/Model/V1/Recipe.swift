@@ -174,5 +174,22 @@ extension SchemaV1 {
             self.amount = amount
             self.notes = notes
         }
+        
+        func amountToString() -> String {
+            if let food {
+                switch amount.unit {
+                case .Custom(_):
+                    // Assume 'serving'
+                    let servingValue = (amount.value * food.size.servingSizeAmount.value.toValue()).toString()
+                    let servingUnit = food.size.servingSizeAmount.unit.getAbbreviation().lowercased()
+                    let totalAmountValue = (food.size.servingAmount.value * amount.value.toValue()).toString()
+                    let totalAmountUnit = food.size.servingAmount.unit.getAbbreviation()
+                    return "\(servingValue) \(servingUnit) (\(totalAmountValue) \(totalAmountUnit))"
+                default:
+                    break
+                }
+            }
+            return "\(amount.value.toString()) \(amount.unit.getAbbreviation())"
+        }
     }
 }

@@ -219,21 +219,78 @@ private struct ItemsView: View {
     var body: some View {
         List(foodItems.filter({ foodType.containsTags($0.metaData.tags) && isSearchFiltered($0) })) { item in
             NavigationLink(value: FoodDatabaseView.ViewType.ItemView(item: item)) {
-                VStack(alignment: .leading) {
-                    Text(item.name)
-                    HStack {
-                        Text(item.metaData.brand ?? "Custom")
-                            .font(.subheadline)
-                            .fontWeight(.light)
-                            .italic()
-                        Spacer()
-                        if !item.storeEntries.isEmpty {
-                            Text("\(bestCostPerServing(item)) / \(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())")
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(item.name)
+                            .font(.headline)
+                            .bold()
+                        HStack {
+                            Text(item.metaData.brand ?? "Generic")
                                 .font(.subheadline)
                                 .fontWeight(.light)
+                                .italic()
+                            Spacer()
+                            if let rating = item.metaData.rating,
+                               let tier = FoodTier.fromRating(rating: rating) {
+                                Text("\(tier.rawValue) Tier")
+                                    .font(.subheadline)
+                                    .bold()
+                            }
                         }
                     }
-                }.contextMenu {
+                    if let storeEntry = findBestStoreEntry(item) {
+                        HStack(alignment: .bottom, spacing: 16) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(formatUsd(storeEntry.costPerServing(size: item.size)))
+                                    .font(.subheadline)
+                                    .bold()
+                                Text("serving")
+                                    .font(.subheadline)
+                                    .fontWeight(.light)
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(formatUsd(storeEntry.costPerServingAmount(size: item.size)))
+                                    .font(.subheadline)
+                                    .bold()
+                                Text(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())
+                                    .lineLimit(1)
+                                    .font(.subheadline)
+                                    .fontWeight(.light)
+                            }
+                            Spacer()
+                            if let costPerEnergy = storeEntry.costPerEnergy(foodItem: item) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(formatUsd(costPerEnergy))
+                                        .font(.subheadline)
+                                        .bold()
+                                    Text("100 Cal")
+                                        .font(.subheadline)
+                                        .fontWeight(.light)
+                                }
+                            }
+                            if item.size.totalAmount.unit.isWeight() {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(formatUsd(storeEntry.costPerWeight(size: item.size)))
+                                        .font(.subheadline)
+                                        .bold()
+                                    Text("100 g")
+                                        .font(.subheadline)
+                                        .fontWeight(.light)
+                                }
+                            } else if item.size.totalAmount.unit.isVolume() {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(formatUsd(storeEntry.costPerVolume(size: item.size)))
+                                        .font(.subheadline)
+                                        .bold()
+                                    Text("100 mL")
+                                        .font(.subheadline)
+                                        .fontWeight(.light)
+                                }
+                            }
+                        }
+                    }
+                }
+                .contextMenu {
                     Button {
                         path.append(.ItemEdit(item: item))
                     } label: {
@@ -258,8 +315,12 @@ private struct ItemsView: View {
         return formatter
     }()
     
-    private func bestCostPerServing(_ item: FoodItem) -> String {
-        currencyFormatter.string(for: item.storeEntries.map({ entry in entry.costPerServingAmount(size: item.size) }).sorted().first!)!
+    private func findBestStoreEntry(_ item: FoodItem) -> FoodItem.StoreEntry? {
+        item.storeEntries.sorted(by: { $0.costPerServingAmount(size: item.size) < $1.costPerServingAmount(size: item.size) }).first
+    }
+    
+    private func formatUsd(_ cost: Double) -> String {
+        currencyFormatter.string(for: cost)!
     }
 }
 

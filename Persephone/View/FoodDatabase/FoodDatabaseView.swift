@@ -26,7 +26,7 @@ struct FoodDatabaseView: View {
         }
         
         func containsTags(_ tags: [String]) -> Bool {
-            (name == "None" && tags.isEmpty) || name == "All" || tags.contains(where: { containsTag($0) })
+            name == "All" || tags.contains(where: { containsTag($0) })
         }
         
         func containsTag(_ tag: String) -> Bool {
@@ -42,16 +42,24 @@ struct FoodDatabaseView: View {
             .init("Spirits"),
             .init("Wine")
         ]),
-        .init("Bread", children: [
-            .init("Buns")
+        .init("Carbs", children: [
+            .init("Bread", children: [
+                .init("Buns")
+            ]),
+            .init("Cereal"),
+            .init("Crackers"),
+            .init("Fries"),
+            .init("Pasta"),
+            .init("Rice"),
+            .init("Tortilla")
         ]),
-        .init("Cereal"),
-        .init("Chocolate"),
         .init("Condiment", children: [
+            .init("BBQ Sauce"),
+            .init("Ketchup"),
+            .init("Maple Syrup"),
             .init("Salt"),
             .init("Sauce")
         ]),
-        .init("Cookies"),
         .init("Dairy", children: [
             .init("Cheese"),
             .init("Eggs"),
@@ -59,38 +67,46 @@ struct FoodDatabaseView: View {
             .init("Milk"),
             .init("Yogurt")
         ]),
-        .init("Fruit"),
+        .init("Fruit", children: [
+            .init("Apple"),
+            .init("Berries"),
+            .init("Grapes"),
+            .init("Orange")
+        ]),
         .init("Ingredients", children: [
             .init("Baking Soda"),
             .init("Butter"),
             .init("Flour"),
             .init("Ginger"),
-            .init("Honey"),
             .init("Mix"),
-            .init("Sugar")
+            .init("Olive Oil"),
         ]),
         .init("Juice"),
         .init("Meat", children: [
+            .init("Bacon"),
             .init("Beef"),
             .init("Chicken"),
-            .init("Pork")
+            .init("Pork"),
+            .init("Turkey")
         ]),
-        .init("Pasta"),
-        .init("Pastry"),
-        .init("Rice"),
         .init("Snack", children: [
             .init("Granola"),
             .init("Granola Bar"),
             .init("Protein Bar")
         ]),
         .init("Soda"),
-        .init("Tortilla"),
+        .init("Sweets", children: [
+            .init("Chocolate"),
+            .init("Cookies"),
+            .init("Honey"),
+            .init("Pastry"),
+            .init("Sugar")
+        ]),
         .init("Vegetable", children: [
             .init("Broccoli"),
             .init("Green Beans"),
             .init("Onion"),
-        ]),
-        .init("None")
+        ])
     ]
     
     enum ViewType: Hashable {
@@ -206,10 +222,51 @@ struct FoodDatabaseView: View {
 private struct ItemsView: View {
     @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
     
+    enum SortType: Identifiable, CaseIterable {
+        var id: String {
+            get { getName() }
+        }
+        
+        case Name
+        case Brand
+        case DateAdded
+        
+        func getName() -> String {
+            switch self {
+            case .Name:
+                "Name"
+            case .Brand:
+                "Brand"
+            case .DateAdded:
+                "Date Added"
+            }
+        }
+    }
+    
+    enum SortDirection: Identifiable, CaseIterable {
+        var id: String {
+            get { getIcon() }
+        }
+        
+        case Ascending
+        case Descending
+        
+        func getIcon() -> String {
+            switch self {
+            case .Ascending:
+                "arrow.up"
+            case .Descending:
+                "arrow.down"
+            }
+        }
+    }
+    
     let foodType: FoodDatabaseView.FoodType
     
     @Binding private var path: [FoodDatabaseView.ViewType]
     @State private var search: String = ""
+    @State private var sortType: SortType = .Name
+    @State private var sortDirection: SortDirection = .Ascending
     
     init(path: Binding<[FoodDatabaseView.ViewType]>, foodType: FoodDatabaseView.FoodType) {
         self._path = path
@@ -217,7 +274,29 @@ private struct ItemsView: View {
     }
     
     var body: some View {
-        List(foodItems.filter({ foodType.containsTags($0.metaData.tags) && isSearchFiltered($0) })) { item in
+        List(foodItems.filter({ foodType.containsTags($0.metaData.tags) && isSearchFiltered($0) })
+            .sorted(by: {
+                switch sortDirection {
+                case .Ascending:
+                    switch sortType {
+                    case .Name:
+                        $0.name < $1.name
+                    case .Brand:
+                        $0.metaData.brand ?? "" < $1.metaData.brand ?? ""
+                    case .DateAdded:
+                        $0.metaData.timestamp < $1.metaData.timestamp
+                    }
+                case .Descending:
+                    switch sortType {
+                    case .Name:
+                        $0.name > $1.name
+                    case .Brand:
+                        $0.metaData.brand ?? "" > $1.metaData.brand ?? ""
+                    case .DateAdded:
+                        $0.metaData.timestamp > $1.metaData.timestamp
+                    }
+                }
+            })) { item in
             NavigationLink(value: FoodDatabaseView.ViewType.ItemView(item: item)) {
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading, spacing: 4) {
@@ -302,6 +381,29 @@ private struct ItemsView: View {
             }
         }.navigationTitle(foodType.name)
             .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always))
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu("Sort") {
+                        ForEach(SortType.allCases) { s in
+                            Button(s.getName()) {
+                                sortType = s
+                            }.disabled(sortType == s)
+                        }
+                    }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        switch sortDirection {
+                        case .Ascending:
+                            sortDirection = .Descending
+                        case .Descending:
+                            sortDirection = .Ascending
+                        }
+                    } label: {
+                        Image(systemName: sortDirection.getIcon())
+                    }
+                }
+            }
     }
     
     private func isSearchFiltered(_ item: FoodItem) -> Bool {

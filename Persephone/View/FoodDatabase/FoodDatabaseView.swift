@@ -180,27 +180,25 @@ struct FoodDatabaseView: View {
         selectedItem = item
     }
     
+    @ViewBuilder
     private func handleNavigation(viewType: ViewType) -> some View {
-        // TODO improve this
-        VStack {
-            switch viewType {
-            case .ItemsView(let type):
-                ItemsView(path: $path, foodType: type)
-            case .ItemView(let item):
-                FoodItemView(path: $path, item: item)
-            case .ItemAdd:
-                FoodItemEditor(path: $path)
-            case .ItemEdit(let item):
-                FoodItemEditor(path: $path, item: item)
-            case .ItemConfirm(let item):
-                FoodItemEditor(path: $path, item: item, mode: .Confirm)
-            case .ScanItem:
-                ScanFoodView(path: $path)
-            case .LookupItem:
-                LookupFoodView(path: $path)
-            case .ExportItems(let items):
-                FoodDatabaseExportView(foodItems: items)
-            }
+        switch viewType {
+        case .ItemsView(let type):
+            ItemsView(path: $path, foodType: type)
+        case .ItemView(let item):
+            FoodItemView(path: $path, item: item)
+        case .ItemAdd:
+            FoodItemEditor(path: $path)
+        case .ItemEdit(let item):
+            FoodItemEditor(path: $path, item: item)
+        case .ItemConfirm(let item):
+            FoodItemEditor(path: $path, item: item, mode: .Confirm)
+        case .ScanItem:
+            ScanFoodView(path: $path)
+        case .LookupItem:
+            LookupFoodView(path: $path)
+        case .ExportItems(let items):
+            FoodDatabaseExportView(foodItems: items)
         }
     }
 }

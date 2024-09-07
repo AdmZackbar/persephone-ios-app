@@ -190,8 +190,8 @@ private struct StoreItemView: View {
         }
     }
     
-    private func formatCost(_ cost: Double) -> String {
-        currencyFormatter.string(for: cost)!
+    private func formatCost(_ cost: FoodItem.Cost) -> String {
+        currencyFormatter.string(for: cost.toUsd())!
     }
 }
 

@@ -175,7 +175,7 @@ extension SchemaV1 {
                     .sorted(by: { $0.costPerUnit(size: food.size) < $1.costPerUnit(size: food.size) })
                     .first {
                     let costPerServing = storeEntry.costPerServing(size: food.size)
-                    return .Cents(Int(round(costPerServing * computeNumServings(food: food) * 100)))
+                    return costPerServing * computeNumServings(food: food) * 100
                 }
             }
             return nil

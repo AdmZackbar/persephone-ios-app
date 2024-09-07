@@ -320,7 +320,7 @@ private struct ItemsView: View {
                     if let storeEntry = findBestStoreEntry(item) {
                         HStack(alignment: .bottom, spacing: 16) {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(formatUsd(storeEntry.costPerServing(size: item.size)))
+                                Text(storeEntry.costPerServing(size: item.size).toString())
                                     .font(.subheadline)
                                     .bold()
                                 Text("serving")
@@ -328,7 +328,7 @@ private struct ItemsView: View {
                                     .fontWeight(.light)
                             }
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(formatUsd(storeEntry.costPerServingAmount(size: item.size)))
+                                Text(storeEntry.costPerServingAmount(size: item.size).toString())
                                     .font(.subheadline)
                                     .bold()
                                 Text(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())
@@ -339,7 +339,7 @@ private struct ItemsView: View {
                             Spacer()
                             if let costPerEnergy = storeEntry.costPerEnergy(foodItem: item) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(formatUsd(costPerEnergy))
+                                    Text(costPerEnergy.toString())
                                         .font(.subheadline)
                                         .bold()
                                     Text("100 Cal")
@@ -349,7 +349,7 @@ private struct ItemsView: View {
                             }
                             if item.size.totalAmount.unit.isWeight() {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(formatUsd(storeEntry.costPerWeight(size: item.size)))
+                                    Text(storeEntry.costPerWeight(size: item.size).toString())
                                         .font(.subheadline)
                                         .bold()
                                     Text("100 g")
@@ -358,7 +358,7 @@ private struct ItemsView: View {
                                 }
                             } else if item.size.totalAmount.unit.isVolume() {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(formatUsd(storeEntry.costPerVolume(size: item.size)))
+                                    Text(storeEntry.costPerVolume(size: item.size).toString())
                                         .font(.subheadline)
                                         .bold()
                                     Text("100 mL")
@@ -419,10 +419,6 @@ private struct ItemsView: View {
     
     private func findBestStoreEntry(_ item: FoodItem) -> FoodItem.StoreEntry? {
         item.storeEntries.sorted(by: { $0.costPerServingAmount(size: item.size) < $1.costPerServingAmount(size: item.size) }).first
-    }
-    
-    private func formatUsd(_ cost: Double) -> String {
-        currencyFormatter.string(for: cost)!
     }
 }
 

@@ -107,21 +107,21 @@ struct FoodItemPreview: View {
             Spacer()
             if let perEnergy = storeEntry.costPerEnergy(foodItem: item) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(formatCost(perEnergy))
+                    Text(perEnergy.toString())
                         .font(.subheadline).bold()
                     Text("100 cal")
                         .font(.caption).italic()
                 }
             } else if item.size.totalAmount.unit.isWeight() {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(formatCost(storeEntry.costPerWeight(size: item.size)))
+                    Text(storeEntry.costPerWeight(size: item.size).toString())
                         .font(.subheadline).bold()
                     Text("100 g")
                         .font(.caption).italic()
                 }
             } else if item.size.totalAmount.unit.isVolume() {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(formatCost(storeEntry.costPerVolume(size: item.size)))
+                    Text(storeEntry.costPerVolume(size: item.size).toString())
                         .font(.subheadline).bold()
                     Text("100 mL")
                         .font(.caption).italic()
@@ -129,14 +129,14 @@ struct FoodItemPreview: View {
             }
             if item.size.numServings != 1 && item.size.servingSizeAmount.value.toValue() != 1 {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(formatCost(storeEntry.costPerServing(size: item.size)))
+                    Text(storeEntry.costPerServing(size: item.size).toString())
                         .font(.subheadline).bold()
                     Text("serving")
                         .font(.caption).italic()
                 }
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text(formatCost(storeEntry.costPerServingAmount(size: item.size)))
+                Text(storeEntry.costPerServingAmount(size: item.size).toString())
                     .font(.subheadline).bold()
                 Text(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())
                     .font(.caption).italic()
@@ -148,28 +148,17 @@ struct FoodItemPreview: View {
         switch costType {
         case .Collection(let cost, let quantity):
             if quantity == 1 {
-                return costToString(cost)
+                return cost.toString()
             } else {
-                return "\(quantity) for \(costToString(cost))"
+                return "\(quantity) for \(cost.toString())"
             }
         case .PerAmount(let cost, let amount):
             if amount.value.toValue() == 1 {
-                return "\(costToString(cost)) per \(amount.unit.getAbbreviation())"
+                return "\(cost.toString()) per \(amount.unit.getAbbreviation())"
             } else {
-                return "\(costToString(cost)) per \(formatter.string(for: amount.value.toValue())!) \(amount.unit.getAbbreviation())"
+                return "\(cost.toString()) per \(formatter.string(for: amount.value.toValue())!) \(amount.unit.getAbbreviation())"
             }
         }
-    }
-    
-    private func costToString(_ cost: FoodItem.Cost) -> String {
-        switch cost {
-        case .Cents(let cents):
-            return formatCost(Double(cents) / 100)
-        }
-    }
-    
-    private func formatCost(_ cost: Double) -> String {
-        currencyFormatter.string(for: cost)!
     }
 }
 

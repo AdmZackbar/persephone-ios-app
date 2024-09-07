@@ -114,45 +114,45 @@ extension SchemaV1 {
             var available: Bool = true
             var sale: Bool = false
             
-            func costPerUnit(size: Size) -> Double {
+            func costPerUnit(size: Size) -> Cost {
                 switch costType {
                 case .Collection(let cost, let quantity):
-                    cost.toUsd() / Double(quantity)
+                    cost / Double(quantity)
                 case .PerAmount(let cost, let amount):
                     if amount.unit.isWeight() && size.totalAmount.unit.isWeight() {
-                        cost.toUsd() / Double(amount.value.toValue()) * (try! size.totalAmount.toGrams().value.toValue() / amount.toGrams().value.toValue())
+                        cost / Double(amount.value.toValue()) * (try! size.totalAmount.toGrams().value.toValue() / amount.toGrams().value.toValue())
                     } else if amount.unit.isVolume() && size.totalAmount.unit.isVolume() {
-                        cost.toUsd() / Double(amount.value.toValue()) * (try! size.totalAmount.toMilliliters().value.toValue() / amount.toMilliliters().value.toValue())
+                        cost / Double(amount.value.toValue()) * (try! size.totalAmount.toMilliliters().value.toValue() / amount.toMilliliters().value.toValue())
                     } else {
                         // TODO handle case
-                        cost.toUsd() / Double(amount.value.toValue())
+                        cost / Double(amount.value.toValue())
                     }
                 }
             }
             
-            func costPerServing(size: Size) -> Double {
+            func costPerServing(size: Size) -> Cost {
                 costPerUnit(size: size) / size.numServings
             }
             
-            func costPerServingAmount(size: Size) -> Double {
+            func costPerServingAmount(size: Size) -> Cost {
                 costPerServing(size: size) / size.servingSizeAmount.value.toValue()
             }
             
-            func costPerEnergy(foodItem: FoodItem) -> Double? {
+            func costPerEnergy(foodItem: FoodItem) -> Cost? {
                 let caloriesPerServing = foodItem.getNutrient(.Energy)?.value.toValue() ?? 0
                 if caloriesPerServing <= 0 {
                     return nil
                 }
                 let totalCal = foodItem.size.numServings * caloriesPerServing
-                return (costPerUnit(size: foodItem.size) / totalCal) * 100
+                return costPerUnit(size: foodItem.size) * (100 / totalCal)
             }
             
-            func costPerWeight(size: Size) -> Double {
-                try! (costPerUnit(size: size) / size.totalAmount.toGrams().value.toValue()) * 100
+            func costPerWeight(size: Size) -> Cost {
+                try! costPerUnit(size: size) * (100 / size.totalAmount.toGrams().value.toValue())
             }
             
-            func costPerVolume(size: Size) -> Double {
-                try! (costPerUnit(size: size) / size.totalAmount.toMilliliters().value.toValue()) * 100
+            func costPerVolume(size: Size) -> Cost {
+                try! costPerUnit(size: size) * (100 / size.totalAmount.toMilliliters().value.toValue())
             }
         }
         
@@ -161,8 +161,15 @@ extension SchemaV1 {
             case PerAmount(cost: Cost, amount: FoodAmount)
         }
         
-        enum Cost: Codable, Equatable, Hashable {
+        enum Cost: Codable, Equatable, Hashable, Comparable {
             case Cents(_ amount: Int)
+            
+            static let formatter: NumberFormatter = {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .currency
+                formatter.maximumFractionDigits = 2
+                return formatter
+            }()
             
             func toUsd() -> Double {
                 switch self {
@@ -172,13 +179,11 @@ extension SchemaV1 {
             }
             
             func toString() -> String {
-                let formatter: NumberFormatter = {
-                    let formatter = NumberFormatter()
-                    formatter.numberStyle = .currency
-                    formatter.maximumFractionDigits = 2
-                    return formatter
-                }()
-                return formatter.string(for: toUsd())!
+                return Cost.formatter.string(for: toUsd())!
+            }
+            
+            static func < (lhs: Cost, rhs: Cost) -> Bool {
+                return lhs.toUsd() < rhs.toUsd()
             }
             
             static func + (left: Cost, right: Cost) -> Cost {

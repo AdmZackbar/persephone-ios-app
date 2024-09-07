@@ -51,6 +51,7 @@ struct StoreItemSheet: View {
     @State private var unit: FoodUnit = .Pound
     @State private var price: Int = 0
     @State private var available: Bool = true
+    @State private var sale: Bool = false
     
     let currencyFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -104,6 +105,9 @@ struct StoreItemSheet: View {
                         TextField("", value: $amount, formatter: formatter)
                     }
                 }
+                Toggle(isOn: $sale) {
+                    Text("Sale:")
+                }
                 Toggle(isOn: $available) {
                     Text("Available:")
                 }
@@ -139,6 +143,7 @@ struct StoreItemSheet: View {
                     default:
                         break
                     }
+                    self.sale = item.wrappedValue.sale
                     self.available = item.wrappedValue.available
                 default:
                     break
@@ -149,10 +154,11 @@ struct StoreItemSheet: View {
     private func save() {
         switch mode {
         case .Add(let items):
-            items.wrappedValue.append(FoodItem.StoreEntry(storeName: storeName, costType: computeCostType(), available: available))
+            items.wrappedValue.append(FoodItem.StoreEntry(storeName: storeName, costType: computeCostType(), available: available, sale: sale))
         case .Edit(let item):
             item.wrappedValue.storeName = storeName
             item.wrappedValue.costType = computeCostType()
+            item.wrappedValue.sale = sale
             item.wrappedValue.available = available
         }
     }

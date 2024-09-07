@@ -206,12 +206,17 @@ struct FoodItemEditor: View {
     
     private func storeSection() -> some View {
         Section("Store Listings") {
-            List($storeItems, id: \.storeName) { $storeItem in
+            List($storeItems, id: \.hashValue) { $storeItem in
                 Button {
                     sheetCoordinator.presentSheet(.EditStoreItem(item: $storeItem))
                 } label: {
                     HStack {
                         Text(storeItem.storeName).bold()
+                        if storeItem.sale {
+                            Text("(sale)").font(.subheadline).fontWeight(.light)
+                        } else if !storeItem.available {
+                            Text("(retired)").font(.subheadline).fontWeight(.light)
+                        }
                         Spacer()
                         switch storeItem.costType {
                         case .Collection(let cost, let quantity):

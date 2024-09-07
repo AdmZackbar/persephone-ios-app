@@ -111,7 +111,8 @@ extension SchemaV1 {
         struct StoreEntry: Codable, Equatable, Hashable {
             var storeName: String
             var costType: CostType
-            var available: Bool
+            var available: Bool = true
+            var sale: Bool = false
             
             func costPerUnit(size: Size) -> Double {
                 switch costType {

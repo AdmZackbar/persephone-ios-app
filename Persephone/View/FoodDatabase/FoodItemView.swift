@@ -91,20 +91,20 @@ struct FoodItemView: View {
 
 private struct StoreItemsTabView: View {
     @ObservedObject var sheetCoordinator: SheetCoordinator<FoodSheetEnum>
-    @State private var tabSelection: String
+    @State private var tabSelection: FoodItem.StoreEntry
     
     @State var foodItem: FoodItem
     
     init(sheetCoordinator: SheetCoordinator<FoodSheetEnum>, foodItem: FoodItem) {
         self.sheetCoordinator = sheetCoordinator
         self.foodItem = foodItem
-        self.tabSelection = foodItem.storeEntries.first!.storeName
+        self.tabSelection = foodItem.storeEntries.first!
     }
     
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $tabSelection) {
-                ForEach($foodItem.storeEntries, id: \.storeName) { $storeItem in
+                ForEach($foodItem.storeEntries, id: \.hashValue) { $storeItem in
                     StoreItemView(foodItem: foodItem, storeItem: storeItem)
                         .contentShape(Rectangle())
                         .contextMenu {
@@ -114,6 +114,7 @@ private struct StoreItemsTabView: View {
                                 Label("Edit", systemImage: "pencil")
                             }
                         }
+                        .tag(storeItem)
                 }
             }.frame(maxWidth: .infinity)
                 .tabViewStyle(.page(indexDisplayMode: .never))
@@ -121,10 +122,10 @@ private struct StoreItemsTabView: View {
             if foodItem.storeEntries.count > 1 {
                 HStack {
                     HStack(spacing: 6) {
-                        ForEach(foodItem.storeEntries, id: \.storeName) { storeItem in
+                        ForEach(foodItem.storeEntries, id: \.hashValue) { storeItem in
                             Image(systemName: "circle.fill")
                                 .font(.system(size: 8))
-                                .foregroundStyle(tabSelection == storeItem.storeName ? Color.accentColor : .gray)
+                                .foregroundStyle(tabSelection == storeItem ? Color.accentColor : .gray)
                         }
                     }
                     Spacer()
@@ -144,7 +145,7 @@ private struct StoreItemView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(storeItem.storeName).font(.title2).bold()
                 Text(computeCostSummary())
-                Text(storeItem.available ? "Available" : "Retired").font(.subheadline).italic()
+                Text(storeItem.sale ? "Sale" : (storeItem.available ? "Available" : "Retired")).font(.subheadline).italic()
                 Spacer()
             }
             Spacer()
@@ -177,7 +178,7 @@ private struct StoreItemView: View {
                     Text("per 100 mL").font(.caption).fontWeight(.light)
                 }
             }
-        }.padding(12).tag(storeItem.storeName)
+        }.padding(12)
     }
     
     private func computeCostSummary() -> String {

@@ -40,9 +40,9 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
                         ),
                         size: FoodItem.Size(totalAmount: FoodAmount.grams(225), numServings: 5, servingSize: "1 unit"),
                         storeEntries: [
-                            FoodItem.StoreEntry(storeName: "Store 1", costType: .Collection(cost: .Cents(599), quantity: 2), available: true),
-                            FoodItem.StoreEntry(storeName: "Store 2", costType: .Collection(cost: .Cents(1099), quantity: 3), available: true),
-                            FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: FoodAmount(value: .Raw(1), unit: .Pound)), available: true)
+                            FoodItem.StoreEntry(storeName: "Store 1", costType: .Collection(cost: .Cents(599), quantity: 2)),
+                            FoodItem.StoreEntry(storeName: "Store 2", costType: .Collection(cost: .Cents(1099), quantity: 3)),
+                            FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: FoodAmount(value: .Raw(1), unit: .Pound)))
                         ])
     context.insert(item)
     return item

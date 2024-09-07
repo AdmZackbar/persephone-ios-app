@@ -81,7 +81,7 @@ struct FoodItemPreview: View {
                     .filter { $0.available }
                     // Sort by best to worst price
                     .sorted { $0.costPerUnit(size: item.size) < $1.costPerUnit(size: item.size) }
-                        , id: \.storeName) { storeEntry in
+                        , id: \.hashValue) { storeEntry in
                     Divider()
                     createStoreEntryView(storeEntry)
                 }
@@ -92,7 +92,14 @@ struct FoodItemPreview: View {
     func createStoreEntryView(_ storeEntry: FoodItem.StoreEntry) -> some View {
         HStack(alignment: .bottom, spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(storeEntry.storeName).bold()
+                HStack {
+                    Text(storeEntry.storeName).bold()
+                    if storeEntry.sale {
+                        Text("(Sale)").font(.subheadline).italic()
+                    } else if !storeEntry.available {
+                        Text("(Retired)").font(.subheadline).italic()
+                    }
+                }
                 Text(formatItemCost(storeEntry.costType))
                     .italic()
                     .font(.subheadline)

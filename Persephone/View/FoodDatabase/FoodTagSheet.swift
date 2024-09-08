@@ -19,7 +19,6 @@ struct FoodTagSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                createDefaultTagMenu()
                 HStack {
                     TextField("Custom tag", text: $customTag).onSubmit(addCustomTag)
                     Button(action: addCustomTag) {
@@ -59,43 +58,6 @@ struct FoodTagSheet: View {
                     }
                 }
         }.presentationDetents([.medium])
-    }
-    
-    private func createDefaultTagMenu() -> some View {
-        Menu("Add Default Tag...") {
-            createButton("Dairy")
-            Menu("Drinks") {
-                Menu("Alcohol") {
-                    createButton("Alcohol")
-                    Divider()
-                    createButton("Beer")
-                    createButton("Spirits")
-                    createButton("Wine")
-                }
-                createButton("Coffee")
-                createButton("Cola")
-                createButton("Energy Drink")
-                createButton("Juice")
-                createButton("Milk")
-                createButton("Sports Drink")
-                createButton("Tea")
-            }
-            createButton("Fruit")
-            Menu("Grains") {
-                createButton("Bread")
-            }
-            Menu("Meats") {
-                createButton("Meat")
-                Divider()
-                createButton("Beef")
-                createButton("Chicken")
-                createButton("Fish")
-                createButton("Lamb")
-                createButton("Pork")
-                createButton("Turkey")
-            }
-            createButton("Vegetable")
-        }
     }
     
     private func createButton(_ name: String) -> some View {

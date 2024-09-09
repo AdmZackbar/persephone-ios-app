@@ -261,12 +261,31 @@ private struct ItemsView: View {
         }
     }
     
+    enum ViewType: Identifiable, CaseIterable {
+        var id: String {
+            get { getName() }
+        }
+        
+        case Macro
+        case Cost
+        
+        func getName() -> String {
+            switch self {
+            case .Macro:
+                "Macros"
+            case .Cost:
+                "Cost"
+            }
+        }
+    }
+    
     let foodType: FoodDatabaseView.FoodType
     
     @Binding private var path: [FoodDatabaseView.ViewType]
     @State private var search: String = ""
     @State private var sortType: SortType = .Name
     @State private var sortDirection: SortDirection = .Ascending
+    @State private var viewType: ViewType = .Cost
     
     init(path: Binding<[FoodDatabaseView.ViewType]>, foodType: FoodDatabaseView.FoodType) {
         self._path = path
@@ -298,90 +317,29 @@ private struct ItemsView: View {
                 }
             })) { item in
             NavigationLink(value: FoodDatabaseView.ViewType.ItemView(item: item)) {
-                VStack(alignment: .leading, spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(item.name)
-                            .font(.headline)
-                            .bold()
-                        HStack {
-                            Text(item.metaData.brand ?? "Generic")
-                                .font(.subheadline)
-                                .fontWeight(.light)
-                                .italic()
-                            Spacer()
-                            if let rating = item.metaData.rating,
-                               let tier = FoodTier.fromRating(rating: rating) {
-                                Text("\(tier.rawValue) Tier")
-                                    .font(.subheadline)
-                                    .bold()
-                            }
+                itemView(item)
+                    .contextMenu {
+                        Button {
+                            path.append(.ItemEdit(item: item))
+                        } label: {
+                            Label("Edit", systemImage: "pencil.circle")
                         }
+                    } preview: {
+                        FoodItemPreview(item: item)
                     }
-                    if let storeEntry = findBestStoreEntry(item) {
-                        HStack(alignment: .bottom, spacing: 16) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(storeEntry.costPerServing(size: item.size).toString())
-                                    .font(.subheadline)
-                                    .bold()
-                                Text("serving")
-                                    .font(.subheadline)
-                                    .fontWeight(.light)
-                            }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(storeEntry.costPerServingAmount(size: item.size).toString())
-                                    .font(.subheadline)
-                                    .bold()
-                                Text(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())
-                                    .lineLimit(1)
-                                    .font(.subheadline)
-                                    .fontWeight(.light)
-                            }
-                            Spacer()
-                            if let costPerEnergy = storeEntry.costPerEnergy(foodItem: item) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(costPerEnergy.toString())
-                                        .font(.subheadline)
-                                        .bold()
-                                    Text("100 Cal")
-                                        .font(.subheadline)
-                                        .fontWeight(.light)
-                                }
-                            }
-                            if item.size.totalAmount.unit.isWeight() {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(storeEntry.costPerWeight(size: item.size).toString())
-                                        .font(.subheadline)
-                                        .bold()
-                                    Text("100 g")
-                                        .font(.subheadline)
-                                        .fontWeight(.light)
-                                }
-                            } else if item.size.totalAmount.unit.isVolume() {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(storeEntry.costPerVolume(size: item.size).toString())
-                                        .font(.subheadline)
-                                        .bold()
-                                    Text("100 mL")
-                                        .font(.subheadline)
-                                        .fontWeight(.light)
-                                }
-                            }
-                        }
-                    }
-                }
-                .contextMenu {
-                    Button {
-                        path.append(.ItemEdit(item: item))
-                    } label: {
-                        Label("Edit", systemImage: "pencil.circle")
-                    }
-                } preview: {
-                    FoodItemPreview(item: item)
-                }
             }
         }.navigationTitle(foodType.name)
             .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always))
             .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu("View") {
+                        ForEach(ViewType.allCases) { v in
+                            Button(v.getName()) {
+                                viewType = v
+                            }.disabled(viewType == v)
+                        }
+                    }
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Menu("Sort") {
                         ForEach(SortType.allCases) { s in
@@ -419,6 +377,109 @@ private struct ItemsView: View {
     
     private func findBestStoreEntry(_ item: FoodItem) -> FoodItem.StoreEntry? {
         item.storeEntries.sorted(by: { $0.costPerServingAmount(size: item.size) < $1.costPerServingAmount(size: item.size) }).first
+    }
+    
+    @ViewBuilder
+    private func itemView(_ item: FoodItem) -> some View {
+        switch viewType {
+        case .Macro:
+            HStack(alignment: .top, spacing: 2) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.name)
+                        .font(.headline)
+                        .bold()
+                    Text(item.metaData.brand ?? "Generic")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                        .italic()
+                    if let rating = item.metaData.rating,
+                       let tier = FoodTier.fromRating(rating: rating) {
+                        Text("\(tier.rawValue) Tier")
+                            .font(.subheadline)
+                            .bold()
+                    }
+                }
+                Spacer()
+                MacroChartView(nutrients: item.ingredients.nutrients)
+                    .frame(width: 140, height: 100)
+            }
+        case .Cost:
+            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.name)
+                        .font(.headline)
+                        .bold()
+                    HStack {
+                        Text(item.metaData.brand ?? "Generic")
+                            .font(.subheadline)
+                            .fontWeight(.light)
+                            .italic()
+                        Spacer()
+                        if let rating = item.metaData.rating,
+                           let tier = FoodTier.fromRating(rating: rating) {
+                            Text("\(tier.rawValue) Tier")
+                                .font(.subheadline)
+                                .bold()
+                        }
+                    }
+                }
+                if let storeEntry = findBestStoreEntry(item) {
+                    storeEntryView(item: item, storeEntry: storeEntry)
+                }
+            }
+        }
+    }
+    
+    private func storeEntryView(item: FoodItem, storeEntry: FoodItem.StoreEntry) -> some View {
+        HStack(alignment: .bottom, spacing: 16) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(storeEntry.costPerServing(size: item.size).toString())
+                    .font(.subheadline)
+                    .bold()
+                Text("serving")
+                    .font(.subheadline)
+                    .fontWeight(.light)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(storeEntry.costPerServingAmount(size: item.size).toString())
+                    .font(.subheadline)
+                    .bold()
+                Text(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())
+                    .lineLimit(1)
+                    .font(.subheadline)
+                    .fontWeight(.light)
+            }
+            Spacer()
+            if let costPerEnergy = storeEntry.costPerEnergy(foodItem: item) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(costPerEnergy.toString())
+                        .font(.subheadline)
+                        .bold()
+                    Text("100 Cal")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                }
+            }
+            if item.size.totalAmount.unit.isWeight() {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(storeEntry.costPerWeight(size: item.size).toString())
+                        .font(.subheadline)
+                        .bold()
+                    Text("100 g")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                }
+            } else if item.size.totalAmount.unit.isVolume() {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(storeEntry.costPerVolume(size: item.size).toString())
+                        .font(.subheadline)
+                        .bold()
+                    Text("100 mL")
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                }
+            }
+        }
     }
 }
 

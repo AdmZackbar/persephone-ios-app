@@ -93,95 +93,10 @@ struct RecipeEditor: View {
                 TextField("description", text: $details, axis: .vertical)
                     .textInputAutocapitalization(.sentences).lineLimit(3...10)
             }
-            Section("Ingredients") {
-                List(recipe.ingredients, id: \.name) { ingredient in
-                    Button {
-                        editIngredient(ingredient)
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("\(ingredient.amountToString()) · \(ingredient.name)")
-                                if !(ingredient.notes ?? "").isEmpty {
-                                    Text(ingredient.notes!).font(.caption).italic()
-                                }
-                            }
-                            Spacer()
-                        }.contentShape(Rectangle())
-                    }.buttonStyle(.plain)
-                        .swipeActions(allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                recipe.ingredients.removeAll { i in i == ingredient }
-                            } label: {
-                                Label("Delete", systemImage: "trash.fill")
-                            }
-                            Button {
-                                editIngredient(ingredient)
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                        }
-                        .contextMenu {
-                            Button {
-                                editIngredient(ingredient)
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                            Button(role: .destructive) {
-                                recipe.ingredients.removeAll { i in i == ingredient }
-                            } label: {
-                                Label("Delete", systemImage: "trash.fill")
-                            }
-                        } preview: {
-                            if let foodItem = ingredient.food {
-                                FoodItemPreview(item: foodItem)
-                            } else {
-                                Text(ingredient.name).padding()
-                            }
-                        }
-                }
-                Menu {
-                    Button("Food Item Ingredient...") {
-                        sheetCoordinator.presentSheet(.AddItemIngredient(recipe: recipe))
-                    }
-                    Button("Custom Ingredient...") {
-                        sheetCoordinator.presentSheet(.AddIngredient(recipe: recipe))
-                    }
-                } label: {
-                    Label("Add Ingredient...", systemImage: "plus")
-                }
+            if mode == .Edit {
+                ingredientsSection()
             }
-            Section("Instructions") {
-                List(instructions, id: \.header) { section in
-                    Button {
-                        sheetCoordinator.presentSheet(.EditInstructions(section: section))
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(section.header).font(.headline)
-                                Text(section.details).lineLimit(3).font(.caption)
-                            }
-                            Spacer()
-                        }.contentShape(Rectangle())
-                    }.buttonStyle(.plain)
-                        .swipeActions(allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                instructions.removeAll { s in s == section }
-                            } label: {
-                                Label("Delete", systemImage: "trash.fill")
-                            }
-                            Button {
-                                sheetCoordinator.presentSheet(.EditInstructions(section: section))
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                        }
-                }
-                Button {
-                    sheetCoordinator.presentSheet(.AddInstructions(instructions: $instructions))
-                } label: {
-                    Label("Add Section...", systemImage: "plus")
-                }
-            }
+            instructionsSection()
             Section("Size") {
                 HStack {
                     Text("Serving Size:")
@@ -203,58 +118,7 @@ struct RecipeEditor: View {
                     }
                 }
             }
-            Section("Times") {
-                Stepper {
-                    HStack {
-                        Text("Prep Time:").fixedSize()
-                        TextField("", value: $prepTime, formatter: timeFormatter)
-                            .multilineTextAlignment(.trailing).italic()
-                            .keyboardType(.decimalPad)
-                        Text("min").italic()
-                    }
-                } onIncrement: {
-                    prepTime += 1
-                } onDecrement: {
-                    if prepTime > 0 {
-                        prepTime -= 1
-                    }
-                }
-                Stepper {
-                    HStack {
-                        Text("Cook Time:").fixedSize()
-                        TextField("", value: $cookTime, formatter: timeFormatter)
-                            .multilineTextAlignment(.trailing).italic()
-                            .keyboardType(.decimalPad)
-                        Text("min").italic()
-                    }
-                } onIncrement: {
-                    cookTime += 1
-                } onDecrement: {
-                    if cookTime > 0 {
-                        cookTime -= 1
-                    }
-                }
-                Stepper {
-                    HStack {
-                        Text("Other:").fixedSize()
-                        TextField("", value: $otherTime, formatter: timeFormatter)
-                            .multilineTextAlignment(.trailing).italic()
-                            .keyboardType(.decimalPad)
-                        Text("min").italic()
-                    }
-                } onIncrement: {
-                    otherTime += 1
-                } onDecrement: {
-                    if otherTime > 0 {
-                        otherTime -= 1
-                    }
-                }
-                HStack {
-                    Text("Total Time:")
-                    Spacer()
-                    Text("\(timeFormatter.string(for: totalTime)!) min").italic()
-                }
-            }
+            timesSection()
             Section("Rating") {
                 Picker("Rating (Fresh):", selection: $rating) {
                     Text("N/A").tag(nil as Double?)
@@ -288,10 +152,7 @@ struct RecipeEditor: View {
                 }
             }
             .onAppear {
-                switch mode {
-                case .Add:
-                    modelContext.insert(recipe)
-                case .Edit:
+                if mode == .Edit {
                     name = recipe.name
                     author = recipe.metaData.author ?? ""
                     details = recipe.metaData.details
@@ -307,6 +168,156 @@ struct RecipeEditor: View {
                     instructions = recipe.instructions
                 }
             }
+    }
+    
+    private func ingredientsSection() -> some View {
+        Section("Ingredients") {
+            List(recipe.ingredients, id: \.name) { ingredient in
+                Button {
+                    editIngredient(ingredient)
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(ingredient.amountToString()) · \(ingredient.name)")
+                            if !(ingredient.notes ?? "").isEmpty {
+                                Text(ingredient.notes!).font(.caption).italic()
+                            }
+                        }
+                        Spacer()
+                    }.contentShape(Rectangle())
+                }.buttonStyle(.plain)
+                    .swipeActions(allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            recipe.ingredients.removeAll { i in i == ingredient }
+                        } label: {
+                            Label("Delete", systemImage: "trash.fill")
+                        }
+                        Button {
+                            editIngredient(ingredient)
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                    }
+                    .contextMenu {
+                        Button {
+                            editIngredient(ingredient)
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        Button(role: .destructive) {
+                            recipe.ingredients.removeAll { i in i == ingredient }
+                        } label: {
+                            Label("Delete", systemImage: "trash.fill")
+                        }
+                    } preview: {
+                        if let foodItem = ingredient.food {
+                            FoodItemPreview(item: foodItem)
+                        } else {
+                            Text(ingredient.name).padding()
+                        }
+                    }
+            }
+            Menu {
+                Button("Food Item Ingredient...") {
+                    sheetCoordinator.presentSheet(.AddItemIngredient(recipe: recipe))
+                }
+                Button("Custom Ingredient...") {
+                    sheetCoordinator.presentSheet(.AddIngredient(recipe: recipe))
+                }
+            } label: {
+                Label("Add Ingredient...", systemImage: "plus")
+            }
+        }
+    }
+    
+    private func instructionsSection() -> some View {
+        Section("Instructions") {
+            List(instructions, id: \.header) { section in
+                Button {
+                    sheetCoordinator.presentSheet(.EditInstructions(section: section))
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(section.header).font(.headline)
+                            Text(section.details).lineLimit(3).font(.caption)
+                        }
+                        Spacer()
+                    }.contentShape(Rectangle())
+                }.buttonStyle(.plain)
+                    .swipeActions(allowsFullSwipe: false) {
+                        Button(role: .destructive) {
+                            instructions.removeAll { s in s == section }
+                        } label: {
+                            Label("Delete", systemImage: "trash.fill")
+                        }
+                        Button {
+                            sheetCoordinator.presentSheet(.EditInstructions(section: section))
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                    }
+            }
+            Button {
+                sheetCoordinator.presentSheet(.AddInstructions(instructions: $instructions))
+            } label: {
+                Label("Add Section...", systemImage: "plus")
+            }
+        }
+    }
+    
+    private func timesSection() -> some View {
+        Section("Times") {
+            Stepper {
+                HStack {
+                    Text("Prep Time:").fixedSize()
+                    TextField("", value: $prepTime, formatter: timeFormatter)
+                        .multilineTextAlignment(.trailing).italic()
+                        .keyboardType(.decimalPad)
+                    Text("min").italic()
+                }
+            } onIncrement: {
+                prepTime += 1
+            } onDecrement: {
+                if prepTime > 0 {
+                    prepTime -= 1
+                }
+            }
+            Stepper {
+                HStack {
+                    Text("Cook Time:").fixedSize()
+                    TextField("", value: $cookTime, formatter: timeFormatter)
+                        .multilineTextAlignment(.trailing).italic()
+                        .keyboardType(.decimalPad)
+                    Text("min").italic()
+                }
+            } onIncrement: {
+                cookTime += 1
+            } onDecrement: {
+                if cookTime > 0 {
+                    cookTime -= 1
+                }
+            }
+            Stepper {
+                HStack {
+                    Text("Other:").fixedSize()
+                    TextField("", value: $otherTime, formatter: timeFormatter)
+                        .multilineTextAlignment(.trailing).italic()
+                        .keyboardType(.decimalPad)
+                    Text("min").italic()
+                }
+            } onIncrement: {
+                otherTime += 1
+            } onDecrement: {
+                if otherTime > 0 {
+                    otherTime -= 1
+                }
+            }
+            HStack {
+                Text("Total Time:")
+                Spacer()
+                Text("\(timeFormatter.string(for: totalTime)!) min").italic()
+            }
+        }
     }
     
     private func editIngredient(_ ingredient: RecipeIngredient) {
@@ -327,14 +338,14 @@ struct RecipeEditor: View {
         recipe.metaData.cookTime = cookTime
         recipe.metaData.otherTime = otherTime
         recipe.instructions = instructions
+        if mode == .Add {
+            modelContext.insert(recipe)
+        }
         dismiss()
     }
     
     private func discard() {
-        switch mode {
-        case .Add:
-            modelContext.delete(recipe)
-        case .Edit:
+        if mode == .Edit {
             recipe.ingredients = ingredientsBackup
         }
         dismiss()

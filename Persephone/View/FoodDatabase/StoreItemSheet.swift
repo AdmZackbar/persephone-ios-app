@@ -135,13 +135,20 @@ struct StoreItemSheet: View {
                     self.storeName = item.wrappedValue.storeName
                     switch item.wrappedValue.costType {
                     case .Collection(let cost, let quantity):
+                        self.costType = .Collection
                         switch cost {
                         case .Cents(let amount):
                             self.price = amount
                         }
                         self.quantity = quantity
-                    default:
-                        break
+                    case .PerAmount(let cost, let amount):
+                        self.costType = .PerAmount
+                        switch cost {
+                        case .Cents(let amount):
+                            self.price = amount
+                        }
+                        self.amount = amount.value.toValue()
+                        self.unit = amount.unit
                     }
                     self.sale = item.wrappedValue.sale
                     self.available = item.wrappedValue.available

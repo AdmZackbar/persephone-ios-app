@@ -43,7 +43,7 @@ struct RecipeItemIngredientSheet: View {
             case .SetAmount(let foodItem):
                 SetAmountView(recipe: recipe, mode: mode, foodItem: foodItem, viewState: $viewState)
             }
-        }.presentationDetents([.medium, .large])
+        }.presentationDetents([.large])
     }
     
     private struct SelectFoodView: View {
@@ -56,33 +56,31 @@ struct RecipeItemIngredientSheet: View {
         
         var body: some View {
             let items = foodItems.filter({ item in search.isEmpty || item.name.localizedCaseInsensitiveContains(search) })
-            return Form {
-                List(items, id: \.name) { item in
-                    Button {
-                        viewState = .SetAmount(foodItem: item)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(item.name)
-                            HStack {
-                                if let brand = item.metaData.brand {
-                                    Text(brand).font(.subheadline).italic()
-                                }
-                                Spacer()
+            return List(items, id: \.hashValue) { item in
+                Button {
+                    viewState = .SetAmount(foodItem: item)
+                } label: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(item.name)
+                        HStack {
+                            if let brand = item.metaData.brand {
+                                Text(brand).font(.subheadline).italic()
                             }
-                        }.contentShape(Rectangle())
-                    }.buttonStyle(.plain)
-                        .contextMenu {
-                            Button("Select") {
-                                viewState = .SetAmount(foodItem: item)
-                            }
-                        } preview: {
-                            FoodItemPreview(item: item)
+                            Spacer()
                         }
-                }
+                    }.contentShape(Rectangle())
+                }.buttonStyle(.plain)
+                    .contextMenu {
+                        Button("Select") {
+                            viewState = .SetAmount(foodItem: item)
+                        }
+                    } preview: {
+                        FoodItemPreview(item: item)
+                    }
             }.navigationTitle("Select Food")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden()
-                .searchable(text: $search)
+                .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always))
                 .overlay {
                     if items.isEmpty {
                         Text(foodItems.isEmpty ? "No food in database" : "No food matches search")

@@ -49,6 +49,29 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
 }
 
 @discardableResult
+func createTestCommercialFood(_ context: ModelContext) -> CommercialFood {
+    let item = CommercialFood(name: "Baconator", seller: "Wendy's", cost: .Cents(589),
+                              nutrients: [
+                                .Energy: .calories(840),
+                                .TotalCarbs: .grams(30),
+                                .TotalFat: .grams(22),
+                                .SaturatedFat: FoodAmount.grams(2),
+                                .PolyunsaturatedFat: FoodAmount.grams(0.5),
+                                .Cholesterol: FoodAmount.milligrams(50),
+                                .Sodium: FoodAmount.milligrams(255),
+                                .Protein: .grams(30),
+                                .Calcium: FoodAmount.milligrams(20),
+                                .Potassium: FoodAmount.milligrams(15)
+                              ],
+                              metaData: CommercialFood.MetaData(
+                                notes: "Pretty good burger lmao",
+                                rating: 8.0,
+                                tags: ["Burger"]))
+    context.insert(item)
+    return item
+}
+
+@discardableResult
 func createTestRecipeItem(_ context: ModelContext) -> Recipe {
     let recipe = Recipe(name: "Test Recipe",
                         metaData: Recipe.MetaData(

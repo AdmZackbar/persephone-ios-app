@@ -510,6 +510,9 @@ private struct ItemsView: View {
                         .font(.subheadline)
                         .fontWeight(.light)
                         .italic()
+                    Text(food.cost.toString())
+                        .font(.subheadline)
+                        .bold()
                     if let rating = food.metaData.rating,
                        let tier = FoodTier.fromRating(rating: rating) {
                         Text("\(tier.rawValue) Tier")
@@ -524,9 +527,15 @@ private struct ItemsView: View {
         case .Cost:
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(food.name)
-                        .font(.headline)
-                        .bold()
+                    HStack {
+                        Text(food.name)
+                            .font(.headline)
+                            .bold()
+                        Spacer()
+                        Text(food.cost.toString())
+                            .font(.headline)
+                            .bold()
+                    }
                     HStack {
                         Text(food.seller)
                             .font(.subheadline)

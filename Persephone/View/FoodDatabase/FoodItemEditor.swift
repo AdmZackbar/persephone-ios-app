@@ -51,8 +51,10 @@ struct FoodItemEditor: View {
     // Ingredients
     @State private var ingredients: String = ""
     @State private var allergens: String = ""
+    @State private var nutrients: [Nutrient : FoodAmount] = [:]
     @State private var storeItems: [FoodItem.StoreEntry] = []
     @State private var rating: Double? = nil
+    @State private var tags: [String] = []
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -90,19 +92,19 @@ struct FoodItemEditor: View {
             }
             storeSection()
             Section("Tags") {
-                if !item.metaData.tags.isEmpty {
+                if !tags.isEmpty {
                     HStack {
-                        Text(item.metaData.tags.joined(separator: ", "))
+                        Text(tags.joined(separator: ", "))
                             .italic(item.metaData.tags.isEmpty)
                             .lineLimit(1...3)
                         Spacer()
                     }.contentShape(Rectangle())
                         .onTapGesture {
-                            sheetCoordinator.presentSheet(.Tags(item: item))
+                            sheetCoordinator.presentSheet(.Tags(tags: $tags))
                         }
                 } else {
                     Button("Add Tag(s)") {
-                        sheetCoordinator.presentSheet(.Tags(item: item))
+                        sheetCoordinator.presentSheet(.Tags(tags: $tags))
                     }
                 }
             }
@@ -188,17 +190,17 @@ struct FoodItemEditor: View {
     
     private func nutrientsSection() -> some View {
         Section("Nutrients") {
-            NutrientTableView(nutrients: item.ingredients.nutrients)
+            NutrientTableView(nutrients: nutrients)
                 .contextMenu {
                     Button("Edit Individual Nutrients") {
-                        sheetCoordinator.presentSheet(.Nutrients(item: item))
+                        sheetCoordinator.presentSheet(.Nutrients(nutrients: $nutrients))
                     }
                     Button("Scale All") {
                         sheetCoordinator.presentSheet(.NutrientsScale(item: item))
                     }
                 }
                 .onTapGesture {
-                    sheetCoordinator.presentSheet(.Nutrients(item: item))
+                    sheetCoordinator.presentSheet(.Nutrients(nutrients: $nutrients))
                 }
             
         }
@@ -273,8 +275,10 @@ struct FoodItemEditor: View {
             totalAmount = item.size.totalAmount.value.toValue()
             ingredients = item.ingredients.all
             allergens = item.ingredients.allergens
+            nutrients = item.ingredients.nutrients
             storeItems = item.storeEntries
             rating = item.metaData.rating
+            tags = item.metaData.tags
         default:
             break
         }
@@ -287,8 +291,10 @@ struct FoodItemEditor: View {
         item.size = FoodItem.Size(totalAmount: FoodAmount(value: .Raw(totalAmount), unit: amountUnit), numServings: numServings, servingSize: servingSize)
         item.ingredients.all = ingredients
         item.ingredients.allergens = allergens
+        item.ingredients.nutrients = nutrients
         item.storeEntries = storeItems
         item.metaData.rating = rating
+        item.metaData.tags = tags
         switch mode {
         case .Add, .Confirm:
             modelContext.insert(item)

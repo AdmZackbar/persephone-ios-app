@@ -12,7 +12,7 @@ typealias CommercialFood = SchemaV1.CommercialFood
 
 extension SchemaV1 {
     @Model
-    final class CommercialFood {
+    final class CommercialFood: Hashable, Equatable {
         var name: String
         var seller: String
         var cost: FoodItem.Cost
@@ -27,10 +27,18 @@ extension SchemaV1 {
             self.metaData = metaData
         }
         
-        struct MetaData: Codable {
+        struct MetaData: Codable, Hashable, Equatable {
+            var timestamp: Date
             var notes: String
             var rating: Double?
             var tags: [String]
+            
+            init(timestamp: Date = Date(), notes: String, rating: Double? = nil, tags: [String]) {
+                self.timestamp = timestamp
+                self.notes = notes
+                self.rating = rating
+                self.tags = tags
+            }
         }
     }
 }

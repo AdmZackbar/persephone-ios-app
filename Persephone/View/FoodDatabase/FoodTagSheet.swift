@@ -11,10 +11,13 @@ import SwiftUI
 struct FoodTagSheet: View {
     @Environment(\.dismiss) private var dismiss
     
-    let item: FoodItem
-    
+    @Binding private var foodTags: [String]
     @State private var tags: [String] = []
     @State private var customTag: String = ""
+    
+    init(tags: Binding<[String]>) {
+        self._foodTags = tags
+    }
     
     var body: some View {
         NavigationStack {
@@ -42,7 +45,7 @@ struct FoodTagSheet: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden()
                 .onAppear {
-                    tags = item.metaData.tags
+                    tags = foodTags
                 }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
@@ -52,7 +55,7 @@ struct FoodTagSheet: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Save") {
-                            item.metaData.tags = tags
+                            foodTags = tags
                             dismiss()
                         }
                     }
@@ -77,6 +80,6 @@ struct FoodTagSheet: View {
 #Preview {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
-    return FoodTagSheet(item: item)
+    return FoodTagSheet(tags: .constant(item.metaData.tags))
         .modelContainer(container)
 }

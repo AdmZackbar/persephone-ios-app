@@ -82,6 +82,10 @@ struct FoodDatabaseView: View {
             .init("Olive Oil"),
         ]),
         .init("Juice"),
+        .init("Meal", children: [
+            .init("Burger"),
+            .init("Sandwich")
+        ]),
         .init("Meat", children: [
             .init("Bacon"),
             .init("Beef"),
@@ -115,6 +119,9 @@ struct FoodDatabaseView: View {
         case ItemAdd
         case ItemEdit(item: FoodItem)
         case ItemConfirm(item: FoodItem)
+        case CommercialFoodView(food: CommercialFood)
+        case CommercialFoodAdd
+        case CommercialFoodEdit(food: CommercialFood)
         case ScanItem
         case LookupItem
         case ExportItems(items: [FoodItem])
@@ -157,7 +164,12 @@ struct FoodDatabaseView: View {
                         Button {
                             path.append(.ItemAdd)
                         } label: {
-                            Label("Add Custom Food", systemImage: "plus")
+                            Label("Add Custom Food Item", systemImage: "plus")
+                        }
+                        Button {
+                            path.append(.CommercialFoodAdd)
+                        } label: {
+                            Label("Add Commercial Food", systemImage: "plus")
                         }
                     } label: {
                         Label("Add", systemImage: "plus")
@@ -209,6 +221,12 @@ struct FoodDatabaseView: View {
             FoodItemEditor(path: $path, item: item)
         case .ItemConfirm(let item):
             FoodItemEditor(path: $path, item: item, mode: .Confirm)
+        case .CommercialFoodView(let food):
+            CommercialFoodView(path: $path, food: food)
+        case .CommercialFoodAdd:
+            CommercialFoodEditor()
+        case .CommercialFoodEdit(let food):
+            CommercialFoodEditor(food: food)
         case .ScanItem:
             ScanFoodView(path: $path)
         case .LookupItem:
@@ -221,6 +239,50 @@ struct FoodDatabaseView: View {
 
 private struct ItemsView: View {
     @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
+    @Query(sort: \CommercialFood.name) var commercialFood: [CommercialFood]
+    
+    enum Item: Identifiable {
+        var id: Int {
+            get {
+                switch self {
+                case .regular(let food):
+                    food.id.hashValue
+                case .commercial(let food):
+                    food.id.hashValue
+                }
+            }
+        }
+        
+        case regular(food: FoodItem)
+        case commercial(food: CommercialFood)
+        
+        func getName() -> String {
+            switch self {
+            case .regular(let food):
+                food.name
+            case .commercial(let food):
+                food.name
+            }
+        }
+        
+        func getBrand() -> String? {
+            switch self {
+            case .regular(let food):
+                food.metaData.brand
+            case .commercial(let food):
+                food.seller
+            }
+        }
+        
+        func getTimestamp() -> Date {
+            switch self {
+            case .regular(let food):
+                food.metaData.timestamp
+            case .commercial(let food):
+                food.metaData.timestamp
+            }
+        }
+    }
     
     enum SortType: Identifiable, CaseIterable {
         var id: String {
@@ -293,40 +355,41 @@ private struct ItemsView: View {
     }
     
     var body: some View {
-        List(foodItems.filter({ foodType.containsTags($0.metaData.tags) && isSearchFiltered($0) })
-            .sorted(by: {
-                switch sortDirection {
-                case .Ascending:
-                    switch sortType {
-                    case .Name:
-                        $0.name < $1.name
-                    case .Brand:
-                        $0.metaData.brand ?? "" < $1.metaData.brand ?? ""
-                    case .DateAdded:
-                        $0.metaData.timestamp < $1.metaData.timestamp
-                    }
-                case .Descending:
-                    switch sortType {
-                    case .Name:
-                        $0.name > $1.name
-                    case .Brand:
-                        $0.metaData.brand ?? "" > $1.metaData.brand ?? ""
-                    case .DateAdded:
-                        $0.metaData.timestamp > $1.metaData.timestamp
-                    }
-                }
-            })) { item in
-            NavigationLink(value: FoodDatabaseView.ViewType.ItemView(item: item)) {
-                itemView(item)
-                    .contextMenu {
-                        Button {
-                            path.append(.ItemEdit(item: item))
-                        } label: {
-                            Label("Edit", systemImage: "pencil.circle")
+        var items: [Item] = []
+        items.append(contentsOf: (foodItems
+            .filter({ foodType.containsTags($0.metaData.tags) && isSearchFiltered($0) })
+            .map({ Item.regular(food: $0) })))
+        items.append(contentsOf: (commercialFood
+            .filter({ foodType.containsTags($0.metaData.tags) && isSearchFiltered($0) })
+            .map({ Item.commercial(food: $0) })))
+        return List(items) { item in
+            switch item {
+            case .regular(let food):
+                NavigationLink(value: FoodDatabaseView.ViewType.ItemView(item: food)) {
+                    itemView(food)
+                        .contextMenu {
+                            Button {
+                                path.append(.ItemEdit(item: food))
+                            } label: {
+                                Label("Edit", systemImage: "pencil.circle")
+                            }
+                        } preview: {
+                            FoodItemPreview(item: food)
                         }
-                    } preview: {
-                        FoodItemPreview(item: item)
-                    }
+                }
+            case .commercial(let food):
+                NavigationLink(value: FoodDatabaseView.ViewType.CommercialFoodView(food: food)) {
+                    foodView(food)
+                        .contextMenu {
+                            Button {
+                                path.append(.CommercialFoodEdit(food: food))
+                            } label: {
+                                Label("Edit", systemImage: "pencil.circle")
+                            }
+                        } preview: {
+                            CommercialFoodPreview(food: food)
+                        }
+                }
             }
         }.navigationTitle(foodType.name)
             .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always))
@@ -366,6 +429,10 @@ private struct ItemsView: View {
     
     private func isSearchFiltered(_ item: FoodItem) -> Bool {
         search.isEmpty || item.name.contains(search) || (item.metaData.brand ?? "").contains(search)
+    }
+    
+    private func isSearchFiltered(_ item: CommercialFood) -> Bool {
+        search.isEmpty || item.name.contains(search) || item.seller.contains(search)
     }
     
     private let currencyFormatter: NumberFormatter = {
@@ -430,6 +497,54 @@ private struct ItemsView: View {
         }
     }
     
+    @ViewBuilder
+    private func foodView(_ food: CommercialFood) -> some View {
+        switch viewType {
+        case .Macro:
+            HStack(alignment: .top, spacing: 2) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(food.name)
+                        .font(.headline)
+                        .bold()
+                    Text(food.seller)
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                        .italic()
+                    if let rating = food.metaData.rating,
+                       let tier = FoodTier.fromRating(rating: rating) {
+                        Text("\(tier.rawValue) Tier")
+                            .font(.subheadline)
+                            .bold()
+                    }
+                }
+                Spacer()
+                MacroChartView(nutrients: food.nutrients)
+                    .frame(width: 140, height: 100)
+            }
+        case .Cost:
+            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(food.name)
+                        .font(.headline)
+                        .bold()
+                    HStack {
+                        Text(food.seller)
+                            .font(.subheadline)
+                            .fontWeight(.light)
+                            .italic()
+                        Spacer()
+                        if let rating = food.metaData.rating,
+                           let tier = FoodTier.fromRating(rating: rating) {
+                            Text("\(tier.rawValue) Tier")
+                                .font(.subheadline)
+                                .bold()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private func storeEntryView(item: FoodItem, storeEntry: FoodItem.StoreEntry) -> some View {
         HStack(alignment: .bottom, spacing: 16) {
             VStack(alignment: .leading, spacing: 2) {
@@ -486,6 +601,7 @@ private struct ItemsView: View {
 #Preview {
     let container = createTestModelContainer()
     createTestFoodItem(container.mainContext)
+    createTestCommercialFood(container.mainContext)
     return FoodDatabaseView()
         .modelContainer(container)
 }

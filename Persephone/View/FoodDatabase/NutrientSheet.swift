@@ -11,9 +11,12 @@ import SwiftUI
 struct NutrientSheet: View {
     @Environment(\.dismiss) private var dismiss
     
-    let item: FoodItem
-    
+    @Binding private var foodNutrients: [Nutrient : FoodAmount]
     @State private var nutrientAmounts: [Nutrient : FoodAmount] = [:]
+    
+    init(nutrients: Binding<[Nutrient : FoodAmount]>) {
+        self._foodNutrients = nutrients
+    }
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -49,19 +52,19 @@ struct NutrientSheet: View {
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Revert") {
-                            nutrientAmounts = item.ingredients.nutrients
+                            nutrientAmounts = foodNutrients
                             dismiss()
                         }
                     }
                     ToolbarItem(placement: .primaryAction) {
                         Button("Save") {
-                            item.ingredients.nutrients = nutrientAmounts
+                            foodNutrients = nutrientAmounts
                             dismiss()
                         }
                     }
                 }
         }.onAppear {
-            nutrientAmounts = item.ingredients.nutrients
+            nutrientAmounts = foodNutrients
         }
     }
     
@@ -84,11 +87,6 @@ struct NutrientSheet: View {
                     clearEntry(nutrient)
                 }.tint(.red)
             }
-            if nutrientAmounts[nutrient] != item.getNutrient(nutrient) {
-                Button("Revert") {
-                    revertEntry(nutrient)
-                }
-            }
             if nutrientAmounts[nutrient]?.value.toValue() ?? 0 > 0 {
                 Button("Round") {
                     roundEntry(nutrient)
@@ -98,9 +96,6 @@ struct NutrientSheet: View {
             Button("Clear") {
                 clearEntry(nutrient)
             }.disabled(nutrientAmounts[nutrient]?.value.toValue() ?? 0 <= 0)
-            Button("Revert") {
-                revertEntry(nutrient)
-            }.disabled(nutrientAmounts[nutrient] == item.getNutrient(nutrient))
             Button("Round") {
                 roundEntry(nutrient)
             }.disabled(nutrientAmounts[nutrient]?.value.toValue() ?? 0 <= 0)
@@ -115,10 +110,6 @@ struct NutrientSheet: View {
     
     private func clearEntry(_ nutrient: Nutrient) {
         nutrientAmounts[nutrient] = nil
-    }
-    
-    private func revertEntry(_ nutrient: Nutrient) {
-        nutrientAmounts[nutrient] = item.getNutrient(nutrient)
     }
     
     private func getFieldName(_ nutrient: Nutrient) -> String {
@@ -159,15 +150,11 @@ struct NutrientSheet: View {
             return "Iron:"
         }
     }
-    
-    init(item: FoodItem) {
-        self.item = item
-    }
 }
 
 #Preview {
     let container = createTestModelContainer()
     let item = createTestFoodItem(container.mainContext)
-    return NutrientSheet(item: item)
+    return NutrientSheet(nutrients: .constant(item.ingredients.nutrients))
         .modelContainer(container)
 }

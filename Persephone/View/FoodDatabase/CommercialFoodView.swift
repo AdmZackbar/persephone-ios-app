@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct CommercialFoodView: View {
+    @Binding private var path: [FoodDatabaseView.ViewType]
+    
     let food: CommercialFood
+    
+    init(path: Binding<[FoodDatabaseView.ViewType]>, food: CommercialFood) {
+        self._path = path
+        self.food = food
+    }
     
     var body: some View {
         ScrollView(.vertical) {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .top) {
                     Text(food.seller)
                         .bold()
@@ -75,11 +82,12 @@ struct CommercialFoodView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Edit") {
-                        // TODO
+                        path.append(.CommercialFoodEdit(food: food))
                     }
                 }
             }
             .padding()
+            .background(Color(UIColor.secondarySystemBackground))
     }
 }
 
@@ -87,6 +95,6 @@ struct CommercialFoodView: View {
     let container = createTestModelContainer()
     let food = createTestCommercialFood(container.mainContext)
     return NavigationStack {
-        CommercialFoodView(food: food)
+        CommercialFoodView(path: .constant([]), food: food)
     }
 }

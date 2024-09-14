@@ -8,29 +8,29 @@
 import SwiftUI
 
 enum FoodSheetEnum: Identifiable, SheetEnum {
-    var id: String {
+    var id: Int {
         switch self {
         case .General(let f):
-            return f.name
-        case .Tags(let f):
-            return f.name
+            return f.hashValue
+        case .Tags(_):
+            return "Edit Tags".hashValue
         case .ServingAmount(_, _):
-            return "Serving Amount"
-        case .Nutrients(let f):
-            return f.name
+            return "Serving Amount".hashValue
+        case .Nutrients(_):
+            return "Nutrient Editor".hashValue
         case .NutrientsScale(let f):
-            return f.name
+            return f.hashValue
         case .AddStoreItem(_):
-            return "Add Store Item"
+            return "Add Store Item".hashValue
         case .EditStoreItem(let i):
-            return i.wrappedValue.storeName
+            return i.wrappedValue.hashValue
         }
     }
     
     case General(item: FoodItem)
-    case Tags(item: FoodItem)
+    case Tags(tags: Binding<[String]>)
     case ServingAmount(totalAmount: Binding<Double>, numServings: Binding<Double>)
-    case Nutrients(item: FoodItem)
+    case Nutrients(nutrients: Binding<[Nutrient : FoodAmount]>)
     case NutrientsScale(item: FoodItem)
     case AddStoreItem(storeItems: Binding<[FoodItem.StoreEntry]>)
     case EditStoreItem(item: Binding<FoodItem.StoreEntry>)
@@ -40,12 +40,12 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
         switch self {
         case .General(let f):
             FoodGeneralSheet(item: f)
-        case .Tags(let f):
-            FoodTagSheet(item: f)
+        case .Tags(let tags):
+            FoodTagSheet(tags: tags)
         case .ServingAmount(let totalAmount, let numServings):
             ServingAmountSheet(totalAmount: totalAmount, numServings: numServings)
-        case .Nutrients(let f):
-            NutrientSheet(item: f)
+        case .Nutrients(let n):
+            NutrientSheet(nutrients: n)
         case .NutrientsScale(let f):
             NutrientScaleSheet(item: f)
         case .AddStoreItem(let storeItems):

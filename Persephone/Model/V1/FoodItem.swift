@@ -72,7 +72,7 @@ extension SchemaV1 {
             }
         }
         
-        struct Size: Codable {
+        struct Size: Codable, Hashable, Equatable {
             // The empirical net weight/volume (e.g. net wt 10 lb)
             var totalAmount: FoodAmount
             // The total number of servings that the item contains

@@ -20,7 +20,7 @@ struct FoodItemView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
-    var item: FoodItem
+    @State var item: FoodItem
     
     @Binding private var path: [FoodDatabaseView.ViewType]
     
@@ -46,7 +46,7 @@ struct FoodItemView: View {
                             .contentShape(Rectangle())
                             .contextMenu {
                                 Button {
-                                    sheetCoordinator.presentSheet(.Tags(item: item))
+                                    sheetCoordinator.presentSheet(.Tags(tags: $item.metaData.tags))
                                 } label: {
                                     Label("Edit Tags", systemImage: "pencil")
                                 }
@@ -60,7 +60,7 @@ struct FoodItemView: View {
                     NutritionTabView(item: item)
                         .contextMenu {
                             Button {
-                                sheetCoordinator.presentSheet(.Nutrients(item: item))
+                                sheetCoordinator.presentSheet(.Nutrients(nutrients: $item.ingredients.nutrients))
                             } label: {
                                 Label("Edit Nutrients", systemImage: "pencil")
                             }
@@ -70,7 +70,7 @@ struct FoodItemView: View {
             if !item.storeEntries.isEmpty {
                 StoreItemsTabView(sheetCoordinator: sheetCoordinator, foodItem: item).frame(height: 112)
             }
-            MainTabView(sheetCoordinator: sheetCoordinator, item: item)
+            MainTabView(sheetCoordinator: sheetCoordinator, item: $item)
         }.navigationBarTitleDisplayMode(.inline)
             .padding(EdgeInsets(top: 4, leading: 16, bottom: 16, trailing: 16))
             .toolbar {
@@ -322,9 +322,14 @@ private struct MainTabView: View {
     
     @ObservedObject var sheetCoordinator: SheetCoordinator<FoodSheetEnum>
     
-    var item: FoodItem
+    @Binding var item: FoodItem
     
     @State private var tabSelection: ViewType = .Description
+    
+    init(sheetCoordinator: SheetCoordinator<FoodSheetEnum>, item: Binding<FoodItem>) {
+        self.sheetCoordinator = sheetCoordinator
+        self._item = item
+    }
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -359,7 +364,7 @@ private struct MainTabView: View {
                     NutrientTableView(nutrients: item.ingredients.nutrients)
                         .contextMenu {
                             Button {
-                                sheetCoordinator.presentSheet(.Nutrients(item: item))
+                                sheetCoordinator.presentSheet(.Nutrients(nutrients: $item.ingredients.nutrients))
                             } label: {
                                 Label("Edit", systemImage: "pencil")
                             }
@@ -367,7 +372,7 @@ private struct MainTabView: View {
                 }.tag(ViewType.Nutrients)
                     .contextMenu {
                         Button {
-                            sheetCoordinator.presentSheet(.Nutrients(item: item))
+                            sheetCoordinator.presentSheet(.Nutrients(nutrients: $item.ingredients.nutrients))
                         } label: {
                             Label("Edit Nutrients", systemImage: "pencil")
                         }

@@ -17,6 +17,15 @@ extension SchemaV1 {
             case Raw(_ value: Double)
             case Rational(num: Double, den: Double)
             
+            func abs() -> Value {
+                switch self {
+                case .Raw(let value):
+                    return .Raw(value >= 0 ? value : -value)
+                case .Rational(let num, let den):
+                    return .Rational(num: num >= 0 ? num : -num, den: den >= 0 ? den : -den)
+                }
+            }
+            
             static func parseString(_ str: String) -> Value? {
                 if let match = try? /([\d.]+)\/([\d.]+)/.wholeMatch(in: str) {
                     if let num = Double(match.1), let den = Double(match.2) {
@@ -44,6 +53,25 @@ extension SchemaV1 {
                         return .Rational(num: r * lDen + lNum, den: lDen)
                     case .Rational(let rNum, let rDen):
                         return .Rational(num: rNum * lDen + lNum * rDen, den: lDen * rDen)
+                    }
+                }
+            }
+            
+            static func - (left: Value, right: Value) -> Value {
+                switch left {
+                case .Raw(let l):
+                    switch right {
+                    case .Raw(let r):
+                        return .Raw(l - r)
+                    case .Rational(let rNum, let rDen):
+                        return .Rational(num: l * rDen - rNum, den: rDen)
+                    }
+                case .Rational(let lNum, let lDen):
+                    switch right {
+                    case .Raw(let r):
+                        return .Rational(num: r * lDen - lNum, den: lDen)
+                    case .Rational(let rNum, let rDen):
+                        return .Rational(num: rNum * lDen - lNum * rDen, den: lDen * rDen)
                     }
                 }
             }

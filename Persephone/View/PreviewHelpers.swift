@@ -105,3 +105,14 @@ func createTestFoodInstance(_ context: ModelContext) -> FoodInstance {
     context.insert(item)
     return item
 }
+
+@discardableResult
+func createTestLogItem(_ context: ModelContext) -> LogbookItem {
+    let item = LogbookItem(date: Date())
+    context.insert(item)
+    item.targetNutrients[.Energy] = .calories(1900)
+    let foodItem = createTestFoodItem(context)
+    let foodEntry = LogbookFoodItemEntry(logItem: item, foodItem: foodItem, amount: FoodAmount.grams(100), mealType: .Breakfast)
+    item.foodEntries.append(foodEntry)
+    return item
+}

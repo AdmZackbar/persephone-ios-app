@@ -26,8 +26,17 @@ extension SchemaV1 {
         // All store entries for the item
         var storeEntries: [StoreEntry]
         
+        var bestStoreEntry: StoreEntry? {
+            get {
+                storeEntries.filter({ $0.available })
+                    .min(by: { $0.costPerUnit(size: size) < $1.costPerUnit(size: size) })
+            }
+        }
+        
         @Relationship(deleteRule: .nullify, inverse: \RecipeIngredient.food)
         var recipeEntries: [RecipeIngredient] = []
+        @Relationship(deleteRule: .cascade, inverse: \LogbookFoodItemEntry.foodItem)
+        var logEntries: [LogbookFoodItemEntry] = []
         
         init(name: String, details: String, metaData: MetaData, ingredients: FoodIngredients, size: Size, storeEntries: [StoreEntry]) {
             self.name = name

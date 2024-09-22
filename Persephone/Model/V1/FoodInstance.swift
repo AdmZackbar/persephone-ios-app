@@ -53,7 +53,7 @@ extension SchemaV1 {
         enum Amount: Codable {
             // For items that you use a portion of at a time (typically)
             // e.g. carton of milk, 2 lbs of ground beef
-            case Single(total: FoodAmount, remaining: FoodAmount)
+            case Single(total: Quantity, remaining: Quantity)
             // For items that come in a package:
             // typically 1 item is used completely at a time
             // e.g. flat of coke cans, set of fairlife protein shakes

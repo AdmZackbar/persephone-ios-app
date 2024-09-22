@@ -6,18 +6,31 @@
 //
 
 import Foundation
+import SwiftData
 
-typealias FoodAmount = SchemaV1.FoodAmount
-typealias FoodUnit = SchemaV1.FoodUnit
-typealias FoodTier = SchemaV1.FoodTier
+typealias Quantity = SchemaV1.Quantity
+typealias Unit = SchemaV1.Unit
+typealias RatingTier = SchemaV1.RatingTier
+typealias NutritionDict = [Nutrient : Quantity]
 
 extension SchemaV1 {
-    struct FoodAmount: Codable, Equatable, Hashable {
-        enum Value: Codable, Equatable, Hashable {
+    struct Quantity: Codable, Equatable, Hashable {
+        enum Magnitude: Codable, Equatable, Hashable {
             case Raw(_ value: Double)
             case Rational(num: Double, den: Double)
             
-            func abs() -> Value {
+            var value: Double {
+                get {
+                    switch self {
+                    case .Raw(let value):
+                        return value
+                    case .Rational(let num, let den):
+                        return num / den
+                    }
+                }
+            }
+            
+            func abs() -> Magnitude {
                 switch self {
                 case .Raw(let value):
                     return .Raw(value >= 0 ? value : -value)
@@ -26,7 +39,7 @@ extension SchemaV1 {
                 }
             }
             
-            static func parseString(_ str: String) -> Value? {
+            static func parseString(_ str: String) -> Magnitude? {
                 if let match = try? /([\d.]+)\/([\d.]+)/.wholeMatch(in: str) {
                     if let num = Double(match.1), let den = Double(match.2) {
                         return .Rational(num: num, den: den)
@@ -38,17 +51,17 @@ extension SchemaV1 {
                 return nil
             }
             
-            static func + (left: Value, right: Value) -> Value {
-                switch left {
+            static func + (lhs: Magnitude, rhs: Magnitude) -> Magnitude {
+                switch lhs {
                 case .Raw(let l):
-                    switch right {
+                    switch rhs {
                     case .Raw(let r):
                         return .Raw(l + r)
                     case .Rational(let rNum, let rDen):
                         return .Rational(num: l * rDen + rNum, den: rDen)
                     }
                 case .Rational(let lNum, let lDen):
-                    switch right {
+                    switch rhs {
                     case .Raw(let r):
                         return .Rational(num: r * lDen + lNum, den: lDen)
                     case .Rational(let rNum, let rDen):
@@ -57,17 +70,17 @@ extension SchemaV1 {
                 }
             }
             
-            static func - (left: Value, right: Value) -> Value {
-                switch left {
+            static func - (lhs: Magnitude, rhs: Magnitude) -> Magnitude {
+                switch lhs {
                 case .Raw(let l):
-                    switch right {
+                    switch rhs {
                     case .Raw(let r):
                         return .Raw(l - r)
                     case .Rational(let rNum, let rDen):
                         return .Rational(num: l * rDen - rNum, den: rDen)
                     }
                 case .Rational(let lNum, let lDen):
-                    switch right {
+                    switch rhs {
                     case .Raw(let r):
                         return .Rational(num: r * lDen - lNum, den: lDen)
                     case .Rational(let rNum, let rDen):
@@ -76,30 +89,21 @@ extension SchemaV1 {
                 }
             }
             
-            static func * (left: Value, right: Double) -> Value {
-                switch left {
+            static func * (lhs: Magnitude, rhs: Double) -> Magnitude {
+                switch lhs {
                 case .Raw(let value):
-                    return .Raw(value * right)
+                    return .Raw(value * rhs)
                 case .Rational(let num, let den):
-                    return right > 1 ? .Rational(num: num * right, den: den) : .Rational(num: num, den: den / right)
+                    return rhs > 1 ? .Rational(num: num * rhs, den: den) : .Rational(num: num, den: den / rhs)
                 }
             }
             
-            static func / (left: Value, right: Double) -> Value {
-                switch left {
+            static func / (lhs: Magnitude, rhs: Double) -> Magnitude {
+                switch lhs {
                 case .Raw(let value):
-                    return .Raw(value / right)
+                    return .Raw(value / rhs)
                 case .Rational(let num, let den):
-                    return right > 1 ? .Rational(num: num, den: den * right) : .Rational(num: num / right, den: den)
-                }
-            }
-            
-            func toValue() -> Double {
-                switch self {
-                case .Raw(let value):
-                    return value
-                case .Rational(let num, let den):
-                    return num / den
+                    return rhs > 1 ? .Rational(num: num, den: den * rhs) : .Rational(num: num / rhs, den: den)
                 }
             }
             
@@ -120,24 +124,24 @@ extension SchemaV1 {
             }
         }
         
-        static func calories(_ value: Double) -> FoodAmount {
-            FoodAmount(value: .Raw(value), unit: .Calorie)
+        static func calories(_ value: Double) -> Quantity {
+            Quantity(value: .Raw(value), unit: .Calorie)
         }
         
-        static func grams(_ value: Double) -> FoodAmount {
-            FoodAmount(value: .Raw(value), unit: .Gram)
+        static func grams(_ value: Double) -> Quantity {
+            Quantity(value: .Raw(value), unit: .Gram)
         }
         
-        static func milligrams(_ value: Double) -> FoodAmount {
-            FoodAmount(value: .Raw(value), unit: .Milligram)
+        static func milligrams(_ value: Double) -> Quantity {
+            Quantity(value: .Raw(value), unit: .Milligram)
         }
         
         // The raw value of the amount
-        var value: Value
+        var value: Magnitude
         // The unit of the amount
-        var unit: FoodUnit
+        var unit: Unit
         
-        func toGrams() throws -> FoodAmount {
+        func toGrams() throws -> Quantity {
             var modifier: Double!
             switch unit {
             case .Microgram:
@@ -153,12 +157,12 @@ extension SchemaV1 {
             case .Pound:
                 modifier = 453.592
             default:
-                throw FoodError.invalidUnit(unit: unit)
+                throw ParseError.invalidUnit(unit: unit)
             }
-            return FoodAmount(value: value * modifier, unit: .Milligram)
+            return Quantity(value: value * modifier, unit: .Milligram)
         }
         
-        func toMilligrams() throws -> FoodAmount {
+        func toMilligrams() throws -> Quantity {
             var modifier: Double!
             switch unit {
             case .Microgram:
@@ -174,12 +178,12 @@ extension SchemaV1 {
             case .Pound:
                 modifier = 453592
             default:
-                throw FoodError.invalidUnit(unit: unit)
+                throw ParseError.invalidUnit(unit: unit)
             }
-            return FoodAmount(value: value * modifier, unit: .Milligram)
+            return Quantity(value: value * modifier, unit: .Milligram)
         }
         
-        func toMilliliters() throws -> FoodAmount {
+        func toMilliliters() throws -> Quantity {
             var modifier: Double!
             switch unit {
             case .Milliliter:
@@ -201,13 +205,13 @@ extension SchemaV1 {
             case .Gallon:
                 modifier = 3785.41
             default:
-                throw FoodError.invalidUnit(unit: unit)
+                throw ParseError.invalidUnit(unit: unit)
             }
-            return FoodAmount(value: value * modifier, unit: .Milligram)
+            return Quantity(value: value * modifier, unit: .Milligram)
         }
     }
     
-    enum FoodUnit: Codable, Equatable, Hashable {
+    enum Unit: Codable, Equatable, Hashable {
         // Energy
         case Calorie
         // Weight (US)
@@ -221,16 +225,18 @@ extension SchemaV1 {
         // Other
         case Custom(name: String)
         
-        func isSi() -> Bool {
-            switch self {
-            case .Microgram, .Milligram, .Gram, .Kilogram, .Milliliter, .Liter:
-                true
-            default:
-                false
+        var isSi: Bool {
+            get {
+                switch self {
+                case .Microgram, .Milligram, .Gram, .Kilogram, .Milliliter, .Liter:
+                    true
+                default:
+                    false
+                }
             }
         }
         
-        func isWeight() -> Bool {
+        var isWeight: Bool {
             switch self {
             case .Ounce, .Pound, .Microgram, .Milligram, .Gram, .Kilogram:
                 return true
@@ -239,7 +245,7 @@ extension SchemaV1 {
             }
         }
         
-        func isVolume() -> Bool {
+        var isVolume: Bool {
             switch self {
             case .Milliliter, .Liter, .Teaspoon, .Tablespoon, .FluidOunce, .Cup, .Pint, .Quart, .Gallon:
                 return true
@@ -248,7 +254,7 @@ extension SchemaV1 {
             }
         }
         
-        func getAbbreviation() -> String {
+        var abbreviation: String {
             switch self {
             case .Calorie:
                 ""
@@ -288,11 +294,11 @@ extension SchemaV1 {
         }
     }
     
-    enum FoodError: Error {
-        case invalidUnit(unit: FoodUnit)
+    enum ParseError: Error {
+        case invalidUnit(unit: Unit)
     }
     
-    enum FoodTier: String, CaseIterable, Codable, Identifiable {
+    enum RatingTier: String, CaseIterable, Codable, Identifiable {
         var id: String {
             get {
                 rawValue
@@ -301,7 +307,7 @@ extension SchemaV1 {
         
         case S, A, B, C, D, F
         
-        func getRating() -> Double {
+        var rating: Double {
             switch self {
             case .S:
                 9.5
@@ -318,7 +324,7 @@ extension SchemaV1 {
             }
         }
         
-        static func fromRating(rating: Double?) -> FoodTier? {
+        static func fromRating(rating: Double?) -> RatingTier? {
             if rating == nil {
                 return nil
             }

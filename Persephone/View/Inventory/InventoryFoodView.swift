@@ -41,14 +41,14 @@ struct InventoryFoodView: View {
             }
             switch item.amount {
             case .Single(let total, let remaining):
-                Gauge(value: remaining.value.toValue(), in: 0...total.value.toValue()) {
+                Gauge(value: remaining.value.value, in: 0...total.value.value) {
                     
                 } currentValueLabel: {
-                    Text("\(formatter.string(for: remaining.value)!) \(remaining.unit.getAbbreviation())")
+                    Text("\(formatter.string(for: remaining.value)!) \(remaining.unit.abbreviation)")
                 } minimumValueLabel: {
                     Text("0")
                 } maximumValueLabel: {
-                    Text("\(formatter.string(for: total.value)!) \(total.unit.getAbbreviation())")
+                    Text("\(formatter.string(for: total.value)!) \(total.unit.abbreviation)")
                 }
             case .Collection(let total, let remaining):
                 Gauge(value: Double(total) / Double(remaining)) {

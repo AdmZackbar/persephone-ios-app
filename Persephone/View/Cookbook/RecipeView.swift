@@ -147,28 +147,28 @@ struct RecipeView: View {
             Divider()
             HStack(spacing: 10) {
                 Image(systemName: "leaf.fill")
-                createStackedText(upper: "\(FoodTier.fromRating(rating: recipe.metaData.rating)?.rawValue ?? "N/A") tier", lower: "FRESH")
+                createStackedText(upper: "\(RatingTier.fromRating(rating: recipe.metaData.rating)?.rawValue ?? "N/A") tier", lower: "FRESH")
             }.contextMenu {
                 Button("N/A") {
                     recipe.metaData.rating = nil
                 }
-                ForEach(FoodTier.allCases) { tier in
+                ForEach(RatingTier.allCases) { tier in
                     Button(tier.rawValue) {
-                        recipe.metaData.rating = tier.getRating()
+                        recipe.metaData.rating = tier.rating
                     }
                 }
             }
             Divider()
             HStack(spacing: 10) {
                 Image(systemName: "snowflake")
-                createStackedText(upper: "\(FoodTier.fromRating(rating: recipe.metaData.ratingLeftover)?.rawValue ?? "N/A") tier", lower: "LEFTOVER")
+                createStackedText(upper: "\(RatingTier.fromRating(rating: recipe.metaData.ratingLeftover)?.rawValue ?? "N/A") tier", lower: "LEFTOVER")
             }.contextMenu {
                 Button("N/A") {
                     recipe.metaData.ratingLeftover = nil
                 }
-                ForEach(FoodTier.allCases) { tier in
+                ForEach(RatingTier.allCases) { tier in
                     Button(tier.rawValue) {
-                        recipe.metaData.ratingLeftover = tier.getRating()
+                        recipe.metaData.ratingLeftover = tier.rating
                     }
                 }
             }
@@ -243,7 +243,7 @@ struct RecipeView: View {
     let container = createTestModelContainer()
     let recipe = createTestRecipeItem(container.mainContext)
     let foodItem = createTestFoodItem(container.mainContext)
-    recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: .Raw(3), unit: .Custom(name: "Serving"))))
+    recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: Quantity(value: .Raw(3), unit: .Custom(name: "Serving"))))
     return NavigationStack {
         RecipeView(recipe: recipe)
             .modelContainer(container)

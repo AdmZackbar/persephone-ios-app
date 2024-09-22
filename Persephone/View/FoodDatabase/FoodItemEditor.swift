@@ -36,7 +36,7 @@ struct FoodItemEditor: View {
     @State private var brand: String = ""
     @State private var details: String = ""
     // Size
-    @State private var amountUnit: FoodUnit = .Gram
+    @State private var amountUnit: Unit = .Gram
     @State private var numServings: Double = 0.0
     @State private var servingSize: String = ""
     @State private var totalAmount: Double = 0
@@ -51,7 +51,7 @@ struct FoodItemEditor: View {
     // Ingredients
     @State private var ingredients: String = ""
     @State private var allergens: String = ""
-    @State private var nutrients: [Nutrient : FoodAmount] = [:]
+    @State private var nutrients: NutritionDict = [:]
     @State private var storeItems: [FoodItem.StoreEntry] = []
     @State private var rating: Double? = nil
     @State private var tags: [String] = []
@@ -67,7 +67,7 @@ struct FoodItemEditor: View {
     
     init(path: Binding<[FoodDatabaseView.ViewType]>, item: FoodItem? = nil, mode: Mode? = nil) {
         self._path = path
-        self.item = item ?? FoodItem(name: "", details: "", metaData: FoodItem.MetaData(), ingredients: FoodIngredients(nutrients: [:]), size: FoodItem.Size(totalAmount: FoodAmount(value: .Raw(0), unit: .Gram), numServings: 1, servingSize: ""), storeEntries: [])
+        self.item = item ?? FoodItem(name: "", details: "", metaData: FoodItem.MetaData(), ingredients: FoodIngredients(nutrients: [:]), size: FoodItem.Size(totalAmount: Quantity(value: .Raw(0), unit: .Gram), numServings: 1, servingSize: ""), storeEntries: [])
         self.mode = mode ?? (item == nil ? .Add : .Edit)
     }
     
@@ -111,8 +111,8 @@ struct FoodItemEditor: View {
             Section("Rating") {
                 Picker("Rating:", selection: $rating) {
                     Text("N/A").tag(nil as Double?)
-                    ForEach(FoodTier.allCases) { tier in
-                        Text(tier.rawValue).tag(tier.getRating() as Double?)
+                    ForEach(RatingTier.allCases) { tier in
+                        Text(tier.rawValue).tag(tier.rating as Double?)
                     }
                 }.pickerStyle(.segmented)
             }
@@ -148,7 +148,7 @@ struct FoodItemEditor: View {
                     .autocorrectionDisabled()
             }
             HStack {
-                Text(amountUnit.isWeight() ? "Net Wt:" : "Net Vol:").fontWeight(.light)
+                Text(amountUnit.isWeight ? "Net Wt:" : "Net Vol:").fontWeight(.light)
                 Picker(selection: $amountUnit) {
                     createAmountUnitOption(.Gram)
                     createAmountUnitOption(.Ounce)
@@ -172,7 +172,7 @@ struct FoodItemEditor: View {
                             .textInputAutocapitalization(.words)
                             .autocorrectionDisabled()
                         Spacer()
-                        Text("(\(formatter.string(for: servingAmount)!)\(amountUnit.getAbbreviation()))")
+                        Text("(\(formatter.string(for: servingAmount)!)\(amountUnit.abbreviation))")
                             .fontWeight(.light)
                             .italic()
                             .onTapGesture {
@@ -230,7 +230,7 @@ struct FoodItemEditor: View {
                             }
                         case .PerAmount(let cost, let amount):
                             VStack(alignment: .trailing) {
-                                Text("\(cost.toString()) / \(amount.value.toValue() == 1 ? "" : amount.value.toString())\(amount.unit.getAbbreviation())")
+                                Text("\(cost.toString()) / \(amount.value.value == 1 ? "" : amount.value.toString())\(amount.unit.abbreviation)")
                                 if !storeItem.available {
                                     Text("(retired)").font(.caption).fontWeight(.thin)
                                 }
@@ -251,8 +251,8 @@ struct FoodItemEditor: View {
         }
     }
     
-    private func createAmountUnitOption(_ unit: FoodUnit) -> some View {
-        Text(unit.getAbbreviation()).tag(unit).font(.subheadline).fontWeight(.thin)
+    private func createAmountUnitOption(_ unit: Unit) -> some View {
+        Text(unit.abbreviation).tag(unit).font(.subheadline).fontWeight(.thin)
     }
     
     private func isMainInfoInvalid() -> Bool {
@@ -272,7 +272,7 @@ struct FoodItemEditor: View {
             amountUnit = item.size.totalAmount.unit
             numServings = item.size.numServings
             servingSize = item.size.servingSize
-            totalAmount = item.size.totalAmount.value.toValue()
+            totalAmount = item.size.totalAmount.value.value
             ingredients = item.ingredients.all
             allergens = item.ingredients.allergens
             nutrients = item.ingredients.nutrients
@@ -288,7 +288,7 @@ struct FoodItemEditor: View {
         item.name = name
         item.metaData.brand = brand
         item.details = details
-        item.size = FoodItem.Size(totalAmount: FoodAmount(value: .Raw(totalAmount), unit: amountUnit), numServings: numServings, servingSize: servingSize)
+        item.size = FoodItem.Size(totalAmount: Quantity(value: .Raw(totalAmount), unit: amountUnit), numServings: numServings, servingSize: servingSize)
         item.ingredients.all = ingredients
         item.ingredients.allergens = allergens
         item.ingredients.nutrients = nutrients

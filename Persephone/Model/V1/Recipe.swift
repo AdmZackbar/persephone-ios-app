@@ -22,9 +22,9 @@ extension SchemaV1 {
         var instructions: [Section]
         // Size info of the recipe
         var size: Size
-        var nutrients: [Nutrient : FoodAmount] {
+        var nutrients: NutritionDict {
             get {
-                var nutrients: [Nutrient : FoodAmount] = [:]
+                var nutrients: NutritionDict = [:]
                 for ingredient in ingredients {
                     if let food = ingredient.food {
                         for nutrient in food.ingredients.nutrients.keys {
@@ -32,17 +32,17 @@ extension SchemaV1 {
                             switch ingredient.amount.unit {
                             case .Custom(_):
                                 // Assume serving
-                                scale = ingredient.amount.value.toValue()
+                                scale = ingredient.amount.value.value
                             default:
-                                if ingredient.amount.unit.isWeight() {
-                                    try? scale = ingredient.amount.toGrams().value.toValue() / food.size.servingAmount.toGrams().value.toValue()
+                                if ingredient.amount.unit.isWeight {
+                                    try? scale = ingredient.amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
                                 } else {
-                                    try? scale = ingredient.amount.toMilliliters().value.toValue() / food.size.servingAmount.toMilliliters().value.toValue()
+                                    try? scale = ingredient.amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
                                 }
                             }
-                            let foodNutrient = FoodAmount(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
+                            let foodNutrient = Quantity(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
                             if let n = nutrients[nutrient] {
-                                nutrients[nutrient] = FoodAmount(value: n.value + foodNutrient.value, unit: n.unit)
+                                nutrients[nutrient] = Quantity(value: n.value + foodNutrient.value, unit: n.unit)
                             } else {
                                 nutrients[nutrient] = foodNutrient
                             }
@@ -166,7 +166,7 @@ extension SchemaV1 {
         // The recipe of this ingredient
         var recipe: Recipe!
         // The amount used
-        var amount: FoodAmount
+        var amount: Quantity
         // Optional notes on this ingredient
         var notes: String?
         var estimatedCost: FoodItem.Cost? {
@@ -181,7 +181,7 @@ extension SchemaV1 {
             return nil
         }
         
-        init(name: String, food: FoodItem? = nil, recipe: Recipe, amount: FoodAmount, notes: String? = nil) {
+        init(name: String, food: FoodItem? = nil, recipe: Recipe, amount: Quantity, notes: String? = nil) {
             self.name = name
             self.food = food
             self.recipe = recipe
@@ -194,26 +194,26 @@ extension SchemaV1 {
                 switch amount.unit {
                 case .Custom(_):
                     // Assume 'serving'
-                    let servingValue = (amount.value * food.size.servingSizeAmount.value.toValue()).toString()
-                    let servingUnit = food.size.servingSizeAmount.unit.getAbbreviation().lowercased()
-                    let totalAmountValue = (food.size.servingAmount.value * amount.value.toValue()).toString()
-                    let totalAmountUnit = food.size.servingAmount.unit.getAbbreviation()
+                    let servingValue = (amount.value * food.size.servingSizeAmount.value.value).toString()
+                    let servingUnit = food.size.servingSizeAmount.unit.abbreviation.lowercased()
+                    let totalAmountValue = (food.size.servingAmount.value * amount.value.value).toString()
+                    let totalAmountUnit = food.size.servingAmount.unit.abbreviation
                     return "\(servingValue) \(servingUnit) (\(totalAmountValue) \(totalAmountUnit))"
                 default:
                     break
                 }
             }
-            return "\(amount.value.toString()) \(amount.unit.getAbbreviation())"
+            return "\(amount.value.toString()) \(amount.unit.abbreviation)"
         }
         
         func computeNumServings(food: FoodItem) -> Double {
-            if amount.unit.isWeight() {
-                return try! amount.toGrams().value.toValue() / food.size.servingAmount.toGrams().value.toValue()
-            } else if amount.unit.isVolume() {
-                return try! amount.toMilliliters().value.toValue() / food.size.servingAmount.toMilliliters().value.toValue()
+            if amount.unit.isWeight {
+                return try! amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
+            } else if amount.unit.isVolume {
+                return try! amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
             }
             // Assume servings
-            return amount.value.toValue()
+            return amount.value.value
         }
     }
 }

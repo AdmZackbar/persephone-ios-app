@@ -47,9 +47,9 @@ extension SchemaV1 {
             self.storeEntries = storeEntries
         }
         
-        func getNutrient(_ nutrient: Nutrient, numServings: Double = 1.0) -> FoodAmount? {
+        func getNutrient(_ nutrient: Nutrient, numServings: Double = 1.0) -> Quantity? {
             if let value = ingredients.nutrients[nutrient] {
-                return FoodAmount(value: value.value * numServings, unit: value.unit)
+                return Quantity(value: value.value * numServings, unit: value.unit)
             }
             return nil
         }
@@ -83,35 +83,35 @@ extension SchemaV1 {
         
         struct Size: Codable, Hashable, Equatable {
             // The empirical net weight/volume (e.g. net wt 10 lb)
-            var totalAmount: FoodAmount
+            var totalAmount: Quantity
             // The total number of servings that the item contains
             var numServings: Double
             // The friendly serving size amount (e.g. 1 waffle, 2 portions, etc.)
             var servingSize: String
             // The empirical serving size (e.g. 54 g)
-            var servingAmount: FoodAmount {
+            var servingAmount: Quantity {
                 get {
-                    FoodAmount(value: totalAmount.value / numServings, unit: totalAmount.unit)
+                    Quantity(value: totalAmount.value / numServings, unit: totalAmount.unit)
                 }
                 set(value) {
                     // Update number of servings instead of total amount
-                    numServings = totalAmount.value.toValue() / value.value.toValue()
+                    numServings = totalAmount.value.value / value.value.value
                 }
             }
-            var servingSizeAmount: FoodAmount {
+            var servingSizeAmount: Quantity {
                 get {
                     if let match = try? /^([\d\/.]+)?\s*(.+)$/.wholeMatch(in: servingSize) {
                         if let rawValue = match.1?.string {
-                            if let value = FoodAmount.Value.parseString(rawValue) {
-                                FoodAmount(value: value, unit: .Custom(name: match.2.string))
+                            if let value = Quantity.Magnitude.parseString(rawValue) {
+                                Quantity(value: value, unit: .Custom(name: match.2.string))
                             } else {
-                                FoodAmount(value: .Raw(1), unit: .Custom(name: "serving"))
+                                Quantity(value: .Raw(1), unit: .Custom(name: "serving"))
                             }
                         } else {
-                            FoodAmount(value: .Raw(1), unit: .Custom(name: match.2.string))
+                            Quantity(value: .Raw(1), unit: .Custom(name: match.2.string))
                         }
                     } else {
-                        FoodAmount(value: .Raw(1), unit: .Custom(name: "serving"))
+                        Quantity(value: .Raw(1), unit: .Custom(name: "serving"))
                     }
                 }
             }
@@ -128,13 +128,13 @@ extension SchemaV1 {
                 case .Collection(let cost, let quantity):
                     cost / Double(quantity)
                 case .PerAmount(let cost, let amount):
-                    if amount.unit.isWeight() && size.totalAmount.unit.isWeight() {
-                        cost / Double(amount.value.toValue()) * (try! size.totalAmount.toGrams().value.toValue() / amount.toGrams().value.toValue())
-                    } else if amount.unit.isVolume() && size.totalAmount.unit.isVolume() {
-                        cost / Double(amount.value.toValue()) * (try! size.totalAmount.toMilliliters().value.toValue() / amount.toMilliliters().value.toValue())
+                    if amount.unit.isWeight && size.totalAmount.unit.isWeight {
+                        cost / Double(amount.value.value) * (try! size.totalAmount.toGrams().value.value / amount.toGrams().value.value)
+                    } else if amount.unit.isVolume && size.totalAmount.unit.isVolume {
+                        cost / Double(amount.value.value) * (try! size.totalAmount.toMilliliters().value.value / amount.toMilliliters().value.value)
                     } else {
                         // TODO handle case
-                        cost / Double(amount.value.toValue())
+                        cost / Double(amount.value.value)
                     }
                 }
             }
@@ -144,11 +144,11 @@ extension SchemaV1 {
             }
             
             func costPerServingAmount(size: Size) -> Cost {
-                costPerServing(size: size) / size.servingSizeAmount.value.toValue()
+                costPerServing(size: size) / size.servingSizeAmount.value.value
             }
             
             func costPerEnergy(foodItem: FoodItem) -> Cost? {
-                let caloriesPerServing = foodItem.getNutrient(.Energy)?.value.toValue() ?? 0
+                let caloriesPerServing = foodItem.getNutrient(.Energy)?.value.value ?? 0
                 if caloriesPerServing <= 0 {
                     return nil
                 }
@@ -157,17 +157,17 @@ extension SchemaV1 {
             }
             
             func costPerWeight(size: Size) -> Cost {
-                try! costPerUnit(size: size) * (100 / size.totalAmount.toGrams().value.toValue())
+                try! costPerUnit(size: size) * (100 / size.totalAmount.toGrams().value.value)
             }
             
             func costPerVolume(size: Size) -> Cost {
-                try! costPerUnit(size: size) * (100 / size.totalAmount.toMilliliters().value.toValue())
+                try! costPerUnit(size: size) * (100 / size.totalAmount.toMilliliters().value.value)
             }
         }
         
         enum CostType: Codable, Equatable, Hashable {
             case Collection(cost: Cost, quantity: Int)
-            case PerAmount(cost: Cost, amount: FoodAmount)
+            case PerAmount(cost: Cost, amount: Quantity)
         }
         
         enum Cost: Codable, Equatable, Hashable, Comparable {

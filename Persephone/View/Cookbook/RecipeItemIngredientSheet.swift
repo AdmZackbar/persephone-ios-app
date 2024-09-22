@@ -110,28 +110,28 @@ struct RecipeItemIngredientSheet: View {
         @Binding private var viewState: ViewState
         
         @State private var amount: String = ""
-        private var amountValue: FoodAmount.Value? {
+        private var amountValue: Quantity.Magnitude? {
             get {
                 .parseString(amount)
             }
         }
-        @State private var unit: FoodUnit = .Custom(name: "Serving")
+        @State private var unit: Unit = .Custom(name: "Serving")
         @State private var notes: String = ""
         
         var body: some View {
             Form {
                 Picker(selection: $unit) {
-                    Text("serving").tag(FoodUnit.Custom(name: "Serving"))
-                    if foodItem.size.servingAmount.unit.isWeight() {
-                        Text("g").tag(FoodUnit.Gram)
-                        Text("oz").tag(FoodUnit.Ounce)
-                        Text("lb").tag(FoodUnit.Pound)
+                    Text("serving").tag(Unit.Custom(name: "Serving"))
+                    if foodItem.size.servingAmount.unit.isWeight {
+                        Text("g").tag(Unit.Gram)
+                        Text("oz").tag(Unit.Ounce)
+                        Text("lb").tag(Unit.Pound)
                     } else {
-                        Text("tsp").tag(FoodUnit.Teaspoon)
-                        Text("tbsp").tag(FoodUnit.Tablespoon)
-                        Text("cup").tag(FoodUnit.Cup)
-                        Text("mL").tag(FoodUnit.Milliliter)
-                        Text("fl oz").tag(FoodUnit.FluidOunce)
+                        Text("tsp").tag(Unit.Teaspoon)
+                        Text("tbsp").tag(Unit.Tablespoon)
+                        Text("cup").tag(Unit.Cup)
+                        Text("mL").tag(Unit.Milliliter)
+                        Text("fl oz").tag(Unit.FluidOunce)
                     }
                 } label: {
                     TextField("amount", text: $amount)
@@ -167,10 +167,10 @@ struct RecipeItemIngredientSheet: View {
                         Button("Save") {
                             switch mode {
                             case .Add:
-                                recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: unit), notes: notes.isEmpty ? nil : notes))
+                                recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: Quantity(value: amountValue!, unit: unit), notes: notes.isEmpty ? nil : notes))
                             case .Edit(let ingredient):
                                 ingredient.name = foodItem.name
-                                ingredient.amount = FoodAmount(value: amountValue!, unit: unit)
+                                ingredient.amount = Quantity(value: amountValue!, unit: unit)
                                 ingredient.notes = notes.isEmpty ? nil : notes
                             }
                             dismiss()
@@ -197,7 +197,7 @@ struct RecipeItemIngredientSheet: View {
                         Text(item.metaData.brand ?? "Generic Brand")
                             .font(.subheadline).italic()
                         Spacer()
-                        if let tier = FoodTier.fromRating(rating: item.metaData.rating) {
+                        if let tier = RatingTier.fromRating(rating: item.metaData.rating) {
                             Text("\(tier.rawValue) Tier")
                                 .font(.subheadline).bold()
                         }
@@ -210,9 +210,9 @@ struct RecipeItemIngredientSheet: View {
                         .frame(width: 160, height: 120)
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) {
-                        Text("\((item.size.servingSizeAmount.value * scale).toString()) \(item.size.servingSizeAmount.unit.getAbbreviation())")
+                        Text("\((item.size.servingSizeAmount.value * scale).toString()) \(item.size.servingSizeAmount.unit.abbreviation)")
                             .bold()
-                        Text("\((item.size.servingAmount.value * scale).toString())\(item.size.servingAmount.unit.getAbbreviation())")
+                        Text("\((item.size.servingAmount.value * scale).toString())\(item.size.servingAmount.unit.abbreviation)")
                             .font(.subheadline).bold()
                     }
                 }
@@ -223,15 +223,15 @@ struct RecipeItemIngredientSheet: View {
             if let amountValue = amountValue {
                 switch unit {
                 case .Custom(_):
-                    return amountValue.toValue()
+                    return amountValue.value
                 default:
-                    if unit.isWeight() {
-                        if let servingAmount = try? foodItem.size.servingAmount.toGrams().value.toValue() {
-                            return try! (FoodAmount(value: amountValue, unit: unit).toGrams().value / servingAmount).toValue()
+                    if unit.isWeight {
+                        if let servingAmount = try? foodItem.size.servingAmount.toGrams().value.value {
+                            return try! (Quantity(value: amountValue, unit: unit).toGrams().value / servingAmount).value
                         }
-                    } else if unit.isVolume() {
-                        if let servingAmount = try? foodItem.size.servingAmount.toMilliliters().value.toValue() {
-                            return try! (FoodAmount(value: amountValue, unit: unit).toMilliliters().value / servingAmount).toValue()
+                    } else if unit.isVolume {
+                        if let servingAmount = try? foodItem.size.servingAmount.toMilliliters().value.value {
+                            return try! (Quantity(value: amountValue, unit: unit).toMilliliters().value / servingAmount).value
                         }
                     }
                 }

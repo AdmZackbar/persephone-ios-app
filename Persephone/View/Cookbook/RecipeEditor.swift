@@ -122,14 +122,14 @@ struct RecipeEditor: View {
             Section("Rating") {
                 Picker("Rating (Fresh):", selection: $rating) {
                     Text("N/A").tag(nil as Double?)
-                    ForEach(FoodTier.allCases) { tier in
-                        Text(tier.rawValue).tag(tier.getRating() as Double?)
+                    ForEach(RatingTier.allCases) { tier in
+                        Text(tier.rawValue).tag(tier.rating as Double?)
                     }
                 }
                 Picker("Rating (Leftover):", selection: $ratingLeftover) {
                     Text("N/A").tag(nil as Double?)
-                    ForEach(FoodTier.allCases) { tier in
-                        Text(tier.rawValue).tag(tier.getRating() as Double?)
+                    ForEach(RatingTier.allCases) { tier in
+                        Text(tier.rawValue).tag(tier.rating as Double?)
                     }
                 }
                 Picker("Skill Level:", selection: $difficulty) {

@@ -14,13 +14,13 @@ typealias Nutrient = SchemaV1.Nutrient
 extension SchemaV1 {
     struct FoodIngredients: Codable {
         // Stores the amount of each nutrient per serving
-        var nutrients: [Nutrient : FoodAmount]
+        var nutrients: NutritionDict
         // The full list of ingredients that make up the item
         var all: String
         // The full list of known allergens for the item
         var allergens: String
         
-        init(nutrients: [Nutrient : FoodAmount], all: String = "", allergens: String = "") {
+        init(nutrients: NutritionDict, all: String = "", allergens: String = "") {
             self.nutrients = nutrients
             self.all = all
             self.allergens = allergens
@@ -50,7 +50,7 @@ extension SchemaV1 {
              Iron,
              Potassium
         
-        func getCommonUnit() -> FoodUnit {
+        func getCommonUnit() -> Unit {
             switch self {
             case .Energy:
                 return .Calorie

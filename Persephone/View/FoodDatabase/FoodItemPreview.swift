@@ -34,7 +34,7 @@ struct FoodItemPreview: View {
                     Text(item.metaData.brand ?? "Generic Brand")
                         .font(.subheadline).italic()
                     Spacer()
-                    if let tier = FoodTier.fromRating(rating: item.metaData.rating) {
+                    if let tier = RatingTier.fromRating(rating: item.metaData.rating) {
                         Text("\(tier.rawValue) Tier")
                             .font(.subheadline).bold()
                     }
@@ -52,24 +52,24 @@ struct FoodItemPreview: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(item.size.servingSize)
                         .bold()
-                    Text("\(item.size.servingAmount.value.toString())\(item.size.servingAmount.unit.getAbbreviation())")
+                    Text("\(item.size.servingAmount.value.toString())\(item.size.servingAmount.unit.abbreviation)")
                         .font(.subheadline).bold()
                     Text("\(formatter.string(for: item.size.numServings)!) servings")
                         .font(.subheadline)
-                    if item.size.totalAmount.unit.isWeight() {
-                        if item.size.totalAmount.unit == .Gram && item.size.totalAmount.value.toValue() > 1000 {
+                    if item.size.totalAmount.unit.isWeight {
+                        if item.size.totalAmount.unit == .Gram && item.size.totalAmount.value.value > 1000 {
                             Text("Net Wt: \((item.size.totalAmount.value / 1000).toString())kg")
                                 .font(.subheadline)
                         } else {
-                            Text("Net Wt: \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.getAbbreviation())")
+                            Text("Net Wt: \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.abbreviation)")
                                 .font(.subheadline)
                         }
-                    } else if item.size.totalAmount.unit.isVolume() {
-                        if item.size.totalAmount.unit == .Milliliter && item.size.totalAmount.value.toValue() > 1000 {
+                    } else if item.size.totalAmount.unit.isVolume {
+                        if item.size.totalAmount.unit == .Milliliter && item.size.totalAmount.value.value > 1000 {
                             Text("Net Vol: \((item.size.totalAmount.value / 1000).toString())L")
                                 .font(.subheadline)
                         } else {
-                            Text("Net Vol: \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.getAbbreviation())")
+                            Text("Net Vol: \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.abbreviation)")
                                 .font(.subheadline)
                         }
                     }
@@ -112,14 +112,14 @@ struct FoodItemPreview: View {
                     Text("100 cal")
                         .font(.caption).italic()
                 }
-            } else if item.size.totalAmount.unit.isWeight() {
+            } else if item.size.totalAmount.unit.isWeight {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(storeEntry.costPerWeight(size: item.size).toString())
                         .font(.subheadline).bold()
                     Text("100 g")
                         .font(.caption).italic()
                 }
-            } else if item.size.totalAmount.unit.isVolume() {
+            } else if item.size.totalAmount.unit.isVolume {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(storeEntry.costPerVolume(size: item.size).toString())
                         .font(.subheadline).bold()
@@ -127,7 +127,7 @@ struct FoodItemPreview: View {
                         .font(.caption).italic()
                 }
             }
-            if item.size.numServings != 1 && item.size.servingSizeAmount.value.toValue() != 1 {
+            if item.size.numServings != 1 && item.size.servingSizeAmount.value.value != 1 {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(storeEntry.costPerServing(size: item.size).toString())
                         .font(.subheadline).bold()
@@ -138,7 +138,7 @@ struct FoodItemPreview: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(storeEntry.costPerServingAmount(size: item.size).toString())
                     .font(.subheadline).bold()
-                Text(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())
+                Text(item.size.servingSizeAmount.unit.abbreviation.lowercased())
                     .font(.caption).italic()
             }
         }
@@ -153,10 +153,10 @@ struct FoodItemPreview: View {
                 return "\(quantity) for \(cost.toString())"
             }
         case .PerAmount(let cost, let amount):
-            if amount.value.toValue() == 1 {
-                return "\(cost.toString()) per \(amount.unit.getAbbreviation())"
+            if amount.value.value == 1 {
+                return "\(cost.toString()) per \(amount.unit.abbreviation)"
             } else {
-                return "\(cost.toString()) per \(formatter.string(for: amount.value.toValue())!) \(amount.unit.getAbbreviation())"
+                return "\(cost.toString()) per \(formatter.string(for: amount.value.value)!) \(amount.unit.abbreviation)"
             }
         }
     }

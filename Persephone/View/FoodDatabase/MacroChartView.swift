@@ -9,7 +9,7 @@ import Charts
 import SwiftUI
 
 struct MacroChartView: View {
-    var nutrients: [Nutrient : FoodAmount]
+    var nutrients: NutritionDict
     var scale: Double
     
     private let formatter: NumberFormatter = {
@@ -19,7 +19,7 @@ struct MacroChartView: View {
         return formatter
     }()
     
-    init(nutrients: [Nutrient : FoodAmount], scale: Double = 1) {
+    init(nutrients: NutritionDict, scale: Double = 1) {
         self.nutrients = nutrients
         self.scale = scale
     }
@@ -108,7 +108,7 @@ struct MacroChartView: View {
     
     private func computeAmount(_ nutrient: Nutrient) -> Double {
         if let amount = try? nutrients[nutrient]?.toGrams().value {
-            (amount * scale).toValue()
+            (amount * scale).value
         } else {
             0
         }

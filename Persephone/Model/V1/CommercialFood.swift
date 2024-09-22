@@ -16,10 +16,10 @@ extension SchemaV1 {
         var name: String
         var seller: String
         var cost: FoodItem.Cost
-        var nutrients: [Nutrient : FoodAmount]
+        var nutrients: NutritionDict
         var metaData: MetaData
         
-        init(name: String, seller: String, cost: FoodItem.Cost, nutrients: [Nutrient : FoodAmount], metaData: MetaData) {
+        init(name: String, seller: String, cost: FoodItem.Cost, nutrients: NutritionDict, metaData: MetaData) {
             self.name = name
             self.seller = seller
             self.cost = cost

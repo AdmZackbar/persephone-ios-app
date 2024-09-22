@@ -20,7 +20,7 @@ struct CommercialFoodPreview: View {
                     .italic()
                 Spacer()
                 if let
-                    rating = FoodTier.fromRating(rating: food.metaData.rating)?.rawValue {
+                    rating = RatingTier.fromRating(rating: food.metaData.rating)?.rawValue {
                     Text("\(rating) Tier").font(.subheadline).bold()
                 }
             }
@@ -33,7 +33,7 @@ struct CommercialFoodPreview: View {
                         Spacer()
                     }
                     HStack {
-                        if let cal = food.nutrients[.Energy]?.value.toValue() {
+                        if let cal = food.nutrients[.Energy]?.value.value {
                             VStack(alignment: .leading) {
                                 Text((food.cost * 100 / cal).toString())
                                     .font(.subheadline)
@@ -42,7 +42,7 @@ struct CommercialFoodPreview: View {
                             }
                         }
                         Spacer()
-                        if let protein = food.nutrients[.Protein]?.value.toValue() {
+                        if let protein = food.nutrients[.Protein]?.value.value {
                             VStack(alignment: .trailing) {
                                 Text((food.cost / protein).toString())
                                     .font(.subheadline)

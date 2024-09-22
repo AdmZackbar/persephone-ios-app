@@ -28,7 +28,7 @@ struct RecipeIngredientSheet: View {
     
     @State private var name: String = ""
     @State private var amount: String = ""
-    private var amountValue: FoodAmount.Value? {
+    private var amountValue: Quantity.Magnitude? {
         get {
             if let match = amount.wholeMatch(of: /([\d.]+)\s*\/\s*([\d.]+)\s+(.+)/),
                 let num = Double(match.1),
@@ -43,7 +43,7 @@ struct RecipeIngredientSheet: View {
             return nil
         }
     }
-    private var amountUnit: FoodUnit? {
+    private var amountUnit: Unit? {
         get {
             var unitName: String?
             if let match = amount.wholeMatch(of: /([\d.]+)\s*\/\s*([\d.]+)\s+(.+)/) {
@@ -68,7 +68,7 @@ struct RecipeIngredientSheet: View {
         return formatter
     }()
     
-    private func tryConvertToUnit(unitName: String) -> FoodUnit? {
+    private func tryConvertToUnit(unitName: String) -> Unit? {
         switch unitName.trimmingCharacters(in: .punctuationCharacters).lowercased() {
         case "c", "cup", "cups":
             return .Cup
@@ -132,7 +132,7 @@ struct RecipeIngredientSheet: View {
                     switch mode {
                     case .Edit(let ingredient):
                         name = ingredient.name
-                        amount = "\(ingredient.amount.value.toString()) \(ingredient.amount.unit.getAbbreviation())"
+                        amount = "\(ingredient.amount.value.toString()) \(ingredient.amount.unit.abbreviation)"
                         notes = ingredient.notes ?? ""
                     default:
                         // Do nothing
@@ -149,10 +149,10 @@ struct RecipeIngredientSheet: View {
                         Button("Save") {
                             switch mode {
                             case .Add(let recipe):
-                                recipe.ingredients.append(RecipeIngredient(name: name, recipe: recipe, amount: FoodAmount(value: amountValue!, unit: amountUnit!), notes: notes))
+                                recipe.ingredients.append(RecipeIngredient(name: name, recipe: recipe, amount: Quantity(value: amountValue!, unit: amountUnit!), notes: notes))
                             case .Edit(let ingredient):
                                 ingredient.name = name
-                                ingredient.amount = FoodAmount(value: amountValue!, unit: amountUnit!)
+                                ingredient.amount = Quantity(value: amountValue!, unit: amountUnit!)
                                 ingredient.notes = notes.isEmpty ? nil : notes
                             }
                             dismiss()

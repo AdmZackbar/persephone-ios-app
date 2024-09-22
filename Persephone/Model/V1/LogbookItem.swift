@@ -15,12 +15,12 @@ extension SchemaV1 {
     @Model
     final class LogbookItem {
         @Attribute(.unique) var date: Date
-        var targetNutrients: [Nutrient : FoodAmount]
+        var targetNutrients: NutritionDict
         
         // Computes the aggregate of all nutrients
-        var nutrients: [Nutrient : FoodAmount] {
+        var nutrients: NutritionDict {
             get {
-                var nutrients: [Nutrient : FoodAmount] = [:]
+                var nutrients: NutritionDict = [:]
                 for entry in foodEntries {
                     if let food = entry.foodItem {
                         for nutrient in food.ingredients.nutrients.keys {
@@ -28,17 +28,17 @@ extension SchemaV1 {
                             switch entry.amount.unit {
                             case .Custom(_):
                                 // Assume serving
-                                scale = entry.amount.value.toValue()
+                                scale = entry.amount.value.value
                             default:
-                                if entry.amount.unit.isWeight() {
-                                    try? scale = entry.amount.toGrams().value.toValue() / food.size.servingAmount.toGrams().value.toValue()
+                                if entry.amount.unit.isWeight {
+                                    try? scale = entry.amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
                                 } else {
-                                    try? scale = entry.amount.toMilliliters().value.toValue() / food.size.servingAmount.toMilliliters().value.toValue()
+                                    try? scale = entry.amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
                                 }
                             }
-                            let foodNutrient = FoodAmount(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
+                            let foodNutrient = Quantity(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
                             if let n = nutrients[nutrient] {
-                                nutrients[nutrient] = FoodAmount(value: n.value + foodNutrient.value, unit: n.unit)
+                                nutrients[nutrient] = Quantity(value: n.value + foodNutrient.value, unit: n.unit)
                             } else {
                                 nutrients[nutrient] = foodNutrient
                             }
@@ -52,7 +52,7 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \LogbookFoodItemEntry.logItem)
         var foodEntries: [LogbookFoodItemEntry] = []
         
-        init(date: Date, targetNutrients: [Nutrient : FoodAmount] = [:]) {
+        init(date: Date, targetNutrients: NutritionDict = [:]) {
             // Enforce that all dates are agnostic of time
             self.date = Calendar.current.startOfDay(for: date)
             self.targetNutrients = targetNutrients
@@ -66,8 +66,8 @@ extension SchemaV1 {
             case Dessert
         }
         
-        func computeNutrients(mealType: MealType) -> [Nutrient : FoodAmount] {
-            var nutrients: [Nutrient : FoodAmount] = [:]
+        func computeNutrients(mealType: MealType) -> NutritionDict {
+            var nutrients: NutritionDict = [:]
             for entry in foodEntries.filter({ $0.mealType == mealType }) {
                 if let food = entry.foodItem {
                     for nutrient in food.ingredients.nutrients.keys {
@@ -75,17 +75,17 @@ extension SchemaV1 {
                         switch entry.amount.unit {
                         case .Custom(_):
                             // Assume serving
-                            scale = entry.amount.value.toValue()
+                            scale = entry.amount.value.value
                         default:
-                            if entry.amount.unit.isWeight() {
-                                try? scale = entry.amount.toGrams().value.toValue() / food.size.servingAmount.toGrams().value.toValue()
+                            if entry.amount.unit.isWeight {
+                                try? scale = entry.amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
                             } else {
-                                try? scale = entry.amount.toMilliliters().value.toValue() / food.size.servingAmount.toMilliliters().value.toValue()
+                                try? scale = entry.amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
                             }
                         }
-                        let foodNutrient = FoodAmount(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
+                        let foodNutrient = Quantity(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
                         if let n = nutrients[nutrient] {
-                            nutrients[nutrient] = FoodAmount(value: n.value + foodNutrient.value, unit: n.unit)
+                            nutrients[nutrient] = Quantity(value: n.value + foodNutrient.value, unit: n.unit)
                         } else {
                             nutrients[nutrient] = foodNutrient
                         }
@@ -100,10 +100,10 @@ extension SchemaV1 {
     final class LogbookFoodItemEntry {
         var logItem: LogbookItem!
         var foodItem: FoodItem!
-        var amount: FoodAmount
+        var amount: Quantity
         var mealType: LogbookItem.MealType
         
-        init(logItem: LogbookItem, foodItem: FoodItem, amount: FoodAmount, mealType: LogbookItem.MealType) {
+        init(logItem: LogbookItem, foodItem: FoodItem, amount: Quantity, mealType: LogbookItem.MealType) {
             self.logItem = logItem
             self.foodItem = foodItem
             self.amount = amount

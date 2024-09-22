@@ -22,27 +22,27 @@ func createTestFoodItem(_ context: ModelContext) -> FoodItem {
                         metaData: FoodItem.MetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"], rating: 8),
                         ingredients: FoodIngredients(
                             nutrients: [
-                                .Energy: FoodAmount.calories(120),
-                                .TotalFat: FoodAmount.grams(3.5),
-                                .SaturatedFat: FoodAmount.grams(2),
-                                .PolyunsaturatedFat: FoodAmount.grams(0.5),
-                                .Cholesterol: FoodAmount.milligrams(50),
-                                .Sodium: FoodAmount.milligrams(255),
-                                .TotalCarbs: FoodAmount.grams(12),
-                                .DietaryFiber: FoodAmount.grams(1),
-                                .TotalSugars: FoodAmount.grams(0.5),
-                                .Protein: FoodAmount.grams(5),
-                                .Calcium: FoodAmount.milligrams(20),
-                                .Potassium: FoodAmount.milligrams(15)
+                                .Energy: Quantity.calories(120),
+                                .TotalFat: Quantity.grams(3.5),
+                                .SaturatedFat: Quantity.grams(2),
+                                .PolyunsaturatedFat: Quantity.grams(0.5),
+                                .Cholesterol: Quantity.milligrams(50),
+                                .Sodium: Quantity.milligrams(255),
+                                .TotalCarbs: Quantity.grams(12),
+                                .DietaryFiber: Quantity.grams(1),
+                                .TotalSugars: Quantity.grams(0.5),
+                                .Protein: Quantity.grams(5),
+                                .Calcium: Quantity.milligrams(20),
+                                .Potassium: Quantity.milligrams(15)
                             ],
                             all: "Salt, Milk, Water, Pectin (for something or other).",
                             allergens: "Milk"
                         ),
-                        size: FoodItem.Size(totalAmount: FoodAmount.grams(225), numServings: 5, servingSize: "1 unit"),
+                        size: FoodItem.Size(totalAmount: Quantity.grams(225), numServings: 5, servingSize: "1 unit"),
                         storeEntries: [
                             FoodItem.StoreEntry(storeName: "Store 1", costType: .Collection(cost: .Cents(599), quantity: 2)),
                             FoodItem.StoreEntry(storeName: "Store 2", costType: .Collection(cost: .Cents(1099), quantity: 3)),
-                            FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: FoodAmount(value: .Raw(1), unit: .Pound)))
+                            FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: Quantity(value: .Raw(1), unit: .Pound)))
                         ])
     context.insert(item)
     return item
@@ -55,13 +55,13 @@ func createTestCommercialFood(_ context: ModelContext) -> CommercialFood {
                                 .Energy: .calories(840),
                                 .TotalCarbs: .grams(30),
                                 .TotalFat: .grams(22),
-                                .SaturatedFat: FoodAmount.grams(2),
-                                .PolyunsaturatedFat: FoodAmount.grams(0.5),
-                                .Cholesterol: FoodAmount.milligrams(50),
-                                .Sodium: FoodAmount.milligrams(255),
+                                .SaturatedFat: Quantity.grams(2),
+                                .PolyunsaturatedFat: Quantity.grams(0.5),
+                                .Cholesterol: Quantity.milligrams(50),
+                                .Sodium: Quantity.milligrams(255),
                                 .Protein: .grams(30),
-                                .Calcium: FoodAmount.milligrams(20),
-                                .Potassium: FoodAmount.milligrams(15)
+                                .Calcium: Quantity.milligrams(20),
+                                .Potassium: Quantity.milligrams(15)
                               ],
                               metaData: CommercialFood.MetaData(
                                 notes: "Pretty good burger lmao",
@@ -93,15 +93,15 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
                             servingSize: "1 waffle"))
     context.insert(recipe)
     recipe.ingredients.append(contentsOf: [
-        RecipeIngredient(name: "Water", recipe: recipe, amount: FoodAmount(value: .Raw(1.2), unit: .Liter), notes: "Tap water or else"),
-        RecipeIngredient(name: "Salt", recipe: recipe, amount: FoodAmount(value: .Raw(600), unit: .Milligram))
+        RecipeIngredient(name: "Water", recipe: recipe, amount: Quantity(value: .Raw(1.2), unit: .Liter), notes: "Tap water or else"),
+        RecipeIngredient(name: "Salt", recipe: recipe, amount: Quantity(value: .Raw(600), unit: .Milligram))
     ])
     return recipe
 }
 
 @discardableResult
 func createTestFoodInstance(_ context: ModelContext) -> FoodInstance {
-    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", cost: .Cents(530)), amount: .Single(total: FoodAmount(value: .Raw(530), unit: .Gram), remaining: FoodAmount(value: .Raw(420), unit: .Gram)), dates: FoodInstance.Dates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
+    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", cost: .Cents(530)), amount: .Single(total: Quantity(value: .Raw(530), unit: .Gram), remaining: Quantity(value: .Raw(420), unit: .Gram)), dates: FoodInstance.Dates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
     context.insert(item)
     return item
 }
@@ -112,7 +112,7 @@ func createTestLogItem(_ context: ModelContext) -> LogbookItem {
     context.insert(item)
     item.targetNutrients[.Energy] = .calories(1900)
     let foodItem = createTestFoodItem(context)
-    let foodEntry = LogbookFoodItemEntry(logItem: item, foodItem: foodItem, amount: FoodAmount.grams(100), mealType: .Breakfast)
+    let foodEntry = LogbookFoodItemEntry(logItem: item, foodItem: foodItem, amount: Quantity.grams(100), mealType: .Breakfast)
     item.foodEntries.append(foodEntry)
     return item
 }

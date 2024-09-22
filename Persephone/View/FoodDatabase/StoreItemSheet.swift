@@ -48,7 +48,7 @@ struct StoreItemSheet: View {
     @State private var costType: CostType = .Collection
     @State private var quantity: Int = 1
     @State private var amount: Double = 1
-    @State private var unit: FoodUnit = .Pound
+    @State private var unit: Unit = .Pound
     @State private var price: Int = 0
     @State private var available: Bool = true
     @State private var sale: Bool = false
@@ -99,8 +99,8 @@ struct StoreItemSheet: View {
                     }
                 case .PerAmount:
                     Picker(selection: $unit) {
-                        Text("lb").tag(FoodUnit.Pound)
-                        Text("oz").tag(FoodUnit.Ounce)
+                        Text("lb").tag(Unit.Pound)
+                        Text("oz").tag(Unit.Ounce)
                     } label: {
                         TextField("", value: $amount, formatter: formatter)
                     }
@@ -147,7 +147,7 @@ struct StoreItemSheet: View {
                         case .Cents(let amount):
                             self.price = amount
                         }
-                        self.amount = amount.value.toValue()
+                        self.amount = amount.value.value
                         self.unit = amount.unit
                     }
                     self.sale = item.wrappedValue.sale
@@ -175,7 +175,7 @@ struct StoreItemSheet: View {
         case .Collection:
             return .Collection(cost: .Cents(price), quantity: quantity)
         case .PerAmount:
-            return .PerAmount(cost: .Cents(price), amount: FoodAmount(value: .Raw(amount), unit: unit))
+            return .PerAmount(cost: .Cents(price), amount: Quantity(value: .Raw(amount), unit: unit))
         }
     }
 }

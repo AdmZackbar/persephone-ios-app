@@ -13,7 +13,7 @@ struct NutrientScaleSheet: View {
     let item: FoodItem
     
     @State private var scale: Double = 1
-    @State private var nutrients: [Nutrient : FoodAmount] = [:]
+    @State private var nutrients: NutritionDict = [:]
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -59,9 +59,9 @@ struct NutrientScaleSheet: View {
             }
     }
     
-    private func computeScaledNutrients() -> [Nutrient : FoodAmount] {
+    private func computeScaledNutrients() -> NutritionDict {
         nutrients.mapValues({ amount in
-            FoodAmount(value: amount.value * scale, unit: amount.unit)
+            Quantity(value: amount.value * scale, unit: amount.unit)
         })
     }
 }

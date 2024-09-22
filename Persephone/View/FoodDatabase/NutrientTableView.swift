@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NutrientTableView: View {
-    var nutrients: [Nutrient : FoodAmount]
+    var nutrients: NutritionDict
     var scale: Double
     
     private let formatter: NumberFormatter = {
@@ -18,7 +18,7 @@ struct NutrientTableView: View {
         return formatter
     }()
     
-    init(nutrients: [Nutrient : FoodAmount], scale: Double = 1) {
+    init(nutrients: NutritionDict, scale: Double = 1) {
         self.nutrients = nutrients
         self.scale = scale
     }
@@ -52,7 +52,7 @@ struct NutrientTableView: View {
             if (nutrient == .Energy) {
                 Text(format(nutrient))
             } else {
-                Text("\(format(nutrient)) \(nutrient.getCommonUnit().getAbbreviation())")
+                Text("\(format(nutrient)) \(nutrient.getCommonUnit().abbreviation)")
             }
         }
         .italic(indented)

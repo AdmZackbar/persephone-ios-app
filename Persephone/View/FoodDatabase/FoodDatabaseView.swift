@@ -460,7 +460,7 @@ private struct ItemsView: View {
                         .fontWeight(.light)
                         .italic()
                     if let rating = item.metaData.rating,
-                       let tier = FoodTier.fromRating(rating: rating) {
+                       let tier = RatingTier.fromRating(rating: rating) {
                         Text("\(tier.rawValue) Tier")
                             .font(.subheadline)
                             .bold()
@@ -483,7 +483,7 @@ private struct ItemsView: View {
                             .italic()
                         Spacer()
                         if let rating = item.metaData.rating,
-                           let tier = FoodTier.fromRating(rating: rating) {
+                           let tier = RatingTier.fromRating(rating: rating) {
                             Text("\(tier.rawValue) Tier")
                                 .font(.subheadline)
                                 .bold()
@@ -514,7 +514,7 @@ private struct ItemsView: View {
                         .font(.subheadline)
                         .bold()
                     if let rating = food.metaData.rating,
-                       let tier = FoodTier.fromRating(rating: rating) {
+                       let tier = RatingTier.fromRating(rating: rating) {
                         Text("\(tier.rawValue) Tier")
                             .font(.subheadline)
                             .bold()
@@ -543,7 +543,7 @@ private struct ItemsView: View {
                             .italic()
                         Spacer()
                         if let rating = food.metaData.rating,
-                           let tier = FoodTier.fromRating(rating: rating) {
+                           let tier = RatingTier.fromRating(rating: rating) {
                             Text("\(tier.rawValue) Tier")
                                 .font(.subheadline)
                                 .bold()
@@ -568,7 +568,7 @@ private struct ItemsView: View {
                 Text(storeEntry.costPerServingAmount(size: item.size).toString())
                     .font(.subheadline)
                     .bold()
-                Text(item.size.servingSizeAmount.unit.getAbbreviation().lowercased())
+                Text(item.size.servingSizeAmount.unit.abbreviation.lowercased())
                     .lineLimit(1)
                     .font(.subheadline)
                     .fontWeight(.light)
@@ -584,7 +584,7 @@ private struct ItemsView: View {
                         .fontWeight(.light)
                 }
             }
-            if item.size.totalAmount.unit.isWeight() {
+            if item.size.totalAmount.unit.isWeight {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(storeEntry.costPerWeight(size: item.size).toString())
                         .font(.subheadline)
@@ -593,7 +593,7 @@ private struct ItemsView: View {
                         .font(.subheadline)
                         .fontWeight(.light)
                 }
-            } else if item.size.totalAmount.unit.isVolume() {
+            } else if item.size.totalAmount.unit.isVolume {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(storeEntry.costPerVolume(size: item.size).toString())
                         .font(.subheadline)

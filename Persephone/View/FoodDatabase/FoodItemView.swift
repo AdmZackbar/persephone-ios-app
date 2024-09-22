@@ -153,12 +153,12 @@ private struct StoreItemView: View {
                 // Show unit cost if either of the following hold:
                 // 1. the serving amount couldn't be parsed (or is just 'serving')
                 // 2. the serving amount is the same as '1 serving'
-                if foodItem.size.servingSizeAmount.unit.getAbbreviation().caseInsensitiveCompare("serving") == .orderedSame || foodItem.size.servingSizeAmount.value.toValue() == 1 {
+                if foodItem.size.servingSizeAmount.unit.abbreviation.caseInsensitiveCompare("serving") == .orderedSame || foodItem.size.servingSizeAmount.value.value == 1 {
                     Text(formatCost(storeItem.costPerUnit(size: foodItem.size))).bold()
                     Text("per Unit").font(.caption).fontWeight(.light)
                 } else {
                     Text(formatCost(storeItem.costPerServingAmount(size: foodItem.size))).bold()
-                    Text("per \(foodItem.size.servingSizeAmount.unit.getAbbreviation())").font(.caption).fontWeight(.light)
+                    Text("per \(foodItem.size.servingSizeAmount.unit.abbreviation)").font(.caption).fontWeight(.light)
                 }
                 Spacer()
                 Text(formatCost(storeItem.costPerServing(size: foodItem.size))).bold()
@@ -170,7 +170,7 @@ private struct StoreItemView: View {
                     Text("per 100 cal").font(.caption).fontWeight(.light)
                     Spacer()
                 }
-                if foodItem.size.totalAmount.unit.isWeight() {
+                if foodItem.size.totalAmount.unit.isWeight {
                     Text(formatCost(storeItem.costPerWeight(size: foodItem.size))).bold()
                     Text("per 100 g").font(.caption).fontWeight(.light)
                 } else {
@@ -186,7 +186,7 @@ private struct StoreItemView: View {
         case .Collection(let cost, let quantity):
             "\(quantity) for \(cost.toString())"
         case .PerAmount(let cost, let amount):
-            "\(cost.toString()) / \(amount.value.toValue() == 1 ? "" : amount.value.toString())\(amount.unit.getAbbreviation())"
+            "\(cost.toString()) / \(amount.value.value == 1 ? "" : amount.value.toString())\(amount.unit.abbreviation)"
         }
     }
     
@@ -210,10 +210,10 @@ private struct SizeTabView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Serving Size").font(.subheadline)
                 Text(item.size.servingSize).font(.title2).bold()
-                Text("\(item.size.servingAmount.value.toString())\(item.size.servingAmount.unit.getAbbreviation())").fontWeight(.light)
+                Text("\(item.size.servingAmount.value.toString())\(item.size.servingAmount.unit.abbreviation)").fontWeight(.light)
                 Spacer()
                 Text("\(formatter.string(for: item.size.numServings)!) servings").lineLimit(1)
-                Text("Net \(item.size.totalAmount.unit.isWeight() ? "Wt" : "Vol"): \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.getAbbreviation())").font(.subheadline).fontWeight(.light).lineLimit(1)
+                Text("Net \(item.size.totalAmount.unit.isWeight ? "Wt" : "Vol"): \(item.size.totalAmount.value.toString())\(item.size.totalAmount.unit.abbreviation)").font(.subheadline).fontWeight(.light).lineLimit(1)
                 
             }
             Spacer()
@@ -304,10 +304,10 @@ private struct NutritionView: View {
     
     private func format(_ nutrient: Nutrient) -> String {
         if nutrient == .Energy {
-            return "\(formatter.string(for: (item.getNutrient(.Energy)?.value.toValue() ?? 0) * modifier)!) Cal"
+            return "\(formatter.string(for: (item.getNutrient(.Energy)?.value.value ?? 0) * modifier)!) Cal"
         }
         let amount = try? item.getNutrient(nutrient)?.toGrams()
-        return "\(formatter.string(for: (amount?.value.toValue() ?? 0) * modifier)!)g"
+        return "\(formatter.string(for: (amount?.value.value ?? 0) * modifier)!)g"
     }
 }
 
@@ -339,15 +339,15 @@ private struct MainTabView: View {
                         Text("Description").font(.title2).bold()
                         Text(item.details.isEmpty ? "No description set." : item.details).multilineTextAlignment(.leading)
                         Spacer(minLength: 20)
-                        if let rating = FoodTier.fromRating(rating: item.metaData.rating)?.rawValue {
+                        if let rating = RatingTier.fromRating(rating: item.metaData.rating)?.rawValue {
                             Text("\(rating) Tier").font(.subheadline).bold()
                                 .contextMenu {
                                     Button("N/A") {
                                         item.metaData.rating = nil
                                     }
-                                    ForEach(FoodTier.allCases) { tier in
+                                    ForEach(RatingTier.allCases) { tier in
                                         Button(tier.rawValue) {
-                                            item.metaData.rating = tier.getRating()
+                                            item.metaData.rating = tier.rating
                                         }
                                     }
                                 }

@@ -67,19 +67,19 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
         if (food.servingSize != nil && food.servingSizeUnit == "g") {
             ratio = food.servingSize! / 100.0
         }
-        var nutrientMap: [Nutrient : FoodAmount] = [:]
+        var nutrientMap: NutritionDict = [:]
         food.foodNutrients?.forEach({ nutrient in
             let adjValue = nutrient.value * ratio
             // Round to nearest half
             if let nutrient = getNutrient(nutrient.nutrientName) {
-                nutrientMap[nutrient] = FoodAmount(value: .Raw(round(adjValue * 2.0) / 2.0), unit: nutrient.getCommonUnit())
+                nutrientMap[nutrient] = Quantity(value: .Raw(round(adjValue * 2.0) / 2.0), unit: nutrient.getCommonUnit())
             }
         })
         let metaData = FoodItem.MetaData(
             barcode: food.gtinUpc,
             brand: food.brandName?.capitalized)
         let size = FoodItem.Size(
-            totalAmount: FoodAmount.grams(totalAmount ?? 0),
+            totalAmount: Quantity.grams(totalAmount ?? 0),
             numServings: numServings ?? 0,
             servingSize: food.householdServingFullText?.capitalized ?? "")
         let ingredients = FoodIngredients(

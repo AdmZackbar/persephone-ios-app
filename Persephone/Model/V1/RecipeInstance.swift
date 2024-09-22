@@ -55,9 +55,9 @@ extension SchemaV1 {
         // The food used in the creation of the recipe
         var food: FoodInstance?
         // The amount of the food used
-        var amount: FoodAmount
+        var amount: Quantity
         
-        init(name: String, recipeInstance: RecipeInstance, food: FoodInstance? = nil, amount: FoodAmount) {
+        init(name: String, recipeInstance: RecipeInstance, food: FoodInstance? = nil, amount: Quantity) {
             self.name = name
             self.recipeInstance = recipeInstance
             self.food = food

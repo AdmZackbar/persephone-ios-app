@@ -30,7 +30,7 @@ enum FoodSheetEnum: Identifiable, SheetEnum {
     case General(item: FoodItem)
     case Tags(tags: Binding<[String]>)
     case ServingAmount(totalAmount: Binding<Double>, numServings: Binding<Double>)
-    case Nutrients(nutrients: Binding<[Nutrient : FoodAmount]>)
+    case Nutrients(nutrients: Binding<NutritionDict>)
     case NutrientsScale(item: FoodItem)
     case AddStoreItem(storeItems: Binding<[FoodItem.StoreEntry]>)
     case EditStoreItem(item: Binding<FoodItem.StoreEntry>)

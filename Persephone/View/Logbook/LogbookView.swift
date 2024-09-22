@@ -78,8 +78,8 @@ struct LogbookItemView: View {
                         Text(diff.abs().toString(maxDigits: 0))
                             .font(.title3)
                             .bold()
-                            .foregroundStyle(computeDiffColor(diff.toValue()))
-                        Text(computeDiffStr(diff.toValue()))
+                            .foregroundStyle(computeDiffColor(diff.value))
+                        Text(computeDiffStr(diff.value))
                             .font(.subheadline)
                             .italic()
                     }
@@ -130,6 +130,6 @@ struct LogbookItemView: View {
 
 #Preview {
     let container = createTestModelContainer()
-    createTestLogItem(container.mainContext)
+     createTestLogItem(container.mainContext)
     return LogbookView().modelContainer(container)
 }

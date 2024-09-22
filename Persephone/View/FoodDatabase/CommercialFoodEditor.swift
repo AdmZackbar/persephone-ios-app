@@ -41,7 +41,7 @@ struct CommercialFoodEditor: View {
     @State private var name: String = ""
     @State private var seller: String = ""
     @State private var cost: Int = 0
-    @State private var nutrients: [Nutrient : FoodAmount] = [:]
+    @State private var nutrients: NutritionDict = [:]
     @State private var notes: String = ""
     @State private var rating: Double? = nil
     @State private var tags: [String] = []
@@ -97,8 +97,8 @@ struct CommercialFoodEditor: View {
             Section("Rating") {
                 Picker("", selection: $rating) {
                     Text("N/A").tag(nil as Double?)
-                    ForEach(FoodTier.allCases) { tier in
-                        Text(tier.rawValue).tag(tier.getRating() as Double?)
+                    ForEach(RatingTier.allCases) { tier in
+                        Text(tier.rawValue).tag(tier.rating as Double?)
                     }
                 }.pickerStyle(.segmented)
             }

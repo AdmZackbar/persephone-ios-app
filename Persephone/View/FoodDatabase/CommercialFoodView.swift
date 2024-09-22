@@ -38,7 +38,7 @@ struct CommercialFoodView: View {
                         }
                         Spacer()
                         HStack {
-                            if let cal = food.nutrients[.Energy]?.value.toValue() {
+                            if let cal = food.nutrients[.Energy]?.value.value {
                                 VStack(alignment: .leading) {
                                     Text((food.cost * 100 / cal).toString())
                                         .font(.subheadline)
@@ -47,7 +47,7 @@ struct CommercialFoodView: View {
                                 }
                             }
                             Spacer()
-                            if let protein = food.nutrients[.Protein]?.value.toValue() {
+                            if let protein = food.nutrients[.Protein]?.value.value {
                                 VStack(alignment: .trailing) {
                                     Text((food.cost / protein).toString())
                                         .font(.subheadline)
@@ -66,7 +66,7 @@ struct CommercialFoodView: View {
                         .background(Color("BackgroundColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                if let rating = FoodTier.fromRating(rating: food.metaData.rating)?.rawValue {
+                if let rating = RatingTier.fromRating(rating: food.metaData.rating)?.rawValue {
                     Text("\(rating) Tier").bold()
                 }
                 if !food.metaData.notes.isEmpty {

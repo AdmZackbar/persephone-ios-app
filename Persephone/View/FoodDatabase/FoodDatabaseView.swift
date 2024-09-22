@@ -224,9 +224,9 @@ struct FoodDatabaseView: View {
         case .CommercialFoodView(let food):
             CommercialFoodView(path: $path, food: food)
         case .CommercialFoodAdd:
-            CommercialFoodEditor()
+            CommercialFoodEditor(path: $path)
         case .CommercialFoodEdit(let food):
-            CommercialFoodEditor(food: food)
+            CommercialFoodEditor(path: $path, food: food)
         case .ScanItem:
             ScanFoodView(path: $path)
         case .LookupItem:

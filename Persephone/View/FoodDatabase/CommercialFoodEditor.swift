@@ -35,6 +35,7 @@ struct CommercialFoodEditor: View {
     @Environment(\.modelContext) var modelContext
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
+    @Binding private var path: [FoodDatabaseView.ViewType]
     let mode: Mode
     var food: CommercialFood
     
@@ -46,7 +47,8 @@ struct CommercialFoodEditor: View {
     @State private var rating: Double? = nil
     @State private var tags: [String] = []
     
-    init(food: CommercialFood? = nil) {
+    init(path: Binding<[FoodDatabaseView.ViewType]>, food: CommercialFood? = nil) {
+        self._path = path
         if let food {
             mode = .Edit
             self.food = food
@@ -145,10 +147,11 @@ struct CommercialFoodEditor: View {
         switch mode {
         case .Add:
             modelContext.insert(food)
-        default:
-            break
+            path.removeLast()
+            path.append(.CommercialFoodView(food: food))
+        case .Edit:
+            dismiss()
         }
-        dismiss()
     }
 }
 
@@ -156,6 +159,6 @@ struct CommercialFoodEditor: View {
     let container = createTestModelContainer()
     let food = createTestCommercialFood(container.mainContext)
     return NavigationStack {
-        CommercialFoodEditor(food: food)
+        CommercialFoodEditor(path: .constant([]), food: food)
     }
 }

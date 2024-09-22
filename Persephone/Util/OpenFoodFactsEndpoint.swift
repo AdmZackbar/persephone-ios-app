@@ -61,15 +61,15 @@ struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
                             .TransFat: Quantity.grams(product.nutriments?.transFat ?? 0),
                             .PolyunsaturatedFat: Quantity.grams(product.nutriments?.polyFat ?? 0),
                             .MonounsaturatedFat: Quantity.grams(product.nutriments?.monoFat ?? 0),
-                            .Cholesterol: try! Quantity.grams(product.nutriments?.cholesterol ?? 0).toMilligrams(),
-                            .Sodium: try! Quantity.grams(product.nutriments?.sodium ?? 0).toMilligrams(),
+                            .Cholesterol: try! Quantity.grams(product.nutriments?.cholesterol ?? 0).convert(unit: .Milligram),
+                            .Sodium: try! Quantity.grams(product.nutriments?.sodium ?? 0).convert(unit: .Milligram),
                             .TotalCarbs: Quantity.grams(product.nutriments?.totalCarbs ?? 0),
                             .DietaryFiber: Quantity.grams(product.nutriments?.dietaryFiber ?? 0),
                             .TotalSugars: Quantity.grams(product.nutriments?.totalSugars ?? 0),
                             .Protein: Quantity.grams(product.nutriments?.protein ?? 0),
-                            .Calcium: try! Quantity.grams(product.nutriments?.calcium ?? 0).toMilligrams(),
-                            .Iron: try! Quantity.grams(product.nutriments?.iron ?? 0).toMilligrams(),
-                            .Potassium: try! Quantity.grams(product.nutriments?.potassium ?? 0).toMilligrams()
+                            .Calcium: try! Quantity.grams(product.nutriments?.calcium ?? 0).convert(unit: .Milligram),
+                            .Iron: try! Quantity.grams(product.nutriments?.iron ?? 0).convert(unit: .Milligram),
+                            .Potassium: try! Quantity.grams(product.nutriments?.potassium ?? 0).convert(unit: .Milligram)
                         ], all: product.ingredients_text?.capitalized ?? "", allergens: allergens ?? ""),
                         size: FoodItem.Size(totalAmount: Quantity.grams(0), numServings: 0, servingSize: servingSize ?? ""),
                 storeEntries: [])

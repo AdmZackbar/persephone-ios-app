@@ -129,9 +129,9 @@ extension SchemaV1 {
                     cost / Double(quantity)
                 case .PerAmount(let cost, let amount):
                     if amount.unit.isWeight && size.totalAmount.unit.isWeight {
-                        cost / Double(amount.value.value) * (try! size.totalAmount.toGrams().value.value / amount.toGrams().value.value)
+                        cost / Double(amount.value.value) * (try! size.totalAmount.convert(unit: .Gram).value.value / amount.convert(unit: .Gram).value.value)
                     } else if amount.unit.isVolume && size.totalAmount.unit.isVolume {
-                        cost / Double(amount.value.value) * (try! size.totalAmount.toMilliliters().value.value / amount.toMilliliters().value.value)
+                        cost / Double(amount.value.value) * (try! size.totalAmount.convert(unit: .Milliliter).value.value / amount.convert(unit: .Milliliter).value.value)
                     } else {
                         // TODO handle case
                         cost / Double(amount.value.value)
@@ -157,11 +157,11 @@ extension SchemaV1 {
             }
             
             func costPerWeight(size: Size) -> Cost {
-                try! costPerUnit(size: size) * (100 / size.totalAmount.toGrams().value.value)
+                try! costPerUnit(size: size) * (100 / size.totalAmount.convert(unit: .Gram).value.value)
             }
             
             func costPerVolume(size: Size) -> Cost {
-                try! costPerUnit(size: size) * (100 / size.totalAmount.toMilliliters().value.value)
+                try! costPerUnit(size: size) * (100 / size.totalAmount.convert(unit: .Milliliter).value.value)
             }
         }
         

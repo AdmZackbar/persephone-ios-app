@@ -141,73 +141,12 @@ extension SchemaV1 {
         // The unit of the amount
         var unit: Unit
         
-        func toGrams() throws -> Quantity {
-            var modifier: Double!
-            switch unit {
-            case .Microgram:
-                modifier = 0.000001
-            case .Milligram:
-                modifier = 0.001
-            case .Gram:
-                modifier = 1
-            case .Kilogram:
-                modifier = 1000
-            case .Ounce:
-                modifier = 28.3495
-            case .Pound:
-                modifier = 453.592
-            default:
-                throw ParseError.invalidUnit(unit: unit)
+        func convert(unit: Unit) throws -> Quantity {
+            if self.unit.isWeight && unit.isWeight || self.unit.isVolume && unit.isVolume {
+                Quantity(value: self.value * unit.conversionModifier / self.unit.conversionModifier, unit: unit)
+            } else {
+                throw ParseError.invalidUnit(unitFrom: self.unit, unitTo: unit)
             }
-            return Quantity(value: value * modifier, unit: .Milligram)
-        }
-        
-        func toMilligrams() throws -> Quantity {
-            var modifier: Double!
-            switch unit {
-            case .Microgram:
-                modifier = 0.001
-            case .Milligram:
-                modifier = 1
-            case .Gram:
-                modifier = 1000
-            case .Kilogram:
-                modifier = 1000000
-            case .Ounce:
-                modifier = 28349.5
-            case .Pound:
-                modifier = 453592
-            default:
-                throw ParseError.invalidUnit(unit: unit)
-            }
-            return Quantity(value: value * modifier, unit: .Milligram)
-        }
-        
-        func toMilliliters() throws -> Quantity {
-            var modifier: Double!
-            switch unit {
-            case .Milliliter:
-                modifier = 1
-            case .Liter:
-                modifier = 1000
-            case .Teaspoon:
-                modifier = 4.92892
-            case .Tablespoon:
-                modifier = 14.7868
-            case .FluidOunce:
-                modifier = 29.5735
-            case .Cup:
-                modifier = 240
-            case .Pint:
-                modifier = 473.176
-            case .Quart:
-                modifier = 946.353
-            case .Gallon:
-                modifier = 3785.41
-            default:
-                throw ParseError.invalidUnit(unit: unit)
-            }
-            return Quantity(value: value * modifier, unit: .Milligram)
         }
     }
     
@@ -295,10 +234,49 @@ extension SchemaV1 {
                 name
             }
         }
+        
+        var conversionModifier: Double {
+            switch self {
+            // Weight
+            case .Microgram:
+                0.001
+            case .Milligram:
+                1
+            case .Gram:
+                1000
+            case .Kilogram:
+                1000000
+            case .Ounce:
+                28349.5
+            case .Pound:
+                453592
+            // Volume
+            case .Milliliter:
+                1
+            case .Liter:
+                1000
+            case .Teaspoon:
+                4.92892
+            case .Tablespoon:
+                14.7868
+            case .FluidOunce:
+                29.5735
+            case .Cup:
+                240
+            case .Pint:
+                473.176
+            case .Quart:
+                946.353
+            case .Gallon:
+                3785.41
+            default:
+                1
+            }
+        }
     }
     
     enum ParseError: Error {
-        case invalidUnit(unit: Unit)
+        case invalidUnit(unitFrom: Unit, unitTo: Unit)
     }
     
     enum RatingTier: String, CaseIterable, Codable, Identifiable {

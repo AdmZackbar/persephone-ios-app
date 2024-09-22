@@ -25,16 +25,13 @@ extension SchemaV1 {
                     if let food = entry.foodItem {
                         for nutrient in food.ingredients.nutrients.keys {
                             var scale: Double = 1
-                            switch entry.amount.unit {
-                            case .Serving, .Custom(_):
+                            if entry.amount.unit.isWeight {
+                                try? scale = entry.amount.convert(unit: .Gram).value.value / food.size.servingAmount.convert(unit: .Gram).value.value
+                            } else if entry.amount.unit.isVolume {
+                                try? scale = entry.amount.convert(unit: .Milliliter).value.value / food.size.servingAmount.convert(unit: .Milliliter).value.value
+                            } else {
                                 // Assume serving
                                 scale = entry.amount.value.value
-                            default:
-                                if entry.amount.unit.isWeight {
-                                    try? scale = entry.amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
-                                } else {
-                                    try? scale = entry.amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
-                                }
                             }
                             let foodNutrient = Quantity(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
                             if let n = nutrients[nutrient] {
@@ -72,16 +69,13 @@ extension SchemaV1 {
                 if let food = entry.foodItem {
                     for nutrient in food.ingredients.nutrients.keys {
                         var scale: Double = 1
-                        switch entry.amount.unit {
-                        case .Serving, .Custom(_):
+                        if entry.amount.unit.isWeight {
+                            try? scale = entry.amount.convert(unit: .Gram).value.value / food.size.servingAmount.convert(unit: .Gram).value.value
+                        } else if entry.amount.unit.isVolume {
+                            try? scale = entry.amount.convert(unit: .Milliliter).value.value / food.size.servingAmount.convert(unit: .Milliliter).value.value
+                        } else {
                             // Assume serving
                             scale = entry.amount.value.value
-                        default:
-                            if entry.amount.unit.isWeight {
-                                try? scale = entry.amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
-                            } else {
-                                try? scale = entry.amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
-                            }
                         }
                         let foodNutrient = Quantity(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
                         if let n = nutrients[nutrient] {

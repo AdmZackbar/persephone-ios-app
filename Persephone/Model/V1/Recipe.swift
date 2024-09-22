@@ -29,16 +29,13 @@ extension SchemaV1 {
                     if let food = ingredient.food {
                         for nutrient in food.ingredients.nutrients.keys {
                             var scale: Double = 1
-                            switch ingredient.amount.unit {
-                            case .Serving, .Custom(_):
+                            if ingredient.amount.unit.isWeight {
+                                try? scale = ingredient.amount.convert(unit: .Gram).value.value / food.size.servingAmount.convert(unit: .Gram).value.value
+                            } else if ingredient.amount.unit.isVolume {
+                                try? scale = ingredient.amount.convert(unit: .Milliliter).value.value / food.size.servingAmount.convert(unit: .Milliliter).value.value
+                            } else {
                                 // Assume serving
                                 scale = ingredient.amount.value.value
-                            default:
-                                if ingredient.amount.unit.isWeight {
-                                    try? scale = ingredient.amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
-                                } else {
-                                    try? scale = ingredient.amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
-                                }
                             }
                             let foodNutrient = Quantity(value: food.ingredients.nutrients[nutrient]!.value * scale, unit: food.ingredients.nutrients[nutrient]!.unit)
                             if let n = nutrients[nutrient] {
@@ -208,9 +205,9 @@ extension SchemaV1 {
         
         func computeNumServings(food: FoodItem) -> Double {
             if amount.unit.isWeight {
-                return try! amount.toGrams().value.value / food.size.servingAmount.toGrams().value.value
+                return try! amount.convert(unit: .Gram).value.value / food.size.servingAmount.convert(unit: .Gram).value.value
             } else if amount.unit.isVolume {
-                return try! amount.toMilliliters().value.value / food.size.servingAmount.toMilliliters().value.value
+                return try! amount.convert(unit: .Milliliter).value.value / food.size.servingAmount.convert(unit: .Milliliter).value.value
             }
             // Assume servings
             return amount.value.value

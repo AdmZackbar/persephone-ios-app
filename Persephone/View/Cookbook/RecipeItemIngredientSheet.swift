@@ -221,19 +221,16 @@ struct RecipeItemIngredientSheet: View {
         
         private func computeScale() -> Double {
             if let amountValue = amountValue {
-                switch unit {
-                case .Serving, .Custom(_):
-                    return amountValue.value
-                default:
-                    if unit.isWeight {
-                        if let servingAmount = try? foodItem.size.servingAmount.toGrams().value.value {
-                            return try! (Quantity(value: amountValue, unit: unit).toGrams().value / servingAmount).value
-                        }
-                    } else if unit.isVolume {
-                        if let servingAmount = try? foodItem.size.servingAmount.toMilliliters().value.value {
-                            return try! (Quantity(value: amountValue, unit: unit).toMilliliters().value / servingAmount).value
-                        }
+                if unit.isWeight {
+                    if let servingAmount = try? foodItem.size.servingAmount.convert(unit: .Gram).value.value {
+                        return try! (Quantity(value: amountValue, unit: unit).convert(unit: .Gram).value / servingAmount).value
                     }
+                } else if unit.isVolume {
+                    if let servingAmount = try? foodItem.size.servingAmount.convert(unit: .Milliliter).value.value {
+                        return try! (Quantity(value: amountValue, unit: unit).convert(unit: .Milliliter).value / servingAmount).value
+                    }
+                } else {
+                    return amountValue.value
                 }
             }
             return 1

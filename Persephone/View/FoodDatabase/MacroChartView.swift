@@ -107,7 +107,7 @@ struct MacroChartView: View {
     }
     
     private func computeAmount(_ nutrient: Nutrient) -> Double {
-        if let amount = try? nutrients[nutrient]?.toGrams().value {
+        if let amount = try? nutrients[nutrient]?.convert(unit: .Gram).value {
             (amount * scale).value
         } else {
             0

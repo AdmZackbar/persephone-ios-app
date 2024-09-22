@@ -1,5 +1,5 @@
 //
-//  Food.swift
+//  FoodHelpers.swift
 //  Persephone
 //
 //  Created by Zach Wassynger on 7/22/24.
@@ -223,6 +223,7 @@ extension SchemaV1 {
         // Volume (SI)
         case Milliliter, Liter
         // Other
+        case Serving
         case Custom(name: String)
         
         var isSi: Bool {
@@ -288,6 +289,8 @@ extension SchemaV1 {
                 "mL"
             case .Liter:
                 "L"
+            case .Serving:
+                "serving"
             case .Custom(let name):
                 name
             }

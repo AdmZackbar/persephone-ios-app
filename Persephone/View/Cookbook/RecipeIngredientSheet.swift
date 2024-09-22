@@ -100,6 +100,8 @@ struct RecipeIngredientSheet: View {
             return .Tablespoon
         case "tsp", "teaspoon", "teaspoons":
             return .Teaspoon
+        case "serving", "servings":
+            return .Serving
         default:
             return .Custom(name: unitName)
         }

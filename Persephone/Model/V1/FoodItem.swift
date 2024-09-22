@@ -105,13 +105,13 @@ extension SchemaV1 {
                             if let value = Quantity.Magnitude.parseString(rawValue) {
                                 Quantity(value: value, unit: .Custom(name: match.2.string))
                             } else {
-                                Quantity(value: .Raw(1), unit: .Custom(name: "serving"))
+                                Quantity(value: .Raw(1), unit: .Serving)
                             }
                         } else {
                             Quantity(value: .Raw(1), unit: .Custom(name: match.2.string))
                         }
                     } else {
-                        Quantity(value: .Raw(1), unit: .Custom(name: "serving"))
+                        Quantity(value: .Raw(1), unit: .Serving)
                     }
                 }
             }

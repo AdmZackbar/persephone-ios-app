@@ -30,7 +30,7 @@ extension SchemaV1 {
                         for nutrient in food.ingredients.nutrients.keys {
                             var scale: Double = 1
                             switch ingredient.amount.unit {
-                            case .Custom(_):
+                            case .Serving, .Custom(_):
                                 // Assume serving
                                 scale = ingredient.amount.value.value
                             default:
@@ -192,7 +192,7 @@ extension SchemaV1 {
         func amountToString() -> String {
             if let food {
                 switch amount.unit {
-                case .Custom(_):
+                case .Serving, .Custom(_):
                     // Assume 'serving'
                     let servingValue = (amount.value * food.size.servingSizeAmount.value.value).toString()
                     let servingUnit = food.size.servingSizeAmount.unit.abbreviation.lowercased()

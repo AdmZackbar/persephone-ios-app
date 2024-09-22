@@ -26,7 +26,7 @@ extension SchemaV1 {
                         for nutrient in food.ingredients.nutrients.keys {
                             var scale: Double = 1
                             switch entry.amount.unit {
-                            case .Custom(_):
+                            case .Serving, .Custom(_):
                                 // Assume serving
                                 scale = entry.amount.value.value
                             default:
@@ -73,7 +73,7 @@ extension SchemaV1 {
                     for nutrient in food.ingredients.nutrients.keys {
                         var scale: Double = 1
                         switch entry.amount.unit {
-                        case .Custom(_):
+                        case .Serving, .Custom(_):
                             // Assume serving
                             scale = entry.amount.value.value
                         default:

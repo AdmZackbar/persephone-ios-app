@@ -115,13 +115,13 @@ struct RecipeItemIngredientSheet: View {
                 .parseString(amount)
             }
         }
-        @State private var unit: Unit = .Custom(name: "Serving")
+        @State private var unit: Unit = .Serving
         @State private var notes: String = ""
         
         var body: some View {
             Form {
                 Picker(selection: $unit) {
-                    Text("serving").tag(Unit.Custom(name: "Serving"))
+                    Text("serving").tag(Unit.Serving)
                     if foodItem.size.servingAmount.unit.isWeight {
                         Text("g").tag(Unit.Gram)
                         Text("oz").tag(Unit.Ounce)
@@ -222,7 +222,7 @@ struct RecipeItemIngredientSheet: View {
         private func computeScale() -> Double {
             if let amountValue = amountValue {
                 switch unit {
-                case .Custom(_):
+                case .Serving, .Custom(_):
                     return amountValue.value
                 default:
                     if unit.isWeight {

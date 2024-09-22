@@ -243,7 +243,7 @@ struct RecipeView: View {
     let container = createTestModelContainer()
     let recipe = createTestRecipeItem(container.mainContext)
     let foodItem = createTestFoodItem(container.mainContext)
-    recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: Quantity(value: .Raw(3), unit: .Custom(name: "Serving"))))
+    recipe.ingredients.append(RecipeIngredient(name: foodItem.name, food: foodItem, recipe: recipe, amount: Quantity(value: .Raw(3), unit: .Serving)))
     return NavigationStack {
         RecipeView(recipe: recipe)
             .modelContainer(container)

@@ -143,7 +143,7 @@ extension SchemaV1 {
         
         func convert(unit: Unit) throws -> Quantity {
             if self.unit.isWeight && unit.isWeight || self.unit.isVolume && unit.isVolume {
-                Quantity(value: self.value * unit.conversionModifier / self.unit.conversionModifier, unit: unit)
+                Quantity(value: self.value * self.unit.conversionModifier / unit.conversionModifier, unit: unit)
             } else {
                 throw ParseError.invalidUnit(unitFrom: self.unit, unitTo: unit)
             }

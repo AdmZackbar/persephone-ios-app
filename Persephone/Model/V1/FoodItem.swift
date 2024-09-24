@@ -129,12 +129,12 @@ extension SchemaV1 {
                     cost / Double(quantity)
                 case .PerAmount(let cost, let amount):
                     if amount.unit.isWeight && size.totalAmount.unit.isWeight {
-                        cost / Double(amount.value.value) * (try! size.totalAmount.convert(unit: .Gram).value.value / amount.convert(unit: .Gram).value.value)
+                        try! cost * (size.totalAmount.convert(unit: .Gram).value.value / amount.convert(unit: .Gram).value.value)
                     } else if amount.unit.isVolume && size.totalAmount.unit.isVolume {
-                        cost / Double(amount.value.value) * (try! size.totalAmount.convert(unit: .Milliliter).value.value / amount.convert(unit: .Milliliter).value.value)
+                        try! cost * (size.totalAmount.convert(unit: .Milliliter).value.value / amount.convert(unit: .Milliliter).value.value)
                     } else {
                         // TODO handle case
-                        cost / Double(amount.value.value)
+                        cost / amount.value.value
                     }
                 }
             }

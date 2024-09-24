@@ -11,13 +11,6 @@ struct NutrientTableView: View {
     var nutrients: NutritionDict
     var scale: Double
     
-    private let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
-    
     init(nutrients: NutritionDict, scale: Double = 1) {
         self.nutrients = nutrients
         self.scale = scale
@@ -25,23 +18,40 @@ struct NutrientTableView: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            createRow(name: "Calories", nutrient: .Energy).bold().font(.title2)
-            createRow(name: "Total Fat", nutrient: .TotalFat).font(.subheadline).bold()
-            createRow(name: "Saturated Fat", nutrient: .SaturatedFat, indented: true).font(.caption)
-            createRow(name: "Trans Fat", nutrient: .TransFat, indented: true).font(.caption)
-            createRow(name: "Polyunsaturated Fat", nutrient: .PolyunsaturatedFat, indented: true).font(.caption)
-            createRow(name: "Monounsaturated Fat", nutrient: .MonounsaturatedFat, indented: true) .font(.caption)
-            createRow(name: "Cholesterol", nutrient: .Cholesterol).font(.subheadline).bold()
-            createRow(name: "Sodium", nutrient: .Sodium).font(.subheadline).bold()
-            createRow(name: "Total Carbohydrates", nutrient: .TotalCarbs).font(.subheadline).bold()
-            createRow(name: "Dietary Fiber", nutrient: .DietaryFiber, indented: true).font(.caption)
-            createRow(name: "Total Sugars", nutrient: .TotalSugars, indented: true).font(.caption)
-            createRow(name: "Added Sugars", nutrient: .AddedSugars, indented: true).font(.caption)
-            createRow(name: "Protein", nutrient: .Protein).font(.subheadline).bold()
-            createRow(name: "Vitamin D", nutrient: .VitaminD).font(.caption)
-            createRow(name: "Calcium", nutrient: .Calcium).font(.caption)
-            createRow(name: "Iron", nutrient: .Iron).font(.caption)
-            createRow(name: "Potassium", nutrient: .Potassium).font(.caption)
+            createRow(name: "Calories", nutrient: .Energy)
+                .bold().font(.title2)
+            createRow(name: "Total Fat", nutrient: .TotalFat)
+                .font(.subheadline).bold()
+            createRow(name: "Saturated Fat", nutrient: .SaturatedFat, indented: true)
+                .font(.caption)
+            createRow(name: "Trans Fat", nutrient: .TransFat, indented: true)
+                .font(.caption)
+            createRow(name: "Polyunsaturated Fat", nutrient: .PolyunsaturatedFat, indented: true)
+                .font(.caption)
+            createRow(name: "Monounsaturated Fat", nutrient: .MonounsaturatedFat, indented: true) 
+                .font(.caption)
+            createRow(name: "Cholesterol", nutrient: .Cholesterol)
+                .font(.subheadline).bold()
+            createRow(name: "Sodium", nutrient: .Sodium)
+                .font(.subheadline).bold()
+            createRow(name: "Total Carbohydrates", nutrient: .TotalCarbs)
+                .font(.subheadline).bold()
+            createRow(name: "Dietary Fiber", nutrient: .DietaryFiber, indented: true)
+                .font(.caption)
+            createRow(name: "Total Sugars", nutrient: .TotalSugars, indented: true)
+                .font(.caption)
+            createRow(name: "Added Sugars", nutrient: .AddedSugars, indented: true)
+                .font(.caption)
+            createRow(name: "Protein", nutrient: .Protein)
+                .font(.subheadline).bold()
+            createRow(name: "Vitamin D", nutrient: .VitaminD)
+                .font(.caption)
+            createRow(name: "Calcium", nutrient: .Calcium)
+                .font(.caption)
+            createRow(name: "Iron", nutrient: .Iron)
+                .font(.caption)
+            createRow(name: "Potassium", nutrient: .Potassium)
+                .font(.caption)
         }
     }
     
@@ -50,21 +60,12 @@ struct NutrientTableView: View {
             Text(name)
             Spacer()
             if (nutrient == .Energy) {
-                Text(format(nutrient))
+                Text(nutrients[nutrient]?.value.toString() ?? "0")
             } else {
-                Text("\(format(nutrient)) \(nutrient.getCommonUnit().abbreviation)")
+                Text("\(nutrients[nutrient]?.value.toString() ?? "0") \(nutrient.getCommonUnit().abbreviation)")
             }
         }
-        .italic(indented)
-        .padding(EdgeInsets(top: 0.0, leading: indented ? 8.0 : 0.0, bottom: 0.0, trailing: 0.0))
-    }
-    
-    private func format(_ nutrient: Nutrient) -> String {
-        if let value = nutrients[nutrient]?.value {
-            (value * scale).toString()
-        } else {
-            ""
-        }
+        .italic(indented).padding(EdgeInsets(top: 0.0, leading: indented ? 8.0 : 0.0, bottom: 0.0, trailing: 0.0))
     }
 }
 

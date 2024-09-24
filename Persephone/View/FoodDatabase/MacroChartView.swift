@@ -12,13 +12,6 @@ struct MacroChartView: View {
     var nutrients: NutritionDict
     var scale: Double
     
-    private let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-        return formatter
-    }()
-    
     init(nutrients: NutritionDict, scale: Double = 1) {
         self.nutrients = nutrients
         self.scale = scale
@@ -60,7 +53,7 @@ struct MacroChartView: View {
                     Spacer()
                 }
                 HStack {
-                    Text("\(formatter.string(for: computeAmount(.Protein))!)g")
+                    Text("\(amountToString(.Protein))g")
                         .font(.caption).bold().foregroundStyle(.purple)
                     Spacer()
                 }
@@ -73,7 +66,7 @@ struct MacroChartView: View {
                 }
                 HStack {
                     Spacer()
-                    Text("\(formatter.string(for: computeAmount(.TotalCarbs))!)g")
+                    Text("\(amountToString(.TotalCarbs))g")
                         .font(.caption).bold().foregroundStyle(.green)
                 }
                 Spacer()
@@ -86,7 +79,7 @@ struct MacroChartView: View {
                     Spacer()
                 }
                 HStack {
-                    Text("\(formatter.string(for: computeAmount(.TotalFat))!)g")
+                    Text("\(amountToString(.TotalFat))g")
                         .font(.caption).bold().foregroundStyle(.orange)
                     Spacer()
                 }
@@ -111,6 +104,14 @@ struct MacroChartView: View {
             (amount * scale).value
         } else {
             0
+        }
+    }
+    
+    private func amountToString(_ nutrient: Nutrient) -> String {
+        if let amount = try? nutrients[nutrient]?.convert(unit: .Gram).value {
+            (amount * scale).toString(maxDigits: 1)
+        } else {
+            "0"
         }
     }
 }

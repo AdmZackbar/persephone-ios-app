@@ -304,9 +304,9 @@ private struct NutritionView: View {
     
     private func format(_ nutrient: Nutrient) -> String {
         if nutrient == .Energy {
-            return "\(formatter.string(for: (item.getNutrient(.Energy)?.value.value ?? 0) * modifier)!) Cal"
+            return "\(formatter.string(for: (item.ingredients.nutrients[nutrient]?.value.value ?? 0) * modifier)!) Cal"
         }
-        let amount = try? item.getNutrient(nutrient)?.convert(unit: .Gram)
+        let amount = try? item.ingredients.nutrients[nutrient]?.convert(unit: .Gram)
         return "\(formatter.string(for: (amount?.value.value ?? 0) * modifier)!)g"
     }
 }

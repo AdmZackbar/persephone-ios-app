@@ -27,7 +27,7 @@ extension SchemaV1 {
         }
     }
     
-    enum Nutrient: Codable, Hashable {
+    enum Nutrient: Codable, Equatable, Hashable {
         // Energy (Calories)
         case Energy
         // Carbs (g)

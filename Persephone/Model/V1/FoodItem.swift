@@ -47,13 +47,6 @@ extension SchemaV1 {
             self.storeEntries = storeEntries
         }
         
-        func getNutrient(_ nutrient: Nutrient, numServings: Double = 1.0) -> Quantity? {
-            if let value = ingredients.nutrients[nutrient] {
-                return Quantity(value: value.value * numServings, unit: value.unit)
-            }
-            return nil
-        }
-        
         struct MetaData: Codable {
             // When this item was recorded
             var timestamp: Date
@@ -148,7 +141,7 @@ extension SchemaV1 {
             }
             
             func costPerEnergy(foodItem: FoodItem) -> Cost? {
-                let caloriesPerServing = foodItem.getNutrient(.Energy)?.value.value ?? 0
+                let caloriesPerServing = foodItem.ingredients.nutrients[.Energy]?.value.value ?? 0
                 if caloriesPerServing <= 0 {
                     return nil
                 }

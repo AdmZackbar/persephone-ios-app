@@ -44,11 +44,14 @@ struct FoodDatabaseView: View {
         ]),
         .init("Carbs", children: [
             .init("Bread", children: [
-                .init("Buns")
+                .init("Buns"),
+                .init("Rolls")
             ]),
             .init("Cereal"),
+            .init("Chips"),
             .init("Crackers"),
             .init("Fries"),
+            .init("Hash Browns"),
             .init("Pasta"),
             .init("Rice"),
             .init("Tortilla")
@@ -84,12 +87,14 @@ struct FoodDatabaseView: View {
         .init("Juice"),
         .init("Meal", children: [
             .init("Burger"),
-            .init("Sandwich")
+            .init("Sandwich"),
+            .init("Pizza")
         ]),
         .init("Meat", children: [
             .init("Bacon"),
             .init("Beef"),
             .init("Chicken"),
+            .init("Ham"),
             .init("Pork"),
             .init("Turkey")
         ]),
@@ -100,9 +105,12 @@ struct FoodDatabaseView: View {
         ]),
         .init("Soda"),
         .init("Sweets", children: [
+            .init("Cake"),
             .init("Chocolate"),
             .init("Cookies"),
+            .init("Cupcake"),
             .init("Honey"),
+            .init("Muffin"),
             .init("Pastry"),
             .init("Sugar")
         ]),

@@ -10,13 +10,6 @@ import SwiftUI
 struct InventoryFoodView: View {
     let item: FoodInstance
     
-    private let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-        return formatter
-    }()
-    
     var body: some View {
         VStack(spacing: 16) {
             HStack(alignment: .top) {
@@ -44,11 +37,11 @@ struct InventoryFoodView: View {
                 Gauge(value: remaining.value.value, in: 0...total.value.value) {
                     
                 } currentValueLabel: {
-                    Text("\(formatter.string(for: remaining.value)!) \(remaining.unit.abbreviation)")
+                    Text("\(remaining.value.toString(maxDigits: 1)) \(remaining.unit.abbreviation)")
                 } minimumValueLabel: {
                     Text("0")
                 } maximumValueLabel: {
-                    Text("\(formatter.string(for: total.value)!) \(total.unit.abbreviation)")
+                    Text("\(total.value.toString(maxDigits: 1)) \(total.unit.abbreviation)")
                 }
             case .Collection(let total, let remaining):
                 Gauge(value: Double(total) / Double(remaining)) {

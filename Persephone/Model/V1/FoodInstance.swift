@@ -45,7 +45,7 @@ extension SchemaV1 {
             // The acquisition date
             var acqDate: Date
             // The nominal expiration date
-            var expDate: Date
+            var expDate: Date?
             // The date this was frozen (if applicable)
             var freezeDate: Date?
         }

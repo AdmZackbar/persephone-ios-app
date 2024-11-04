@@ -65,6 +65,7 @@
 		E8D72EF32C4641840053CA26 /* CookbookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF22C4641840053CA26 /* CookbookView.swift */; };
 		E8D72EF52C470E1E0053CA26 /* RecipeEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF42C470E1E0053CA26 /* RecipeEditor.swift */; };
 		E8D72EF72C478C620053CA26 /* RecipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D72EF62C478C610053CA26 /* RecipeView.swift */; };
+		E8EB2A592CD94707000E4B67 /* AddFoodInstanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB2A582CD94707000E4B67 /* AddFoodInstanceView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +150,7 @@
 		E8D72EF22C4641840053CA26 /* CookbookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookbookView.swift; sourceTree = "<group>"; };
 		E8D72EF42C470E1E0053CA26 /* RecipeEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEditor.swift; sourceTree = "<group>"; };
 		E8D72EF62C478C610053CA26 /* RecipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeView.swift; sourceTree = "<group>"; };
+		E8EB2A582CD94707000E4B67 /* AddFoodInstanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFoodInstanceView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -231,6 +233,7 @@
 			children = (
 				E847B1EA2C5AA4D00084CD13 /* InventoryView.swift */,
 				E847B1EC2C5AA93E0084CD13 /* InventoryFoodView.swift */,
+				E8EB2A582CD94707000E4B67 /* AddFoodInstanceView.swift */,
 			);
 			path = Inventory;
 			sourceTree = "<group>";
@@ -511,6 +514,7 @@
 				E8CE55302C6C76A700D0CB2B /* LookupFoodView.swift in Sources */,
 				E80E2C402C3F6C9000D35BE7 /* CurrencyUITextField.swift in Sources */,
 				E8743BAD2C56ED9F00E1B871 /* FoodTagSheet.swift in Sources */,
+				E8EB2A592CD94707000E4B67 /* AddFoodInstanceView.swift in Sources */,
 				E89D08D12C861914005AE1EF /* RecipePreview.swift in Sources */,
 				E8B236E32C94C12200D5AC66 /* CommercialFoodPreview.swift in Sources */,
 				E8828EE52C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift in Sources */,

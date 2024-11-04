@@ -17,80 +17,83 @@ func createTestModelContainer() -> ModelContainer {
 
 @discardableResult
 func createTestFoodItem(_ context: ModelContext) -> FoodItem {
-    let item = FoodItem(name: "Test Food",
-                        details: "Preparation: cook at 375 F for 12-14 minutes.",
-                        metaData: FoodItem.MetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"], rating: 8),
-                        ingredients: FoodIngredients(
-                            nutrients: [
-                                .Energy: Quantity.calories(120),
-                                .TotalFat: Quantity.grams(3.5),
-                                .SaturatedFat: Quantity.grams(2),
-                                .PolyunsaturatedFat: Quantity.grams(0.5),
-                                .Cholesterol: Quantity.milligrams(50),
-                                .Sodium: Quantity.milligrams(255),
-                                .TotalCarbs: Quantity.grams(12),
-                                .DietaryFiber: Quantity.grams(1),
-                                .TotalSugars: Quantity.grams(0.5),
-                                .Protein: Quantity.grams(5),
-                                .Calcium: Quantity.milligrams(20),
-                                .Potassium: Quantity.milligrams(15)
-                            ],
-                            all: "Salt, Milk, Water, Pectin (for something or other).",
-                            allergens: "Milk"
-                        ),
-                        size: FoodItem.Size(totalAmount: Quantity.grams(225), numServings: 5, servingSize: "1 unit"),
-                        storeEntries: [
-                            FoodItem.StoreEntry(storeName: "Store 1", costType: .Collection(cost: .Cents(599), quantity: 2)),
-                            FoodItem.StoreEntry(storeName: "Store 2", costType: .Collection(cost: .Cents(1099), quantity: 3)),
-                            FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: Quantity(value: .Raw(1), unit: .Pound)))
-                        ])
+    let item = FoodItem(
+        name: "Test Food",
+        details: "Preparation: cook at 375 F for 12-14 minutes.",
+        metaData: FoodItem.MetaData(barcode: "0123456789", brand: "Some Brand", tags: ["Bread"], rating: 8),
+        ingredients: FoodIngredients(
+            nutrients: [
+                .Energy: Quantity.calories(120),
+                .TotalFat: Quantity.grams(3.5),
+                .SaturatedFat: Quantity.grams(2),
+                .PolyunsaturatedFat: Quantity.grams(0.5),
+                .Cholesterol: Quantity.milligrams(50),
+                .Sodium: Quantity.milligrams(255),
+                .TotalCarbs: Quantity.grams(12),
+                .DietaryFiber: Quantity.grams(1),
+                .TotalSugars: Quantity.grams(0.5),
+                .Protein: Quantity.grams(5),
+                .Calcium: Quantity.milligrams(20),
+                .Potassium: Quantity.milligrams(15)
+            ],
+            all: "Salt, Milk, Water, Pectin (for something or other).",
+            allergens: "Milk"
+        ),
+        size: FoodItem.Size(totalAmount: Quantity.grams(225), numServings: 5, servingSize: "1 unit"),
+        storeEntries: [
+            FoodItem.StoreEntry(storeName: "Store 1", costType: .Collection(cost: .Cents(599), quantity: 2)),
+            FoodItem.StoreEntry(storeName: "Store 2", costType: .Collection(cost: .Cents(1099), quantity: 3)),
+            FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: Quantity(value: .Raw(1), unit: .Pound)))
+        ])
     context.insert(item)
     return item
 }
 
 @discardableResult
 func createTestCommercialFood(_ context: ModelContext) -> CommercialFood {
-    let item = CommercialFood(name: "Baconator", seller: "Wendy's", cost: .Cents(589),
-                              nutrients: [
-                                .Energy: .calories(840),
-                                .TotalCarbs: .grams(30),
-                                .TotalFat: .grams(22),
-                                .SaturatedFat: Quantity.grams(2),
-                                .PolyunsaturatedFat: Quantity.grams(0.5),
-                                .Cholesterol: Quantity.milligrams(50),
-                                .Sodium: Quantity.milligrams(255),
-                                .Protein: .grams(30),
-                                .Calcium: Quantity.milligrams(20),
-                                .Potassium: Quantity.milligrams(15)
-                              ],
-                              metaData: CommercialFood.MetaData(
-                                notes: "Pretty good burger lmao",
-                                rating: 8.0,
-                                tags: ["Burger"]))
+    let item = CommercialFood(
+        name: "Baconator", seller: "Wendy's", cost: .Cents(589),
+        nutrients: [
+            .Energy: .calories(840),
+            .TotalCarbs: .grams(30),
+            .TotalFat: .grams(22),
+            .SaturatedFat: Quantity.grams(2),
+            .PolyunsaturatedFat: Quantity.grams(0.5),
+            .Cholesterol: Quantity.milligrams(50),
+            .Sodium: Quantity.milligrams(255),
+            .Protein: .grams(30),
+            .Calcium: Quantity.milligrams(20),
+            .Potassium: Quantity.milligrams(15)],
+        metaData: CommercialFood.MetaData(
+            notes: "Pretty good burger lmao",
+            rating: 8.0,
+            tags: ["Burger"]
+        ))
     context.insert(item)
     return item
 }
 
 @discardableResult
 func createTestRecipeItem(_ context: ModelContext) -> Recipe {
-    let recipe = Recipe(name: "Test Recipe",
-                        metaData: Recipe.MetaData(
-                            author: "Zach Wassynger",
-                            details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
-                            prepTime: 8,
-                            cookTime: 17,
-                            otherTime: 0,
-                            tags: ["Breakfast", "Bread"],
-                            rating: 7.5,
-                            ratingLeftover: 5,
-                            difficulty: 5),
-                        instructions: [
-                            Recipe.Section(header: "Prep", details: "1. Put the mix with the water\n2. Mix until barely combined"),
-                            Recipe.Section(header: "Cook", details: "1. Put mix into the iron\n2. Wait until iron signals completion\n3. Remove and allow to cool")
-                        ],
-                        size: Recipe.Size(
-                            numServings: 6,
-                            servingSize: "1 waffle"))
+    let recipe = Recipe(
+        name: "Test Recipe",
+        metaData: Recipe.MetaData(
+            author: "Zach Wassynger",
+            details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
+            prepTime: 8,
+            cookTime: 17,
+            otherTime: 0,
+            tags: ["Breakfast", "Bread"],
+            rating: 7.5,
+            ratingLeftover: 5,
+            difficulty: 5),
+        instructions: [
+            Recipe.Section(header: "Prep", details: "1. Put the mix with the water\n2. Mix until barely combined"),
+            Recipe.Section(header: "Cook", details: "1. Put mix into the iron\n2. Wait until iron signals completion\n3. Remove and allow to cool")],
+        size: Recipe.Size(
+            numServings: 6,
+            servingSize: "1 waffle"
+        ))
     context.insert(recipe)
     recipe.ingredients.append(contentsOf: [
         RecipeIngredient(name: "Water", recipe: recipe, amount: Quantity(value: .Raw(1.2), unit: .Liter), notes: "Tap water or else"),
@@ -101,7 +104,17 @@ func createTestRecipeItem(_ context: ModelContext) -> Recipe {
 
 @discardableResult
 func createTestFoodInstance(_ context: ModelContext) -> FoodInstance {
-    let item = FoodInstance(foodItem: createTestFoodItem(context), origin: .Store(store: "Costco", cost: .Cents(530)), amount: .Single(total: Quantity(value: .Raw(530), unit: .Gram), remaining: Quantity(value: .Raw(420), unit: .Gram)), dates: FoodInstance.Dates(acqDate: Date(), expDate: Date().addingTimeInterval(100000), freezeDate: Date().addingTimeInterval(3600)))
+    let item = FoodInstance(
+        foodItem: createTestFoodItem(context),
+        origin: .Store(store: "Costco", cost: .Cents(530)),
+        amount: .Single(
+            total: Quantity(value: .Raw(530), unit: .Gram),
+            remaining: Quantity(value: .Raw(420), unit: .Gram)),
+        dates: FoodInstance.Dates(
+            acqDate: Date(),
+            expDate: Date().addingTimeInterval(100000),
+            freezeDate: Date().addingTimeInterval(3600)
+        ))
     context.insert(item)
     return item
 }

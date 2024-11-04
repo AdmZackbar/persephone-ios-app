@@ -62,7 +62,9 @@ struct InventoryFoodView: View {
                     createDateView(item.dates.freezeDate!, field: "Freeze")
                     Spacer()
                 }
-                createDateView(item.dates.acqDate, field: "Expires")
+                if item.dates.expDate != nil {
+                    createDateView(item.dates.expDate!, field: "Expires")
+                }
                 Spacer()
                 
             }

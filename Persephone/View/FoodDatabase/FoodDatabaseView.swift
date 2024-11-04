@@ -246,6 +246,7 @@ struct FoodDatabaseView: View {
 }
 
 private struct ItemsView: View {
+    @Environment(\.modelContext) var modelContext
     @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
     @Query(sort: \CommercialFood.name) var commercialFood: [CommercialFood]
     
@@ -381,6 +382,11 @@ private struct ItemsView: View {
                             } label: {
                                 Label("Edit", systemImage: "pencil.circle")
                             }
+                            Button(role: .destructive) {
+                                modelContext.delete(food)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         } preview: {
                             FoodItemPreview(item: food)
                         }
@@ -393,6 +399,11 @@ private struct ItemsView: View {
                                 path.append(.CommercialFoodEdit(food: food))
                             } label: {
                                 Label("Edit", systemImage: "pencil.circle")
+                            }
+                            Button(role: .destructive) {
+                                modelContext.delete(food)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
                             }
                         } preview: {
                             CommercialFoodPreview(food: food)

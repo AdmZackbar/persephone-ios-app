@@ -84,6 +84,13 @@ struct FoodItemView: View {
                         path.append(.ItemEdit(item: item))
                     }
                 }
+                ToolbarItem(placement: .secondaryAction) {
+                    Button(role: .destructive) {
+                        path.append(.ItemEdit(item: item))
+                    } label: {
+                        Label("Delete", systemImage: "trash.fill")
+                    }
+                }
             }.background(Color(UIColor.secondarySystemBackground))
                 .sheetCoordinating(coordinator: sheetCoordinator)
     }

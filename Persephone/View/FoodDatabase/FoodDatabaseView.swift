@@ -66,7 +66,6 @@ struct FoodDatabaseView: View {
         .init("Dairy", children: [
             .init("Cheese"),
             .init("Eggs"),
-            .init("Ice Cream"),
             .init("Milk"),
             .init("Yogurt")
         ]),
@@ -109,7 +108,9 @@ struct FoodDatabaseView: View {
             .init("Chocolate"),
             .init("Cookies"),
             .init("Cupcake"),
+            .init("Ice Cream"),
             .init("Honey"),
+            .init("Milkshake"),
             .init("Muffin"),
             .init("Pastry"),
             .init("Sugar")
@@ -371,6 +372,28 @@ private struct ItemsView: View {
         items.append(contentsOf: (commercialFood
             .filter({ foodType.containsTags($0.metaData.tags) && isSearchFiltered($0) })
             .map({ Item.commercial(food: $0) })))
+        items = items.sorted { a, b in
+            switch (sortDirection) {
+            case .Ascending:
+                switch (sortType) {
+                case .Brand:
+                    return a.getName() < b.getName()
+                case .DateAdded:
+                    return a.getTimestamp() < b.getTimestamp()
+                case .Name:
+                    return a.getName() < b.getName()
+                }
+            case .Descending:
+                switch (sortType) {
+                case .Brand:
+                    return a.getName() > b.getName()
+                case .DateAdded:
+                    return a.getTimestamp() > b.getTimestamp()
+                case .Name:
+                    return a.getName() > b.getName()
+                }
+            }
+        }
         return List(items) { item in
             switch item {
             case .regular(let food):

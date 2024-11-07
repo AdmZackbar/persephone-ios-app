@@ -93,6 +93,7 @@ struct FoodDatabaseView: View {
             .init("Bacon"),
             .init("Beef"),
             .init("Chicken"),
+            .init("Fake Meat"),
             .init("Ham"),
             .init("Pork"),
             .init("Turkey")
@@ -405,6 +406,18 @@ private struct ItemsView: View {
                             } label: {
                                 Label("Edit", systemImage: "pencil.circle")
                             }
+                            Menu("Set Tier") {
+                                ForEach(RatingTier.allCases, id: \.rawValue) { tier in
+                                    Button(tier.rawValue) {
+                                        food.metaData.rating = tier.rating
+                                    }.disabled(RatingTier.fromRating(rating: food.metaData.rating) == tier)
+                                }
+                                if RatingTier.fromRating(rating: food.metaData.rating) != nil {
+                                    Button("Clear") {
+                                        food.metaData.rating = nil
+                                    }
+                                }
+                            }
                             Button(role: .destructive) {
                                 modelContext.delete(food)
                             } label: {
@@ -422,6 +435,18 @@ private struct ItemsView: View {
                                 path.append(.CommercialFoodEdit(food: food))
                             } label: {
                                 Label("Edit", systemImage: "pencil.circle")
+                            }
+                            Menu("Set Tier") {
+                                ForEach(RatingTier.allCases, id: \.rawValue) { tier in
+                                    Button(tier.rawValue) {
+                                        food.metaData.rating = tier.rating
+                                    }.disabled(RatingTier.fromRating(rating: food.metaData.rating) == tier)
+                                }
+                                if RatingTier.fromRating(rating: food.metaData.rating) != nil {
+                                    Button("Clear") {
+                                        food.metaData.rating = nil
+                                    }
+                                }
                             }
                             Button(role: .destructive) {
                                 modelContext.delete(food)

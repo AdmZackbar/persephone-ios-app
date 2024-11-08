@@ -59,10 +59,11 @@ struct NutrientTableView: View {
         HStack {
             Text(name)
             Spacer()
+            let amount = ((nutrients[nutrient]?.value ?? .Raw(0)) * scale).toString(maxDigits: 1)
             if (nutrient == .Energy) {
-                Text(nutrients[nutrient]?.value.toString() ?? "0")
+                Text(amount)
             } else {
-                Text("\(nutrients[nutrient]?.value.toString() ?? "0") \(nutrient.getCommonUnit().abbreviation)")
+                Text("\(amount) \(nutrient.getCommonUnit().abbreviation)")
             }
         }
         .italic(indented).padding(EdgeInsets(top: 0.0, leading: indented ? 8.0 : 0.0, bottom: 0.0, trailing: 0.0))

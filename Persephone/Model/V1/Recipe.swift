@@ -15,13 +15,13 @@ extension SchemaV1 {
     @Model
     final class Recipe {
         // The name of the recipe
-        var name: String
+        var name: String = ""
         // Metadata of the recipe
-        var metaData: MetaData
+        var metaData: MetaData = MetaData(details: "", prepTime: 0.0, cookTime: 0.0, otherTime: 0.0, tags: [])
         // Instructions (header -> details list)
-        var instructions: [Section]
+        var instructions: [Section] = []
         // Size info of the recipe
-        var size: Size
+        var size: Size = Size(numServings: 0.0, servingSize: "")
         var nutrients: NutritionDict {
             get {
                 var nutrients: NutritionDict = [:]
@@ -54,9 +54,9 @@ extension SchemaV1 {
         }
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.recipe)
-        var ingredients: [RecipeIngredient] = []
+        var ingredients: [RecipeIngredient]! = []
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstance.recipe)
-        var instances: [RecipeInstance] = []
+        var instances: [RecipeInstance]! = []
         
         init(name: String, metaData: MetaData, instructions: [Section], size: Size) {
             self.name = name
@@ -157,15 +157,15 @@ extension SchemaV1 {
     @Model
     final class RecipeIngredient {
         // The name of the food ingredient
-        var name: String
+        var name: String = ""
         // Optional link to the food item itself
-        var food: FoodItem?
+        var food: FoodItem? = nil
         // The recipe of this ingredient
-        var recipe: Recipe!
+        var recipe: Recipe! = nil
         // The amount used
-        var amount: Quantity
+        var amount: Quantity = Quantity.grams(0)
         // Optional notes on this ingredient
-        var notes: String?
+        var notes: String? = nil
         var estimatedCost: FoodItem.Cost? {
             if let food {
                 if let storeEntry = food.storeEntries

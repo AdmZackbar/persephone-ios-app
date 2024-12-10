@@ -105,6 +105,7 @@
 		E847B1FA2C6046A40084CD13 /* RecipeIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeIngredientSheet.swift; sourceTree = "<group>"; };
 		E847B1FE2C63F5860084CD13 /* RecipeItemIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeItemIngredientSheet.swift; sourceTree = "<group>"; };
 		E847B2002C66B8360084CD13 /* RecipeInstructionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeInstructionsSheet.swift; sourceTree = "<group>"; };
+		E85AE3CD2D0797AE00CA9D0C /* Persephone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Persephone.entitlements; sourceTree = "<group>"; };
 		E860ACDE2C3EFBE5007E65DE /* Persephone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Persephone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneApp.swift; sourceTree = "<group>"; };
 		E860ACE72C3EFBE8007E65DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -263,6 +264,7 @@
 		E860ACE02C3EFBE5007E65DE /* Persephone */ = {
 			isa = PBXGroup;
 			children = (
+				E85AE3CD2D0797AE00CA9D0C /* Persephone.entitlements */,
 				E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */,
 				E82CFBDD2C3F0E150055C6B2 /* Model */,
 				E82CFBDE2C3F0E1F0055C6B2 /* View */,
@@ -705,6 +707,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Persephone/Persephone.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Persephone/Preview Content\"";
@@ -739,6 +742,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Persephone/Persephone.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Persephone/Preview Content\"";

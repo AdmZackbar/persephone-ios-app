@@ -13,11 +13,11 @@ typealias CommercialFood = SchemaV1.CommercialFood
 extension SchemaV1 {
     @Model
     final class CommercialFood: Hashable, Equatable {
-        var name: String
-        var seller: String
-        var cost: FoodItem.Cost
-        var nutrients: NutritionDict
-        var metaData: MetaData
+        var name: String = ""
+        var seller: String = ""
+        var cost: FoodItem.Cost = FoodItem.Cost.Cents(0)
+        var nutrients: NutritionDict = [:]
+        var metaData: MetaData = MetaData(notes: "", tags: [])
         
         init(name: String, seller: String, cost: FoodItem.Cost, nutrients: NutritionDict, metaData: MetaData) {
             self.name = name

@@ -15,18 +15,20 @@ extension SchemaV1 {
     @Model
     final class RecipeInstance {
         // The recipe this is based on
-        var recipe: Recipe!
+        var recipe: Recipe! = nil
         // The amount of food remaining from this batch
-        var amount: FoodInstance.Amount
+        var amount: FoodInstance.Amount = FoodInstance.Amount.Collection(total: 0, remaining: 0)
         // The relevant dates for this instance
-        var dates: Dates
+        var dates: Dates = Dates(creationDate: Date(), expDate: Date())
         // Any notes on how it was made
-        var prepNotes: String
+        var prepNotes: String = ""
         // Any notes on its quality or anything after it was made
-        var postNotes: String
+        var postNotes: String = ""
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.recipeInstance)
-        var ingredients: [RecipeInstanceIngredient] = []
+        var ingredients: [RecipeInstanceIngredient]! = []
+        @Relationship(deleteRule: .cascade, inverse: \LogEntryRecipe.recipe)
+        var logEntries: [LogEntryRecipe]! = []
         
         init(recipe: Recipe, amount: FoodInstance.Amount, dates: Dates, prepNotes: String, postNotes: String) {
             self.recipe = recipe
@@ -49,13 +51,13 @@ extension SchemaV1 {
     @Model
     final class RecipeInstanceIngredient {
         // The name of the ingredient/food
-        var name: String
+        var name: String = ""
         // The recipe instance
-        var recipeInstance: RecipeInstance!
+        var recipeInstance: RecipeInstance! = nil
         // The food used in the creation of the recipe
-        var food: FoodInstance?
+        var food: FoodInstance? = nil
         // The amount of the food used
-        var amount: Quantity
+        var amount: Quantity = Quantity.grams(0)
         
         init(name: String, recipeInstance: RecipeInstance, food: FoodInstance? = nil, amount: Quantity) {
             self.name = name

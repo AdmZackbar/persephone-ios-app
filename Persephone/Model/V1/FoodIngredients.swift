@@ -14,11 +14,11 @@ typealias Nutrient = SchemaV1.Nutrient
 extension SchemaV1 {
     struct FoodIngredients: Codable {
         // Stores the amount of each nutrient per serving
-        var nutrients: NutritionDict
+        var nutrients: NutritionDict = [:]
         // The full list of ingredients that make up the item
-        var all: String
+        var all: String = ""
         // The full list of known allergens for the item
-        var allergens: String
+        var allergens: String = ""
         
         init(nutrients: NutritionDict, all: String = "", allergens: String = "") {
             self.nutrients = nutrients

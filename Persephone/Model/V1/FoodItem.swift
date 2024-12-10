@@ -14,17 +14,17 @@ extension SchemaV1 {
     @Model
     final class FoodItem {
         // The name of the item
-        var name: String
+        var name: String = ""
         // Any additional information about the item
-        var details: String
+        var details: String = ""
         // Metadata about the item
-        var metaData: MetaData
+        var metaData: MetaData = MetaData()
         // Info about the ingredients and nutrition of the item
-        var ingredients: FoodIngredients
+        var ingredients: FoodIngredients = FoodIngredients(nutrients: [:])
         // Info about the size of the item
-        var size: Size
+        var size: Size = Size(totalAmount: .grams(0), numServings: 0.0, servingSize: "")
         // All store entries for the item
-        var storeEntries: [StoreEntry]
+        var storeEntries: [StoreEntry] = []
         
         var bestStoreEntry: StoreEntry? {
             get {
@@ -33,10 +33,14 @@ extension SchemaV1 {
             }
         }
         
+        @Relationship(deleteRule: .cascade, inverse: \FoodInstance.foodItem)
+        var instances: [FoodInstance]! = []
+        @Relationship(deleteRule: .cascade, inverse: \LogEntryFood.food)
+        var logEntries: [LogEntryFood]! = []
         @Relationship(deleteRule: .nullify, inverse: \RecipeIngredient.food)
-        var recipeEntries: [RecipeIngredient] = []
+        var recipeEntries: [RecipeIngredient]! = []
         @Relationship(deleteRule: .cascade, inverse: \LogbookFoodItemEntry.foodItem)
-        var logEntries: [LogbookFoodItemEntry] = []
+        var logbookEntries: [LogbookFoodItemEntry]! = []
         
         init(name: String, details: String, metaData: MetaData, ingredients: FoodIngredients, size: Size, storeEntries: [StoreEntry]) {
             self.name = name

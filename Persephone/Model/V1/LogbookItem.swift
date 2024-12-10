@@ -14,8 +14,8 @@ typealias LogbookFoodItemEntry = SchemaV1.LogbookFoodItemEntry
 extension SchemaV1 {
     @Model
     final class LogbookItem {
-        @Attribute(.unique) var date: Date
-        var targetNutrients: NutritionDict
+        var date: Date = Date()
+        var targetNutrients: NutritionDict = [:]
         
         // Computes the aggregate of all nutrients
         var nutrients: NutritionDict {
@@ -47,7 +47,7 @@ extension SchemaV1 {
         }
         
         @Relationship(deleteRule: .cascade, inverse: \LogbookFoodItemEntry.logItem)
-        var foodEntries: [LogbookFoodItemEntry] = []
+        var foodEntries: [LogbookFoodItemEntry]! = []
         
         init(date: Date, targetNutrients: NutritionDict = [:]) {
             // Enforce that all dates are agnostic of time
@@ -92,10 +92,10 @@ extension SchemaV1 {
     
     @Model
     final class LogbookFoodItemEntry {
-        var logItem: LogbookItem!
-        var foodItem: FoodItem!
-        var amount: Quantity
-        var mealType: LogbookItem.MealType
+        var logItem: LogbookItem! = nil
+        var foodItem: FoodItem! = nil
+        var amount: Quantity = Quantity.grams(0)
+        var mealType: LogbookItem.MealType = LogbookItem.MealType.Breakfast
         
         init(logItem: LogbookItem, foodItem: FoodItem, amount: Quantity, mealType: LogbookItem.MealType) {
             self.logItem = logItem

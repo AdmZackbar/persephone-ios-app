@@ -12,14 +12,14 @@ extension SchemaV1 {
     @Model
     final class LogEntry {
         // The date of this log entry
-        var date: Date
+        var date: Date = Date()
         
         @Relationship(deleteRule: .cascade, inverse: \LogEntryFoodInstance.logEntry)
-        var foodInstances: [LogEntryFoodInstance] = []
+        var foodInstances: [LogEntryFoodInstance]! = []
         @Relationship(deleteRule: .cascade, inverse: \LogEntryFood.logEntry)
-        var foods: [LogEntryFood] = []
+        var foods: [LogEntryFood]! = []
         @Relationship(deleteRule: .cascade, inverse: \LogEntryRecipe.logEntry)
-        var recipes: [LogEntryRecipe] = []
+        var recipes: [LogEntryRecipe]! = []
         
         init(date: Date) {
             self.date = date
@@ -29,11 +29,11 @@ extension SchemaV1 {
     @Model
     final class LogEntryFoodInstance {
         // The log entry
-        var logEntry: LogEntry!
+        var logEntry: LogEntry! = nil
         // The logged food instance
-        var food: FoodInstance!
+        var food: FoodInstance! = nil
         // If false, this is just a planned entry
-        var confirmed: Bool
+        var confirmed: Bool = false
         
         init(logEntry: LogEntry, food: FoodInstance, confirmed: Bool) {
             self.logEntry = logEntry
@@ -44,9 +44,9 @@ extension SchemaV1 {
     
     @Model
     final class LogEntryFood {
-        var logEntry: LogEntry!
-        var food: FoodItem!
-        var confirmed: Bool
+        var logEntry: LogEntry! = nil
+        var food: FoodItem! = nil
+        var confirmed: Bool = false
         
         init(logEntry: LogEntry, food: FoodItem, confirmed: Bool) {
             self.logEntry = logEntry
@@ -57,9 +57,9 @@ extension SchemaV1 {
     
     @Model
     final class LogEntryRecipe {
-        var logEntry: LogEntry!
-        var recipe: RecipeInstance!
-        var confirmed: Bool
+        var logEntry: LogEntry! = nil
+        var recipe: RecipeInstance! = nil
+        var confirmed: Bool = false
         
         init(logEntry: LogEntry, recipe: RecipeInstance, confirmed: Bool) {
             self.logEntry = logEntry

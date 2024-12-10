@@ -14,16 +14,18 @@ extension SchemaV1 {
     @Model
     final class FoodInstance {
         // The type of food
-        var foodItem: FoodItem!
+        var foodItem: FoodItem! = nil
         // The origin of the food (store bought, gifted, grown)
-        var origin: Origin
+        var origin: Origin = Origin.Gift(from: "")
         // The amount of food that is left over
-        var amount: Amount
+        var amount: Amount = Amount.Single(total: .grams(0), remaining: .grams(0))
         // Relevant dates pertaining to the food
-        var dates: Dates
+        var dates: Dates = Dates(acqDate: .now)
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.food)
-        var recipes: [RecipeInstanceIngredient] = []
+        var recipes: [RecipeInstanceIngredient]! = []
+        @Relationship(deleteRule: .cascade, inverse: \LogEntryFoodInstance.food)
+        var logEntries: [LogEntryFoodInstance]! = []
         
         init(foodItem: FoodItem, origin: Origin, amount: Amount, dates: Dates) {
             self.foodItem = foodItem

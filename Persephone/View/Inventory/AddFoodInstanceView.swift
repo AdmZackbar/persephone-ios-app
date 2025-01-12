@@ -109,13 +109,7 @@ struct AddFoodInstanceView: View {
                 Text("Store:")
                 TextField("required", text: $store)
             }
-            let formatter = {
-                let formatter = NumberFormatter()
-                formatter.numberStyle = .currency
-                formatter.maximumFractionDigits = 2
-                return formatter
-            }()
-            CurrencyTextField(numberFormatter: formatter, value: $price)
+            CurrencyField(value: $price)
         case .Gift:
             HStack {
                 Text("Giver:")

@@ -53,13 +53,6 @@ struct StoreItemSheet: View {
     @State private var available: Bool = true
     @State private var sale: Bool = false
     
-    let currencyFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
-    
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -76,7 +69,7 @@ struct StoreItemSheet: View {
                 }
                 HStack {
                     Text("Total Price:")
-                    CurrencyTextField(numberFormatter: currencyFormatter, value: $price)
+                    CurrencyField(value: $price)
                 }
                 Picker("", selection: $costType) {
                     Text("Collection").tag(CostType.Collection)

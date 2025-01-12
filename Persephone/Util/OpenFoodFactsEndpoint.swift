@@ -46,7 +46,7 @@ struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
         var allergens: String? = nil
         if let allergenMatches = product.allergens?.matches(of: /\w+:([^,]+)/) {
             allergens = allergenMatches.map { match in
-                match.1.string.capitalized
+                match.1.capitalized
             }.joined(separator: ", ")
         }
         let rawServingSize = product.serving_size

@@ -58,13 +58,6 @@ struct CommercialFoodEditor: View {
         }
     }
     
-    let formatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 2
-        return formatter
-    }()
-    
     var body: some View {
         Form {
             HStack {
@@ -79,7 +72,7 @@ struct CommercialFoodEditor: View {
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
             }
-            CurrencyTextField(numberFormatter: formatter, value: $cost)
+            CurrencyField(value: $cost)
             TextField("notes", text: $notes, axis: .vertical)
                 .lineLimit(3...6)
                 .textInputAutocapitalization(.sentences)

@@ -47,9 +47,9 @@ struct RecipeIngredientSheet: View {
         get {
             var unitName: String?
             if let match = amount.wholeMatch(of: /([\d.]+)\s*\/\s*([\d.]+)\s+(.+)/) {
-                unitName = match.3.string
+                unitName = String(match.3)
             } else if let match = amount.wholeMatch(of: /([\d.]+)\s+(.+)/) {
-                unitName = match.2.string
+                unitName = String(match.2)
             } else if !amount.trimmingCharacters(in: .whitespaces).isEmpty {
                 unitName = amount.trimmingCharacters(in: .whitespaces)
             } else {

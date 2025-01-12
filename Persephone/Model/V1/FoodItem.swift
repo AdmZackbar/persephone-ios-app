@@ -60,19 +60,16 @@ extension SchemaV1 {
             var brand: String?
             // The icon representing this item
             var icon: String?
-            // An image of the item
-            @Attribute(.externalStorage) var imageData: Data?
             // Set of tags that describe this item
             var tags: [String]
             // Personal rating of the food [0,10] worst -> best
             var rating: Double?
             
-            init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, imageData: Data? = nil, tags: [String] = [], rating: Double? = nil) {
+            init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, tags: [String] = [], rating: Double? = nil) {
                 self.timestamp = timestamp
                 self.barcode = barcode
                 self.brand = brand
                 self.icon = icon
-                self.imageData = imageData
                 self.tags = tags
                 self.rating = rating
             }
@@ -98,14 +95,14 @@ extension SchemaV1 {
             var servingSizeAmount: Quantity {
                 get {
                     if let match = try? /^([\d\/.]+)?\s*(.+)$/.wholeMatch(in: servingSize) {
-                        if let rawValue = match.1?.string {
-                            if let value = Quantity.Magnitude.parseString(rawValue) {
-                                Quantity(value: value, unit: .Custom(name: match.2.string))
+                        if let rawValue = match.1 {
+                            if let value = Quantity.Magnitude.parseString(String(rawValue)) {
+                                Quantity(value: value, unit: .Custom(name: String(match.2)))
                             } else {
                                 Quantity(value: .Raw(1), unit: .Serving)
                             }
                         } else {
-                            Quantity(value: .Raw(1), unit: .Custom(name: match.2.string))
+                            Quantity(value: .Raw(1), unit: .Custom(name: String(match.2)))
                         }
                     } else {
                         Quantity(value: .Raw(1), unit: .Serving)

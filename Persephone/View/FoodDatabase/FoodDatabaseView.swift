@@ -534,7 +534,7 @@ private struct ItemsView: View {
                     }
                 }
                 Spacer()
-                MacroChartView(nutrients: item.ingredients.nutrients)
+                NutrientPieChart(nutrients: item.ingredients.nutrients)
                     .frame(width: 140, height: 100)
             }
         case .Cost:
@@ -588,7 +588,7 @@ private struct ItemsView: View {
                     }
                 }
                 Spacer()
-                MacroChartView(nutrients: food.nutrients)
+                NutrientPieChart(nutrients: food.nutrients)
                     .frame(width: 140, height: 100)
             }
         case .Cost:
@@ -674,10 +674,6 @@ private struct ItemsView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    createTestFoodItem(container.mainContext)
-    createTestCommercialFood(container.mainContext)
-    return FoodDatabaseView()
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    FoodDatabaseView()
 }

@@ -20,7 +20,7 @@ extension SchemaV1 {
         // The full list of known allergens for the item
         var allergens: String = ""
         
-        init(nutrients: NutritionDict, all: String = "", allergens: String = "") {
+        init(nutrients: NutritionDict = [:], all: String = "", allergens: String = "") {
             self.nutrients = nutrients
             self.all = all
             self.allergens = allergens

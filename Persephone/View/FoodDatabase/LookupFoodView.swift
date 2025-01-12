@@ -104,9 +104,8 @@ struct LookupFoodView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    return NavigationStack {
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NavigationStack {
         LookupFoodView(path: .constant([]))
-    }.modelContainer(container)
+    }
 }

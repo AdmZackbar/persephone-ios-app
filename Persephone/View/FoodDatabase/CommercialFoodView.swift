@@ -60,7 +60,7 @@ struct CommercialFoodView: View {
                         .background(Color("BackgroundColor"))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     Spacer()
-                    MacroChartView(nutrients: food.nutrients)
+                    NutrientPieChart(nutrients: food.nutrients)
                         .frame(width: 160, height: 120)
                         .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
                         .background(Color("BackgroundColor"))
@@ -91,10 +91,8 @@ struct CommercialFoodView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let food = createTestCommercialFood(container.mainContext)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
     return NavigationStack {
-        CommercialFoodView(path: .constant([]), food: food)
+        CommercialFoodView(path: .constant([]), food: .init())
     }
 }

@@ -197,7 +197,7 @@ private struct StoreItemView: View {
         }
     }
     
-    private func formatCost(_ cost: FoodItem.Cost) -> String {
+    private func formatCost(_ cost: Price) -> String {
         currencyFormatter.string(for: cost.toUsd())!
     }
 }
@@ -255,7 +255,7 @@ private struct NutritionTabView: View {
                 }.scrollTargetBehavior(.paging)
                     .padding(12)
                     .tag(ViewType.Main)
-                MacroChartView(nutrients: item.ingredients.nutrients)
+                NutrientPieChart(nutrients: item.ingredients.nutrients)
                     .padding(12)
                     .tag(ViewType.Macro)
             }.tabViewStyle(.page(indexDisplayMode: .never))
@@ -427,10 +427,8 @@ private struct MainTabView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return NavigationStack {
-        FoodItemView(path: .constant([]), item: item)
-    }.modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NavigationStack {
+        FoodItemView(path: .constant([]), item: .init(name: "Test", details: "details", metaData: .init(), ingredients: .init(nutrients: [:]), size: .init(totalAmount: .grams(100), numServings: 1, servingSize: "1 unit"), storeEntries: []))
+    }
 }

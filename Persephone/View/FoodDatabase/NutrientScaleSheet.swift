@@ -66,8 +66,6 @@ struct NutrientScaleSheet: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return NutrientScaleSheet(item: item)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NutrientScaleSheet(item: .init())
 }

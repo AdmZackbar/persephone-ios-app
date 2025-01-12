@@ -173,9 +173,6 @@ struct StoreItemSheet: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return StoreItemSheet(mode: .Edit(item: .constant(item.storeEntries.first!)))
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    StoreItemSheet(mode: .Edit(item: .constant(.init(storeName: "", costType: .Collection(cost: .Cents(100), quantity: 1)))))
 }

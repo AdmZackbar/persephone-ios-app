@@ -54,7 +54,7 @@ struct CommercialFoodPreview: View {
                     Spacer()
                 }
                 Spacer()
-                MacroChartView(nutrients: food.nutrients)
+                NutrientPieChart(nutrients: food.nutrients)
                     .frame(width: 140, height: 100)
             }
         }.navigationTitle(food.name)
@@ -70,16 +70,14 @@ struct CommercialFoodPreview: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let food = createTestCommercialFood(container.mainContext)
-    return VStack {
-        Text(food.name).contextMenu {
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    VStack {
+        Text("Test").contextMenu {
             Button("Test") {
                 // Do nothing
             }
         } preview: {
-            CommercialFoodPreview(food: food)
+            CommercialFoodPreview(food: .init(name: "Test"))
         }
     }
 }

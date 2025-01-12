@@ -77,9 +77,6 @@ struct FoodTagSheet: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return FoodTagSheet(tags: .constant(item.metaData.tags))
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    FoodTagSheet(tags: .constant([]))
 }

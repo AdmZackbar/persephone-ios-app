@@ -10,8 +10,8 @@ import SwiftUI
 
 struct InventoryView: View {
     @Environment(\.modelContext) var modelContext
-    @Query(sort: \FoodInstance.foodItem.name) var foodInstances: [FoodInstance]
-    @Query(sort: \RecipeInstance.recipe.name) var recipeInstances: [RecipeInstance]
+    @Query var foodInstances: [FoodInstance]
+    @Query var recipeInstances: [RecipeInstance]
     
     enum ViewType: Hashable {
         case AddItem
@@ -88,9 +88,6 @@ struct InventoryView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    createTestFoodInstance(container.mainContext)
-    return InventoryView()
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    InventoryView()
 }

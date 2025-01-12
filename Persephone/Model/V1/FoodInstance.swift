@@ -16,7 +16,7 @@ extension SchemaV1 {
         // The type of food
         var foodItem: FoodItem! = nil
         // The origin of the food (store bought, gifted, grown)
-        var origin: Origin = Origin.Gift(from: "")
+        var origin: Origin? = nil
         // The amount of food that is left over
         var amount: Amount = Amount.Single(total: .grams(0), remaining: .grams(0))
         // Relevant dates pertaining to the food
@@ -24,10 +24,11 @@ extension SchemaV1 {
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.food)
         var recipes: [RecipeInstanceIngredient]! = []
-        @Relationship(deleteRule: .cascade, inverse: \LogEntryFoodInstance.food)
-        var logEntries: [LogEntryFoodInstance]! = []
         
-        init(foodItem: FoodItem, origin: Origin, amount: Amount, dates: Dates) {
+        init(foodItem: FoodItem,
+             origin: Origin? = nil,
+             amount: Amount = .Collection(total: 1, remaining: 1),
+             dates: Dates = .init()) {
             self.foodItem = foodItem
             self.origin = origin
             self.amount = amount
@@ -36,7 +37,7 @@ extension SchemaV1 {
         
         enum Origin: Codable {
             // Store-bought
-            case Store(store: String, cost: FoodItem.Cost)
+            case Store(store: String, price: Price)
             // Obtained for free from someone/somewhere
             case Gift(from: String)
             // Grown and obtained in some organic manner
@@ -50,6 +51,14 @@ extension SchemaV1 {
             var expDate: Date?
             // The date this was frozen (if applicable)
             var freezeDate: Date?
+            
+            init(acqDate: Date = Date(),
+                 expDate: Date? = nil,
+                 freezeDate: Date? = nil) {
+                self.acqDate = acqDate
+                self.expDate = expDate
+                self.freezeDate = freezeDate
+            }
         }
         
         enum Amount: Codable {

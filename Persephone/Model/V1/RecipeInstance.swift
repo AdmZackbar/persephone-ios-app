@@ -17,7 +17,7 @@ extension SchemaV1 {
         // The recipe this is based on
         var recipe: Recipe! = nil
         // The amount of food remaining from this batch
-        var amount: FoodInstance.Amount = FoodInstance.Amount.Collection(total: 0, remaining: 0)
+        var amount: FoodInstance.Amount = FoodInstance.Amount.Collection(total: 1, remaining: 1)
         // The relevant dates for this instance
         var dates: Dates = Dates(creationDate: Date(), expDate: Date())
         // Any notes on how it was made
@@ -27,10 +27,12 @@ extension SchemaV1 {
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.recipeInstance)
         var ingredients: [RecipeInstanceIngredient]! = []
-        @Relationship(deleteRule: .cascade, inverse: \LogEntryRecipe.recipe)
-        var logEntries: [LogEntryRecipe]! = []
         
-        init(recipe: Recipe, amount: FoodInstance.Amount, dates: Dates, prepNotes: String, postNotes: String) {
+        init(recipe: Recipe,
+             amount: FoodInstance.Amount = .Collection(total: 1, remaining: 1),
+             dates: Dates = .init(),
+             prepNotes: String = "",
+             postNotes: String = "") {
             self.recipe = recipe
             self.amount = amount
             self.dates = dates
@@ -45,6 +47,14 @@ extension SchemaV1 {
             var expDate: Date
             // The date this was frozen (if applicable)
             var freezeDate: Date?
+            
+            init(creationDate: Date = .init(),
+                 expDate: Date = .init(),
+                 freezeDate: Date? = nil) {
+                self.creationDate = creationDate
+                self.expDate = expDate
+                self.freezeDate = freezeDate
+            }
         }
     }
     

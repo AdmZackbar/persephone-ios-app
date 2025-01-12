@@ -70,10 +70,8 @@ struct NutrientTableView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return NavigationStack {
-        NutrientTableView(nutrients: item.ingredients.nutrients)
-    }.modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NavigationStack {
+        NutrientTableView(nutrients: [:])
+    }
 }

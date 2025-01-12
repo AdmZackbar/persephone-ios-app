@@ -15,11 +15,15 @@ extension SchemaV1 {
     final class CommercialFood: Hashable, Equatable {
         var name: String = ""
         var seller: String = ""
-        var cost: FoodItem.Cost = FoodItem.Cost.Cents(0)
+        var cost: Price = Price.Cents(0)
         var nutrients: NutritionDict = [:]
         var metaData: MetaData = MetaData(notes: "", tags: [])
         
-        init(name: String, seller: String, cost: FoodItem.Cost, nutrients: NutritionDict, metaData: MetaData) {
+        init(name: String = "",
+             seller: String = "",
+             cost: Price = .Cents(0),
+             nutrients: NutritionDict = [:],
+             metaData: MetaData = .init()) {
             self.name = name
             self.seller = seller
             self.cost = cost
@@ -33,7 +37,10 @@ extension SchemaV1 {
             var rating: Double?
             var tags: [String]
             
-            init(timestamp: Date = Date(), notes: String, rating: Double? = nil, tags: [String]) {
+            init(timestamp: Date = Date(),
+                 notes: String = "",
+                 rating: Double? = nil,
+                 tags: [String] = []) {
                 self.timestamp = timestamp
                 self.notes = notes
                 self.rating = rating

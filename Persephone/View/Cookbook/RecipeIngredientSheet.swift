@@ -166,7 +166,27 @@ struct RecipeIngredientSheet: View {
 }
 
 #Preview {
-    let container = createTestModelContainer()
-    let recipe = createTestRecipeItem(container.mainContext)
-    return RecipeIngredientSheet(mode: .Add(recipe: recipe))
+    return RecipeIngredientSheet(mode: .Add(recipe: .init(
+        name: "Test Recipe",
+        metaData: Recipe.MetaData(
+            author: "Zach Wassynger",
+            details: "My fav waffles, some more text here just put them on the iron for a few minutes and eat",
+            prepTime: 8,
+            cookTime: 17,
+            otherTime: 0,
+            tags: ["Breakfast", "Bread"],
+            rating: 7.5,
+            ratingLeftover: 5,
+            difficulty: 5),
+        instructions: [
+            Recipe.Section(header: "Prep", details: "1. Put the mix with the water\n2. Mix until barely combined"),
+            Recipe.Section(header: "Cook", details: "1. Put mix into the iron\n2. Wait until iron signals completion\n3. Remove and allow to cool")],
+        size: Recipe.Size(
+            numServings: 6,
+            servingSize: "1 waffle"
+        ),
+        ingredients: [
+            .init(name: "Water", amount: Quantity(value: .Raw(1.2), unit: .Liter), notes: "Tap water or else"),
+            .init(name: "Salt", amount: Quantity(value: .Raw(600), unit: .Milligram))
+        ])))
 }

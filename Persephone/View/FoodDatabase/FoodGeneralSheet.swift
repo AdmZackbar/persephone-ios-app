@@ -55,9 +55,6 @@ struct FoodGeneralSheet: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return FoodGeneralSheet(item: item)
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    FoodGeneralSheet(item: .init())
 }

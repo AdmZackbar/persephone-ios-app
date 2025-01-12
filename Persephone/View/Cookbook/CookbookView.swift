@@ -146,10 +146,6 @@ private struct CustomTagLabel: LabelStyle {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    createTestRecipeItem(container.mainContext)
-    createTestFoodItem(container.mainContext)
-    return CookbookView()
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    CookbookView()
 }

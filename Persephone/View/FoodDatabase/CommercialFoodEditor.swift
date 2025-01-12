@@ -148,10 +148,8 @@ struct CommercialFoodEditor: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let food = createTestCommercialFood(container.mainContext)
-    return NavigationStack {
-        CommercialFoodEditor(path: .constant([]), food: food)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NavigationStack {
+        CommercialFoodEditor(path: .constant([]), food: .init())
     }
 }

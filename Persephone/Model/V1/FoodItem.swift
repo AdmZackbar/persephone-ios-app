@@ -20,9 +20,9 @@ extension SchemaV1 {
         // Metadata about the item
         var metaData: MetaData = MetaData()
         // Info about the ingredients and nutrition of the item
-        var ingredients: FoodIngredients = FoodIngredients(nutrients: [:])
+        var ingredients: FoodIngredients = FoodIngredients()
         // Info about the size of the item
-        var size: Size = Size(totalAmount: .grams(0), numServings: 0.0, servingSize: "")
+        var size: Size = Size()
         // All store entries for the item
         var storeEntries: [StoreEntry] = []
         
@@ -35,14 +35,17 @@ extension SchemaV1 {
         
         @Relationship(deleteRule: .cascade, inverse: \FoodInstance.foodItem)
         var instances: [FoodInstance]! = []
-        @Relationship(deleteRule: .cascade, inverse: \LogEntryFood.food)
-        var logEntries: [LogEntryFood]! = []
+        @Relationship(deleteRule: .cascade, inverse: \LogFoodItemEntry.item)
+        var logEntries: [LogFoodItemEntry]! = []
         @Relationship(deleteRule: .nullify, inverse: \RecipeIngredient.food)
         var recipeEntries: [RecipeIngredient]! = []
-        @Relationship(deleteRule: .cascade, inverse: \LogbookFoodItemEntry.foodItem)
-        var logbookEntries: [LogbookFoodItemEntry]! = []
         
-        init(name: String, details: String, metaData: MetaData, ingredients: FoodIngredients, size: Size, storeEntries: [StoreEntry]) {
+        init(name: String = "",
+             details: String = "",
+             metaData: MetaData = .init(),
+             ingredients: FoodIngredients = .init(),
+             size: Size = .init(),
+             storeEntries: [StoreEntry] = []) {
             self.name = name
             self.details = details
             self.metaData = metaData
@@ -65,7 +68,12 @@ extension SchemaV1 {
             // Personal rating of the food [0,10] worst -> best
             var rating: Double?
             
-            init(timestamp: Date = .now, barcode: String? = nil, brand: String? = nil, icon: String? = nil, tags: [String] = [], rating: Double? = nil) {
+            init(timestamp: Date = .now,
+                 barcode: String? = nil,
+                 brand: String? = nil,
+                 icon: String? = nil,
+                 tags: [String] = [],
+                 rating: Double? = nil) {
                 self.timestamp = timestamp
                 self.barcode = barcode
                 self.brand = brand
@@ -109,6 +117,14 @@ extension SchemaV1 {
                     }
                 }
             }
+            
+            init(totalAmount: Quantity = .grams(0),
+                 numServings: Double = 1,
+                 servingSize: String = "") {
+                self.totalAmount = totalAmount
+                self.numServings = numServings
+                self.servingSize = servingSize
+            }
         }
         
         struct StoreEntry: Codable, Equatable, Hashable {
@@ -117,7 +133,7 @@ extension SchemaV1 {
             var available: Bool = true
             var sale: Bool = false
             
-            func costPerUnit(size: Size) -> Cost {
+            func costPerUnit(size: Size) -> Price {
                 switch costType {
                 case .Collection(let cost, let quantity):
                     cost / Double(quantity)
@@ -133,15 +149,15 @@ extension SchemaV1 {
                 }
             }
             
-            func costPerServing(size: Size) -> Cost {
+            func costPerServing(size: Size) -> Price {
                 costPerUnit(size: size) / size.numServings
             }
             
-            func costPerServingAmount(size: Size) -> Cost {
+            func costPerServingAmount(size: Size) -> Price {
                 costPerServing(size: size) / size.servingSizeAmount.value.value
             }
             
-            func costPerEnergy(foodItem: FoodItem) -> Cost? {
+            func costPerEnergy(foodItem: FoodItem) -> Price? {
                 let caloriesPerServing = foodItem.ingredients.nutrients[.Energy]?.value.value ?? 0
                 if caloriesPerServing <= 0 {
                     return nil
@@ -150,78 +166,18 @@ extension SchemaV1 {
                 return costPerUnit(size: foodItem.size) * (100 / totalCal)
             }
             
-            func costPerWeight(size: Size) -> Cost {
+            func costPerWeight(size: Size) -> Price {
                 try! costPerUnit(size: size) * (100 / size.totalAmount.convert(unit: .Gram).value.value)
             }
             
-            func costPerVolume(size: Size) -> Cost {
+            func costPerVolume(size: Size) -> Price {
                 try! costPerUnit(size: size) * (100 / size.totalAmount.convert(unit: .Milliliter).value.value)
             }
         }
         
         enum CostType: Codable, Equatable, Hashable {
-            case Collection(cost: Cost, quantity: Int)
-            case PerAmount(cost: Cost, amount: Quantity)
-        }
-        
-        enum Cost: Codable, Equatable, Hashable, Comparable {
-            case Cents(_ amount: Int)
-            
-            static let formatter: NumberFormatter = {
-                let formatter = NumberFormatter()
-                formatter.numberStyle = .currency
-                formatter.maximumFractionDigits = 2
-                return formatter
-            }()
-            
-            func toUsd() -> Double {
-                switch self {
-                case .Cents(let amount):
-                    return Double(amount) / 100.0
-                }
-            }
-            
-            func toString() -> String {
-                return Cost.formatter.string(for: toUsd())!
-            }
-            
-            static func < (lhs: Cost, rhs: Cost) -> Bool {
-                return lhs.toUsd() < rhs.toUsd()
-            }
-            
-            static func + (left: Cost, right: Cost) -> Cost {
-                switch left {
-                case .Cents(let l):
-                    switch right {
-                    case .Cents(let r):
-                        return .Cents(l + r)
-                    }
-                }
-            }
-            
-            static func - (left: Cost, right: Cost) -> Cost {
-                switch left {
-                case .Cents(let l):
-                    switch right {
-                    case .Cents(let r):
-                        return .Cents(l - r)
-                    }
-                }
-            }
-            
-            static func * (left: Cost, right: Double) -> Cost {
-                switch left {
-                case .Cents(let l):
-                    return .Cents(Int(round(Double(l) * right)))
-                }
-            }
-            
-            static func / (left: Cost, right: Double) -> Cost {
-                switch left {
-                case .Cents(let l):
-                    return .Cents(Int(round(Double(l) / right)))
-                }
-            }
+            case Collection(cost: Price, quantity: Int)
+            case PerAmount(cost: Price, amount: Quantity)
         }
     }
 }

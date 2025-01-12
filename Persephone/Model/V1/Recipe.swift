@@ -49,8 +49,8 @@ extension SchemaV1 {
                 return nutrients
             }
         }
-        var estimatedCost: FoodItem.Cost {
-            ingredients.reduce(FoodItem.Cost.Cents(0), { $0 + ($1.estimatedCost ?? FoodItem.Cost.Cents(0)) })
+        var estimatedCost: Price {
+            ingredients.reduce(Price.Cents(0), { $0 + ($1.estimatedCost ?? Price.Cents(0)) })
         }
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.recipe)
@@ -58,11 +58,16 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \RecipeInstance.recipe)
         var instances: [RecipeInstance]! = []
         
-        init(name: String, metaData: MetaData, instructions: [Section], size: Size) {
+        init(name: String = "",
+             metaData: MetaData = .init(),
+             instructions: [Section] = [],
+             size: Size = .init(numServings: 1, servingSize: ""),
+             ingredients: [RecipeIngredient] = []) {
             self.name = name
             self.metaData = metaData
             self.instructions = instructions
             self.size = size
+            self.ingredients = ingredients
         }
         
         struct MetaData: Codable {
@@ -92,6 +97,26 @@ extension SchemaV1 {
             var ratingLeftover: Double?
             // Estimated difficulty to make the recipe [0,10] easiest -> hardest
             var difficulty: Double?
+            
+            init(author: String? = nil,
+                 details: String = "",
+                 prepTime: Double = 0,
+                 cookTime: Double = 0,
+                 otherTime: Double = 0,
+                 tags: [String] = [],
+                 rating: Double? = nil,
+                 ratingLeftover: Double? = nil,
+                 difficulty: Double? = nil) {
+                self.author = author
+                self.details = details
+                self.prepTime = prepTime
+                self.cookTime = cookTime
+                self.otherTime = otherTime
+                self.tags = tags
+                self.rating = rating
+                self.ratingLeftover = ratingLeftover
+                self.difficulty = difficulty
+            }
         }
         
         struct Section: Codable, Equatable, Hashable {
@@ -166,7 +191,7 @@ extension SchemaV1 {
         var amount: Quantity = Quantity.grams(0)
         // Optional notes on this ingredient
         var notes: String? = nil
-        var estimatedCost: FoodItem.Cost? {
+        var estimatedCost: Price? {
             if let food {
                 if let storeEntry = food.storeEntries
                     .sorted(by: { $0.costPerUnit(size: food.size) < $1.costPerUnit(size: food.size) })
@@ -178,7 +203,11 @@ extension SchemaV1 {
             return nil
         }
         
-        init(name: String, food: FoodItem? = nil, recipe: Recipe, amount: Quantity, notes: String? = nil) {
+        init(name: String = "",
+             food: FoodItem? = nil,
+             recipe: Recipe? = nil,
+             amount: Quantity = .grams(0),
+             notes: String? = nil) {
             self.name = name
             self.food = food
             self.recipe = recipe

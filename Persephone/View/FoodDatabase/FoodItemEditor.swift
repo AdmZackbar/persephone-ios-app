@@ -311,10 +311,8 @@ struct FoodItemEditor: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return NavigationStack {
-        FoodItemEditor(path: .constant([]), item: item)
-    }.modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NavigationStack {
+        FoodItemEditor(path: .constant([]), item: .init())
+    }
 }

@@ -152,9 +152,6 @@ struct NutrientSheet: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return NutrientSheet(nutrients: .constant(item.ingredients.nutrients))
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NutrientSheet(nutrients: .constant([:]))
 }

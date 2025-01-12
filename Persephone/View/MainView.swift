@@ -23,7 +23,7 @@ struct MainView: View {
                 .tabItem {
                     Label("Inventory", systemImage: "list.clipboard")
                 }
-            Text("Logbook")
+            LogbookView()
                 .tabItem {
                     Label("Logbook", systemImage: "calendar")
                 }
@@ -31,10 +31,6 @@ struct MainView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    createTestFoodItem(container.mainContext)
-    createTestRecipeItem(container.mainContext)
-    return MainView()
-        .modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    MainView()
 }

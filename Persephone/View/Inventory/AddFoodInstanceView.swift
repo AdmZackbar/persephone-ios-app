@@ -200,7 +200,7 @@ struct AddFoodInstanceView: View {
     private func computeOrigin() -> FoodInstance.Origin {
         switch originType {
         case .Store:
-            return .Store(store: store, cost: .Cents(price))
+            return .Store(store: store, price: .Cents(price))
         case .Gift:
             return .Gift(from: giftFrom)
         case .Grown:
@@ -218,10 +218,8 @@ struct AddFoodInstanceView: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    createTestFoodItem(container.mainContext)
-    return NavigationStack {
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NavigationStack {
         AddFoodInstanceView(path: .constant([]))
-    }.modelContainer(container)
+    }
 }

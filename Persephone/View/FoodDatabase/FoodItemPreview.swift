@@ -46,7 +46,7 @@ struct FoodItemPreview: View {
                 }
             }
             HStack(alignment: .top, spacing: 16) {
-                MacroChartView(nutrients: item.ingredients.nutrients)
+                NutrientPieChart(nutrients: item.ingredients.nutrients)
                     .frame(width: 140, height: 100)
                 Divider()
                 VStack(alignment: .trailing, spacing: 4) {
@@ -162,16 +162,14 @@ struct FoodItemPreview: View {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodItem(container.mainContext)
-    return Form {
-        Text(item.name).contextMenu {
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    Form {
+        Text("test").contextMenu {
             Button("test") {
                 
             }
         } preview: {
-            FoodItemPreview(item: item)
+            FoodItemPreview(item: .init())
         }
     }
 }

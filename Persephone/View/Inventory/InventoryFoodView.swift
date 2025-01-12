@@ -20,15 +20,17 @@ struct InventoryFoodView: View {
                     }
                 }
                 Spacer()
-                VStack(alignment: .trailing, spacing: 6) {
-                    switch item.origin {
-                    case .Store(let store, let price):
-                        Text(store).font(.headline)
-                        Text(price.toString()).italic()
-                    case .Gift(let from):
-                        Text("Gift from \(from)")
-                    case .Grown(let location):
-                        Text("Grown at \(location)")
+                if let origin = item.origin {
+                    VStack(alignment: .trailing, spacing: 6) {
+                        switch origin {
+                        case .Store(let store, let price):
+                            Text(store).font(.headline)
+                            Text(price.toString()).italic()
+                        case .Gift(let from):
+                            Text("Gift from \(from)")
+                        case .Grown(let location):
+                            Text("Grown at \(location)")
+                        }
                     }
                 }
             }
@@ -86,6 +88,8 @@ struct InventoryFoodView: View {
             "Gift"
         case .Grown(_):
             "Grown"
+        case .none:
+            "Unknown"
         }
     }
     
@@ -111,10 +115,16 @@ struct FoodAmountGaugeStyle: GaugeStyle {
     }
 }
 
-#Preview {
-    let container = createTestModelContainer()
-    let item = createTestFoodInstance(container.mainContext)
-    return NavigationStack {
-        InventoryFoodView(item: item)
-    }.modelContainer(container)
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    NavigationStack {
+        InventoryFoodView(item: .init(foodItem:
+                .init(name: "Chicken Thighs",
+                      details: "Non organic",
+                      metaData: .init(brand: "Kirkland Signature", tags: ["Chicken"]), ingredients: .init(nutrients: [
+            .Energy: .calories(120),
+            .Protein: .grams(22),
+            .TotalFat: .grams(1),
+            .Sodium: .milligrams(150)
+        ])), origin: .Store(store: "", price: .Cents(100)), amount: .Collection(total: 1, remaining: 1), dates: .init()))
+    }
 }

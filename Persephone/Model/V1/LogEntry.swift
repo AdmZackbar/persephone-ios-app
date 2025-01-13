@@ -16,23 +16,33 @@ extension SchemaV1 {
     final class LogFoodItemEntry {
         var date: Date = Date()
         var item: FoodItem! = nil
-        var amount: Quantity = Quantity.grams(0)
+        var amount: Quantity.Magnitude = Quantity.Magnitude.Raw(1)
         var category: String = ""
         var type: LogType = LogType.actual
-        var price: Price? = nil
+        var unitPrice: Price? = nil
+        var nutrients: NutritionDict {
+            item.ingredients.nutrients * amount.value
+        }
+        var price: Price? {
+            if let unitPrice {
+                unitPrice * amount.value
+            } else {
+                nil
+            }
+        }
         
         init(date: Date = Date(),
              item: FoodItem,
-             amount: Quantity = .grams(0),
+             amount: Quantity.Magnitude = .Raw(1),
              category: String = "",
              type: LogType = .actual,
-             price: Price? = nil) {
+             unitPrice: Price? = nil) {
             self.date = date
             self.item = item
             self.amount = amount
             self.category = category
             self.type = type
-            self.price = price
+            self.unitPrice = unitPrice
         }
     }
     

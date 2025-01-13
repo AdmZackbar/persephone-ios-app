@@ -13,6 +13,35 @@ typealias Unit = SchemaV1.Unit
 typealias RatingTier = SchemaV1.RatingTier
 typealias NutritionDict = [Nutrient : Quantity]
 
+extension NutritionDict {
+    var calories: Double {
+        return self[.Energy]?.value.value ?? 0
+    }
+    
+    static func + (lhs: NutritionDict, rhs: NutritionDict) -> NutritionDict {
+        lhs.merging(rhs) { x, y in
+            if x.unit == y.unit {
+                return .init(value: x.value + y.value, unit: x.unit)
+            } else if x.unit.isWeight {
+                return try! .init(value: x.convert(unit: .Gram).value + y.convert(unit: .Gram).value, unit: .Gram)
+            }
+            return try! .init(value: x.convert(unit: .Milliliter).value + y.convert(unit: .Milliliter).value, unit: .Milliliter)
+        }
+    }
+    
+    static func * (lhs: NutritionDict, rhs: Double) -> NutritionDict {
+        lhs.mapValues { x in
+            return .init(value: x.value * rhs, unit: x.unit)
+        }
+    }
+    
+    static func / (lhs: NutritionDict, rhs: Double) -> NutritionDict {
+        lhs.mapValues { x in
+            return .init(value: x.value / rhs, unit: x.unit)
+        }
+    }
+}
+
 extension SchemaV1 {
     struct Quantity: Codable, Equatable, Hashable {
         enum Magnitude: Codable, Equatable, Hashable {

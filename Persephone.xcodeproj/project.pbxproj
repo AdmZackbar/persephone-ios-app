@@ -28,6 +28,9 @@
 		E860ACF52C3EFBE9007E65DE /* PersephoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACF42C3EFBE9007E65DE /* PersephoneTests.swift */; };
 		E860ACFF2C3EFBE9007E65DE /* PersephoneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */; };
 		E860AD012C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */; };
+		E867E6662D343B05001917C0 /* LogbookPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E867E6652D343AF8001917C0 /* LogbookPieChart.swift */; };
+		E867E6682D343FDD001917C0 /* ModelUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E867E6672D343FDA001917C0 /* ModelUtilities.swift */; };
+		E869C0852D348637000E9F10 /* LogCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E869C0842D34862A000E9F10 /* LogCategoryView.swift */; };
 		E86D48032C972BF2006AB0BF /* LogbookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86D48022C972BF2006AB0BF /* LogbookView.swift */; };
 		E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743B9C2C51FB0E00E1B871 /* SheetCoordinator.swift */; };
 		E8743BA12C52DC3A00E1B871 /* StoreItemSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743BA02C52DC3A00E1B871 /* StoreItemSheet.swift */; };
@@ -49,6 +52,7 @@
 		E89D08C92C7ED4FF005AE1EF /* ServingAmountSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08C82C7ED4FF005AE1EF /* ServingAmountSheet.swift */; };
 		E89D08CF2C85F806005AE1EF /* FoodItemPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08CE2C85F806005AE1EF /* FoodItemPreview.swift */; };
 		E89D08D12C861914005AE1EF /* RecipePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08D02C861914005AE1EF /* RecipePreview.swift */; };
+		E8AD4B672D3499C100C1B30A /* LogFoodItemEntryEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD4B662D3499AB00C1B30A /* LogFoodItemEntryEditView.swift */; };
 		E8B236DF2C94B52800D5AC66 /* CommercialFood.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B236DE2C94B52800D5AC66 /* CommercialFood.swift */; };
 		E8B236E12C94B72900D5AC66 /* CommercialFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B236E02C94B72900D5AC66 /* CommercialFoodView.swift */; };
 		E8B236E32C94C12200D5AC66 /* CommercialFoodPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B236E22C94C12200D5AC66 /* CommercialFoodPreview.swift */; };
@@ -112,6 +116,9 @@
 		E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PersephoneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITests.swift; sourceTree = "<group>"; };
 		E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		E867E6652D343AF8001917C0 /* LogbookPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogbookPieChart.swift; sourceTree = "<group>"; };
+		E867E6672D343FDA001917C0 /* ModelUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelUtilities.swift; sourceTree = "<group>"; };
+		E869C0842D34862A000E9F10 /* LogCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogCategoryView.swift; sourceTree = "<group>"; };
 		E86D48022C972BF2006AB0BF /* LogbookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogbookView.swift; sourceTree = "<group>"; };
 		E8743B9C2C51FB0E00E1B871 /* SheetCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetCoordinator.swift; sourceTree = "<group>"; };
 		E8743BA02C52DC3A00E1B871 /* StoreItemSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreItemSheet.swift; sourceTree = "<group>"; };
@@ -135,6 +142,7 @@
 		E89D08C82C7ED4FF005AE1EF /* ServingAmountSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServingAmountSheet.swift; sourceTree = "<group>"; };
 		E89D08CE2C85F806005AE1EF /* FoodItemPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItemPreview.swift; sourceTree = "<group>"; };
 		E89D08D02C861914005AE1EF /* RecipePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipePreview.swift; sourceTree = "<group>"; };
+		E8AD4B662D3499AB00C1B30A /* LogFoodItemEntryEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFoodItemEntryEditView.swift; sourceTree = "<group>"; };
 		E8B236DE2C94B52800D5AC66 /* CommercialFood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommercialFood.swift; sourceTree = "<group>"; };
 		E8B236E02C94B72900D5AC66 /* CommercialFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommercialFoodView.swift; sourceTree = "<group>"; };
 		E8B236E22C94C12200D5AC66 /* CommercialFoodPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommercialFoodPreview.swift; sourceTree = "<group>"; };
@@ -266,6 +274,7 @@
 				E860ACE12C3EFBE5007E65DE /* PersephoneApp.swift */,
 				E8E7024C2D33F9CD00FB7013 /* NavigationStore.swift */,
 				E8E7024E2D33FBA000FB7013 /* MainUtilities.swift */,
+				E867E6672D343FDA001917C0 /* ModelUtilities.swift */,
 				E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */,
 				E82CFBDD2C3F0E150055C6B2 /* Model */,
 				E82CFBDE2C3F0E1F0055C6B2 /* View */,
@@ -306,6 +315,8 @@
 		E86D48012C972BD4006AB0BF /* Logbook */ = {
 			isa = PBXGroup;
 			children = (
+				E8AD4B662D3499AB00C1B30A /* LogFoodItemEntryEditView.swift */,
+				E869C0842D34862A000E9F10 /* LogCategoryView.swift */,
 				E86D48022C972BF2006AB0BF /* LogbookView.swift */,
 			);
 			path = Logbook;
@@ -366,6 +377,7 @@
 		E8E702522D34089A00FB7013 /* Chart */ = {
 			isa = PBXGroup;
 			children = (
+				E867E6652D343AF8001917C0 /* LogbookPieChart.swift */,
 				E8E702552D3408CF00FB7013 /* NutrientPieChart.swift */,
 			);
 			path = Chart;
@@ -529,10 +541,12 @@
 				E8B236E32C94C12200D5AC66 /* CommercialFoodPreview.swift in Sources */,
 				E8828EE52C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift in Sources */,
 				E89D08C92C7ED4FF005AE1EF /* ServingAmountSheet.swift in Sources */,
+				E867E6682D343FDD001917C0 /* ModelUtilities.swift in Sources */,
 				E8743BAB2C56ED0B00E1B871 /* FoodSheetEnum.swift in Sources */,
 				E81454AB2C6EFDB3009056D2 /* NutrientScaleSheet.swift in Sources */,
 				E8D72EF12C463D3A0053CA26 /* Recipe.swift in Sources */,
 				E847B1FB2C6046A40084CD13 /* RecipeIngredientSheet.swift in Sources */,
+				E867E6662D343B05001917C0 /* LogbookPieChart.swift in Sources */,
 				E8E7024D2D33F9CD00FB7013 /* NavigationStore.swift in Sources */,
 				E8828ED92C5031F3006C7CB3 /* RecipeInstance.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
@@ -549,11 +563,13 @@
 				E8E7024F2D33FBA000FB7013 /* MainUtilities.swift in Sources */,
 				E8B236E12C94B72900D5AC66 /* CommercialFoodView.swift in Sources */,
 				E847B2012C66B8360084CD13 /* RecipeInstructionsSheet.swift in Sources */,
+				E8AD4B672D3499C100C1B30A /* LogFoodItemEntryEditView.swift in Sources */,
 				E8828ED52C4F5871006C7CB3 /* FoodIngredients.swift in Sources */,
 				E89D08C32C7B896C005AE1EF /* FoodDatabaseExportView.swift in Sources */,
 				E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */,
 				E8828ED12C4F529A006C7CB3 /* FoodHelpers.swift in Sources */,
 				E8D72EF72C478C620053CA26 /* RecipeView.swift in Sources */,
+				E869C0852D348637000E9F10 /* LogCategoryView.swift in Sources */,
 				E8828EDC2C503550006C7CB3 /* LogEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

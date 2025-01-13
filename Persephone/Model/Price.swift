@@ -10,6 +10,13 @@ import Foundation
 enum Price: Codable, Equatable, Hashable, Comparable {
     case Cents(_ amount: Int)
     
+    func toCents() -> Int {
+        switch self {
+        case .Cents(let amount):
+            return amount
+        }
+    }
+    
     func toUsd() -> Double {
         switch self {
         case .Cents(let amount):

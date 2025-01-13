@@ -15,8 +15,7 @@ struct LogbookView: View {
         "Breakfast",
         "Lunch",
         "Dinner",
-        "Snacks",
-        "Other"
+        "Snacks"
     ]
     
     @StateObject private var navigationStore = NavigationStore()
@@ -105,7 +104,7 @@ struct LogbookView: View {
             VStack(alignment: .leading) {
                 Text(category.uppercased())
                     .fontWeight(.light)
-                Text("\(items.totalNutrients.calories.formatted()) Cal")
+                Text("\(items.totalNutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
                     .font(.title2)
                     .bold()
                 Text(items.totalPrice.toString())

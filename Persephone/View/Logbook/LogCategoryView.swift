@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LogCategoryView: View {
     @Query(sort: \LogFoodItemEntry.date) var foodItems: [LogFoodItemEntry]
+    @Environment(\.modelContext) var modelContext
     
     @EnvironmentObject
     private var navigationStore: NavigationStore
@@ -37,6 +38,11 @@ struct LogCategoryView: View {
             Form {
                 Section {
                     ForEach(items, id: \.hashValue, content: itemView)
+                        .onDelete { indices in
+                            for index in indices {
+                                modelContext.delete(items[index])
+                            }
+                        }
                 } header: {
                     Menu {
                         Button("All Entries") {
@@ -65,28 +71,32 @@ struct LogCategoryView: View {
     }
     
     @ViewBuilder
-    private func itemView(_ item: LogFoodItemEntry) -> some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(item.item.name)
-                    .font(.headline)
-                if let brand = item.item.metaData.brand {
-                    Text(brand)
-                        .font(.subheadline)
-                        .italic()
+    private func itemView(_ entry: LogFoodItemEntry) -> some View {
+        Button {
+            navigationStore.push(LogViewType.editFoodItem(entry: entry))
+        } label: {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    Text(entry.item.name)
+                        .font(.headline)
+                    if let brand = entry.item.metaData.brand {
+                        Text(brand)
+                            .font(.subheadline)
+                            .italic()
+                    }
                 }
-            }
-            Spacer()
-            VStack(alignment: .trailing) {
-                Text("\(item.nutrients.calories.formatted()) Cal")
-                    .font(.headline)
-                if let price = item.price {
-                    Text(price.toString())
-                        .font(.subheadline)
-                        .italic()
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text("\(entry.nutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
+                        .font(.headline)
+                    if let price = entry.price {
+                        Text(price.toString())
+                            .font(.subheadline)
+                            .italic()
+                    }
                 }
-            }
-        }
+            }.contentShape(Rectangle())
+        }.buttonStyle(.plain)
     }
     
     @ToolbarContentBuilder

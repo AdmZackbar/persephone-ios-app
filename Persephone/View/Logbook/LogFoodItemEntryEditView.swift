@@ -15,6 +15,7 @@ struct LogFoodItemEntryEditView: View {
     
     @State private var item: Item
     @State private var filter: String = ""
+    @State private var isAmountServing: Bool = true
     
     init(item: Item) {
         self.item = item
@@ -39,17 +40,18 @@ struct LogFoodItemEntryEditView: View {
             } else {
                 selectFoodView()
             }
-        }.navigationTitle(item.entry != nil ? "Edit Entry" : "Add Entry")
+        }.navigationTitle(item.isEditing ? "Edit Entry" : "Add Entry")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         item.save(modelContext)
+                        navigationStore.pop()
                     }.disabled(item.foodItem == nil)
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(item.entry != nil ? "Cancel" : "Back") {
+                    Button(item.isEditing ? "Cancel" : "Back") {
                         navigationStore.pop()
                     }
                 }
@@ -59,37 +61,54 @@ struct LogFoodItemEntryEditView: View {
     @ViewBuilder
     private func foodAmountView(_ foodItem: FoodItem) -> some View {
         Section("Food") {
-            TextField("Amount", text: Binding(get: {
-                item.amount.toString()
-            }, set: { str in
-                if let value = Quantity.Magnitude.parseString(str) {
-                    item.amount = value
-                }
-            })).autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
+            Picker(selection: $isAmountServing) {
+                Text(foodItem.size.servingSizeAmount.unit.abbreviation).tag(true)
+                Text(foodItem.size.servingAmount.unit.isWeight ? "g" : "mL").tag(false)
+            } label: {
+                TextField("Amount", text: Binding(get: {
+                    if isAmountServing {
+                        item.amount.toString()
+                    } else {
+                        (item.amount * foodItem.size.servingAmount.value.value).toString()
+                    }
+                }, set: { str in
+                    if let value = Quantity.Magnitude.parseString(str) {
+                        if isAmountServing {
+                            item.amount = value
+                        } else {
+                            item.amount = value / foodItem.size.servingAmount.value.value
+                        }
+                    }
+                })).keyboardType(.decimalPad)
+            }
             VStack(alignment: .leading) {
-                HStack {
-                    Text(foodItem.name)
-                        .font(.headline)
-                    Spacer()
-                    Text("\((foodItem.size.servingSizeAmount.value * item.amount.value).toString()) \(foodItem.size.servingSizeAmount.unit.abbreviation)")
-                        .bold()
-                }
-                HStack {
-                    if let brand = foodItem.metaData.brand {
-                        Text(brand)
-                            .font(.subheadline)
-                            .italic()
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading) {
+                        Text(foodItem.name)
+                            .font(.headline)
+                        if let brand = foodItem.metaData.brand {
+                            Text(brand)
+                                .font(.subheadline)
+                                .italic()
+                        }
                     }
                     Spacer()
-                    Text("\((foodItem.size.servingAmount.value * item.amount.value).toString())\(foodItem.size.servingAmount.unit.abbreviation)")
-                        .font(.subheadline).bold()
+                    VStack(alignment: .trailing) {
+                        Text("\((foodItem.size.servingSizeAmount.value * item.amount.value).toString()) \(foodItem.size.servingSizeAmount.unit.abbreviation)")
+                            .bold()
+                        Text("\((foodItem.size.servingAmount.value * item.amount.value).toString())\(foodItem.size.servingAmount.unit.abbreviation)")
+                            .font(.subheadline).bold()
+                    }
                 }
                 NutrientPieChart(nutrients: foodItem.ingredients.nutrients * item.amount.value)
                     .frame(width: 160, height: 120)
             }
             Toggle(isOn: $item.hasPrice) {
                 costEntryView(foodItem)
+            }
+            Button("Change Food") {
+                filter = ""
+                item.foodItem = nil
             }
         }
     }
@@ -125,12 +144,20 @@ struct LogFoodItemEntryEditView: View {
     private func selectFoodView() -> some View {
         Section("Food") {
             TextField("Search", text: $filter)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
             if filter.count > 2 {
                 let foodItems = foodItems.filter({ $0.contains(filter) })
                 if !foodItems.isEmpty {
                     ForEach(foodItems, id: \.hashValue) { item in
                         Button(item.name) {
                             self.item.foodItem = item
+                            if let storeEntry = item.bestStoreEntry {
+                                self.item.hasPrice = true
+                                self.item.unitPrice = storeEntry.costPerUnit(size: item.size)
+                            } else {
+                                self.item.hasPrice = false
+                            }
                         }
                     }
                 } else {
@@ -141,7 +168,10 @@ struct LogFoodItemEntryEditView: View {
     }
     
     struct Item {
-        var entry: LogFoodItemEntry?
+        private var entry: LogFoodItemEntry?
+        var isEditing: Bool {
+            entry != nil
+        }
         
         var date: Date
         var foodItem: FoodItem?

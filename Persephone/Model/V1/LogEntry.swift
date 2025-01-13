@@ -25,7 +25,7 @@ extension SchemaV1 {
         }
         var price: Price? {
             if let unitPrice {
-                unitPrice * amount.value
+                unitPrice * (amount.value / item.size.numServings)
             } else {
                 nil
             }

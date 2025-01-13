@@ -15,7 +15,8 @@ struct LogbookView: View {
         "Breakfast",
         "Lunch",
         "Dinner",
-        "Snacks"
+        "Snacks",
+        "Other"
     ]
     
     @StateObject private var navigationStore = NavigationStore()
@@ -36,15 +37,27 @@ struct LogbookView: View {
         NavigationStack(path: $navigationStore.path) {
             VStack(spacing: 24) {
                 dateHeader()
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        ForEach(Self.Categories, id: \.hashValue) { category in
-                            categoryButton(category: category, items: itemMap[category] ?? [])
-                        }
+                VStack(alignment: .leading, spacing: 20) {
+                    nutrientView(nutrition: items.totalNutrients, price: items.totalPrice)
+                    HStack {
+                        categoryButton(category: "Breakfast", items: itemMap["Breakfast"] ?? [])
+                        Spacer()
+                        categoryButton(category: "Lunch", items: itemMap["Lunch"] ?? [])
+                        Spacer()
+                        categoryButton(category: "Dinner", items: itemMap["Dinner"] ?? [])
+                    }.frame(maxWidth: .infinity)
+                    HStack {
+                        Spacer()
+                        categoryButton(category: "Snacks", items: itemMap["Snacks"] ?? [])
+                        Spacer()
+                        categoryButton(category: "Other", items: itemMap["Other"] ?? [])
+                        Spacer()
+                    }.frame(maxWidth: .infinity)
+                    Button("View All Entries") {
+                        navigationStore.logConfig.selectedCategory = nil
+                        navigationStore.push(LogViewType.entries)
                     }
                     Spacer()
-                    LogbookPieChart(nutrients: items.totalNutrients, price: items.totalPrice)
-                        .frame(width: 200, height: 200)
                 }
                 Spacer()
             }.navigationTitle("Logbook")
@@ -111,6 +124,26 @@ struct LogbookView: View {
                     .font(.title3)
             }.clipShape(Rectangle())
         }.buttonStyle(.plain)
+    }
+    
+    @ViewBuilder
+    private func nutrientView(nutrition: NutritionDict, price: Price) -> some View {
+        HStack(alignment: .center) {
+            LogbookPieChart(nutrients: nutrition, price: price)
+                .frame(width: 190, height: 190)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Carbs: \(nutrition[.TotalCarbs]?.value.toString(maxDigits: 0) ?? "0")g")
+                    .font(.title3)
+                    .foregroundStyle(Color("CarbsColor"))
+                Text("Fat: \(nutrition[.TotalFat]?.value.toString(maxDigits: 0) ?? "0")g")
+                    .font(.title3)
+                    .foregroundStyle(Color("FatColor"))
+                Text("Protein: \(nutrition[.Protein]?.value.toString(maxDigits: 0) ?? "0")g")
+                    .font(.title3)
+                    .foregroundStyle(Color("ProteinColor"))
+                Text("Sodium: \(nutrition[.Sodium]?.value.toString(maxDigits: 0) ?? "0")mg")
+            }.bold()
+        }
     }
     
     @ViewBuilder

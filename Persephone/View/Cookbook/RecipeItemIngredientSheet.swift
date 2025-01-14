@@ -206,7 +206,7 @@ struct RecipeItemIngredientSheet: View {
                         .font(.subheadline).lineLimit(1...7)
                 }
                 HStack(alignment: .top, spacing: 16) {
-                    NutrientPieChart(nutrients: item.ingredients.nutrients, scale: scale)
+                    NutrientPieChart(nutrients: item.ingredients.nutrients * scale)
                         .frame(width: 160, height: 120)
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) {

@@ -10,11 +10,9 @@ import SwiftUI
 
 struct NutrientPieChart: View {
     let nutrients: NutritionDict
-    let scale: Double
     
-    init(nutrients: NutritionDict, scale: Double = 1) {
+    init(nutrients: NutritionDict) {
         self.nutrients = nutrients
-        self.scale = scale
     }
     
     var body: some View {
@@ -71,13 +69,8 @@ struct NutrientPieChart: View {
     @ViewBuilder
     private func chartOverlay(_ frame: CGRect) -> some View {
         VStack(spacing: 2) {
-            if let cal = nutrients[.Energy] {
-                Text((cal.value * scale).toString(maxDigits: 0))
-                    .font(.title3).fontWeight(.heavy)
-            } else {
-                Text("0")
-                    .font(.title3).fontWeight(.heavy)
-            }
+            Text(nutrients.calories.formatted(.number.precision(.fractionLength(0))))
+                .font(.title3).fontWeight(.heavy)
             Text("Cal")
                 .font(.caption).bold()
         }.position(x: frame.midX, y: frame.midY)
@@ -97,7 +90,7 @@ struct NutrientPieChart: View {
     
     private func computeAmount(_ nutrient: Nutrient) -> Double {
         if let amount = try? nutrients[nutrient]?.convert(unit: .Gram).value {
-            (amount * scale).value
+            amount.value
         } else {
             0
         }
@@ -105,7 +98,7 @@ struct NutrientPieChart: View {
     
     private func amountToString(_ nutrient: Nutrient) -> String {
         if let amount = try? nutrients[nutrient]?.convert(unit: .Gram).value {
-            (amount * scale).toString(maxDigits: 1)
+            amount.toString(maxDigits: 1)
         } else {
             "0"
         }

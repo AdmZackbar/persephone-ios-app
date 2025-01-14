@@ -50,7 +50,7 @@ struct RecipePreview: View {
                 }
             }
             HStack(alignment: .top) {
-                NutrientPieChart(nutrients: recipe.nutrients, scale: 1 / recipe.size.numServings)
+                NutrientPieChart(nutrients: recipe.nutrients / recipe.size.numServings)
                     .frame(width: 140, height: 100)
                 Divider()
                 VStack(alignment: .trailing, spacing: 6) {

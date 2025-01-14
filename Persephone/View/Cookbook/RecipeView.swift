@@ -94,7 +94,7 @@ struct RecipeView: View {
                         Text("recipe").tag(NutrientViewType.Whole)
                     }.pickerStyle(.segmented)
                     HStack {
-                        NutrientPieChart(nutrients: recipe.nutrients, scale: computeNutrientScale())
+                        NutrientPieChart(nutrients: recipe.nutrients * computeNutrientScale())
                             .frame(width: 180, height: 140)
                             .fixedSize(horizontal: true, vertical: true)
                         Spacer()

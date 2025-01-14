@@ -85,25 +85,15 @@ struct LogCategoryView: View {
             sheetType = .EditFoodItem(entry: entry)
         } label: {
             VStack(alignment: .leading, spacing: 2) {
-                let brand = entry.item.metaData.brand
-                if brand != nil || entry.price != nil {
-                    HStack {
-                        if let brand {
-                            Text(brand)
-                                .opacity(0.7)
-                        }
-                        Spacer()
-                        if let price = entry.price {
-                            Text(price.toString())
-                                .italic()
-                        }
-                    }.font(.subheadline)
+                if let brand = entry.item.metaData.brand {
+                    Text(brand)
+                        .font(.subheadline)
+                        .opacity(0.7)
                 }
                 Text(entry.item.name)
                     .bold()
                 HStack {
                     Text("\(entry.nutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
-                        .fontWeight(.semibold)
                     Spacer()
                     let amount: String = {
                         switch entry.amountUnit {
@@ -115,10 +105,15 @@ struct LogCategoryView: View {
                     }()
                     Text(amount)
                 }.font(.subheadline)
+                    .fontWeight(.semibold)
                 HStack {
                     macroSummaryText(entry.nutrients)
                         .fontWeight(.semibold)
                     Spacer()
+                    if let price = entry.price {
+                        Text(price.toString())
+                            .italic()
+                    }
                 }.font(.subheadline)
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
@@ -148,6 +143,10 @@ struct LogCategoryView: View {
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
+            } preview: {
+                LogFoodItemEntryPreview(entry: entry)
+                    .padding()
+                    .frame(width: 300)
             }
             .swipeActions(allowsFullSwipe: false) {
                 Button {
@@ -355,7 +354,7 @@ struct EditAmountSheet: View {
                         }
                     }
                 }
-        }
+        }.presentationDetents([.medium])
     }
     
     @ViewBuilder
@@ -382,6 +381,35 @@ struct EditAmountSheet: View {
             } else {
                 Text("No Price Data")
             }
+        }
+    }
+}
+
+struct LogFoodItemEntryPreview: View {
+    let entry: LogFoodItemEntry
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    Text(entry.item.name)
+                        .font(.headline)
+                    if let brand = entry.item.metaData.brand {
+                        Text(brand)
+                            .font(.subheadline)
+                            .italic()
+                    }
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text("\((entry.item.size.servingSizeAmount.value * entry.amount.value).toString()) \(entry.item.size.servingSizeAmount.unit.abbreviation)")
+                        .bold()
+                    Text("\((entry.item.size.servingAmount.value * entry.amount.value).toString())\(entry.item.size.servingAmount.unit.abbreviation)")
+                        .font(.subheadline).bold()
+                }
+            }
+            NutrientPieChart(nutrients: entry.item.ingredients.nutrients * entry.amount.value)
+                .frame(width: 160, height: 120)
         }
     }
 }

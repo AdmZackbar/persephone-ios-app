@@ -67,14 +67,14 @@ struct LogFoodItemEntryEditView: View {
             } label: {
                 TextField("Amount", text: Binding(get: {
                     if item.amountUnit == nil {
-                        item.amount.toString()
+                        (item.amount * foodItem.size.servingSizeAmount.value.value).toString()
                     } else {
                         (item.amount * foodItem.size.servingAmount.value.value).toString()
                     }
                 }, set: { str in
                     if let value = Quantity.Magnitude.parseString(str) {
                         if item.amountUnit == nil {
-                            item.amount = value
+                            item.amount = value / foodItem.size.servingSizeAmount.value.value
                         } else {
                             item.amount = value / foodItem.size.servingAmount.value.value
                         }

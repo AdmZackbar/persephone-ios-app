@@ -318,9 +318,9 @@
 		E86D48012C972BD4006AB0BF /* Logbook */ = {
 			isa = PBXGroup;
 			children = (
-				E8AD4B662D3499AB00C1B30A /* LogFoodItemEntryEditView.swift */,
-				E869C0842D34862A000E9F10 /* LogCategoryView.swift */,
 				E86D48022C972BF2006AB0BF /* LogbookView.swift */,
+				E869C0842D34862A000E9F10 /* LogCategoryView.swift */,
+				E8AD4B662D3499AB00C1B30A /* LogFoodItemEntryEditView.swift */,
 			);
 			path = Logbook;
 			sourceTree = "<group>";

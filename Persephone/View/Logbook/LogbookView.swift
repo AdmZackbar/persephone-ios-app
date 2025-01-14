@@ -159,8 +159,8 @@ struct LogbookView: View {
         switch type {
         case .entries:
             LogCategoryView()
-        case .addFoodItem:
-            LogFoodItemEntryEditView(item: .init(date: navigationStore.logConfig.date, category: navigationStore.logConfig.selectedCategory ?? "Other", type: navigationStore.logConfig.selectedType))
+        case .addFoodItem(let category):
+            LogFoodItemEntryEditView(item: .init(date: navigationStore.logConfig.date, category: category ?? navigationStore.logConfig.selectedCategory ?? "Other", type: navigationStore.logConfig.selectedType))
         case .editFoodItem(let entry):
             LogFoodItemEntryEditView(item: .init(entry: entry))
         }

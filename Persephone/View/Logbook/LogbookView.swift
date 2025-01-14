@@ -55,6 +55,7 @@ struct LogbookView: View {
                 }.headerProminence(.increased)
             }.navigationTitle("Logbook")
                 .navigationBarTitleDisplayMode(.inline)
+                .background(Color(uiColor: UIColor.secondarySystemBackground))
                 .toolbar {
                     ToolbarItem(placement: .principal) {
                         Picker("", selection: $navigationStore.logConfig.selectedType) {

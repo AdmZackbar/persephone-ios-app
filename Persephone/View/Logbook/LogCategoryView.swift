@@ -69,6 +69,7 @@ struct LogCategoryView: View {
             Spacer()
         }.navigationTitle("Logbook")
             .navigationBarTitleDisplayMode(.inline)
+            .background(Color(uiColor: UIColor.secondarySystemBackground))
             .toolbar(content: toolbarContent)
             .sheet(item: $sheetType) { type in
                 switch type {

@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LogbookView: View {
     @Query(sort: \LogFoodItemEntry.date) var foodItems: [LogFoodItemEntry]
+    @Environment(\.modelContext) var modelContext
     
     static let Categories: [String] = [
         "Breakfast",
@@ -44,7 +45,7 @@ struct LogbookView: View {
                     }
                     Section("Meals") {
                         ForEach(Self.Categories, id: \.hashValue) { category in
-                            categoryButton(category: category, items: itemMap[category, default: []])
+                            categoryButton(category: category, entries: itemMap[category, default: []])
                         }
                         Button("View All Entries") {
                             navigationStore.logConfig.selectedCategory = nil
@@ -100,7 +101,7 @@ struct LogbookView: View {
     }
     
     @ViewBuilder
-    private func categoryButton(category: String, items: [LogFoodItemEntry]) -> some View {
+    private func categoryButton(category: String, entries: [LogFoodItemEntry]) -> some View {
         Button {
             navigationStore.logConfig.selectedCategory = category
             navigationStore.push(LogViewType.entries)
@@ -110,28 +111,58 @@ struct LogbookView: View {
                     Text(category.capitalized)
                         .font(.title3)
                         .bold()
-                    Text(items.totalPrice.toString())
+                    Text(entries.totalPrice.toString())
                         .italic()
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(items.totalNutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
+                    Text("\(entries.totalNutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
                         .font(.title3)
                         .bold()
                     HStack(spacing: 4) {
-                        Text("\(items.totalNutrients[.TotalCarbs]?.formatted() ?? "0g")")
+                        Text("\(entries.totalNutrients[.TotalCarbs]?.formatted() ?? "0g")")
                             .foregroundStyle(Colors.carbs)
                         Text("·")
-                        Text("\(items.totalNutrients[.TotalFat]?.formatted() ?? "0g")")
+                        Text("\(entries.totalNutrients[.TotalFat]?.formatted() ?? "0g")")
                             .foregroundStyle(Colors.fat)
                         Text("·")
-                        Text("\(items.totalNutrients[.Protein]?.formatted() ?? "0g")")
+                        Text("\(entries.totalNutrients[.Protein]?.formatted() ?? "0g")")
                             .foregroundStyle(Colors.protein)
                     }.italic()
                         .bold()
                 }
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
+            .contextMenu {
+                if navigationStore.logConfig.selectedType == .plan {
+                    Menu("Actualize") {
+                        Button("Copy") {
+                            for entry in entries {
+                                let copy = LogFoodItemEntry(date: entry.date,
+                                                            item: entry.item,
+                                                            amount: entry.amount,
+                                                            amountUnit: entry.amountUnit,
+                                                            category: entry.category,
+                                                            type: .actual,
+                                                            unitPrice: entry.unitPrice)
+                                modelContext.insert(copy)
+                            }
+                        }
+                        Button("Move") {
+                            for entry in entries {
+                                entry.type = .actual
+                            }
+                        }
+                    }
+                }
+                Button(role: .destructive) {
+                    for entry in entries {
+                        modelContext.delete(entry)
+                    }
+                } label: {
+                    Label("Clear All", systemImage: "trash")
+                }
+            }
     }
     
     @ViewBuilder
@@ -139,7 +170,7 @@ struct LogbookView: View {
         HStack(alignment: .top) {
             LogbookPieChart(nutrients: nutrition, price: price)
                 .frame(width: 180, height: 170)
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Carbs: \(nutrition[.TotalCarbs]?.formatted() ?? "0g")")
                     .font(.title3)
                     .foregroundStyle(Colors.carbs)

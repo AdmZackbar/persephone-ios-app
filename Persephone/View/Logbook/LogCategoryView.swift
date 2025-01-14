@@ -38,11 +38,6 @@ struct LogCategoryView: View {
             Form {
                 Section {
                     ForEach(items, id: \.hashValue, content: itemView)
-                        .onDelete { indices in
-                            for index in indices {
-                                modelContext.delete(items[index])
-                            }
-                        }
                 } header: {
                     Menu {
                         Button("All Entries") {
@@ -118,6 +113,71 @@ struct LogCategoryView: View {
                 }.font(.subheadline)
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
+            .contextMenu {
+                if entry.type == .plan {
+                    Menu("Actualize") {
+                        Button("Copy") {
+                            copyToActual(entry)
+                        }
+                        Button("Move") {
+                            moveToActual(entry)
+                        }
+                    }
+                }
+                Button {
+                    duplicate(entry)
+                } label: {
+                    Label("Duplicate", systemImage: "doc.on.doc")
+                }
+                Button(role: .destructive) {
+                    delete(entry)
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+            .swipeActions(allowsFullSwipe: false) {
+                Button {
+                    delete(entry)
+                } label: {
+                    Label("Delete", systemImage: "trash").tint(.red)
+                }
+                Button {
+                    duplicate(entry)
+                } label: {
+                    Label("Duplicate", systemImage: "doc.on.doc").tint(.blue)
+                }
+            }
+    }
+    
+    private func copyToActual(_ entry: LogFoodItemEntry) {
+        let copy = LogFoodItemEntry(date: entry.date,
+                                    item: entry.item,
+                                    amount: entry.amount,
+                                    amountUnit: entry.amountUnit,
+                                    category: entry.category,
+                                    type: .actual,
+                                    unitPrice: entry.unitPrice)
+        modelContext.insert(copy)
+    }
+    
+    private func moveToActual(_ entry: LogFoodItemEntry) {
+        entry.type = .actual
+    }
+    
+    private func duplicate(_ entry: LogFoodItemEntry) {
+        let copy = LogFoodItemEntry(date: entry.date,
+                                    item: entry.item,
+                                    amount: entry.amount,
+                                    amountUnit: entry.amountUnit,
+                                    category: entry.category,
+                                    type: entry.type,
+                                    unitPrice: entry.unitPrice)
+        modelContext.insert(copy)
+        navigationStore.push(LogViewType.editFoodItem(entry: copy))
+    }
+    
+    private func delete(_ entry: LogFoodItemEntry) {
+        modelContext.delete(entry)
     }
     
     @ViewBuilder
@@ -138,7 +198,7 @@ struct LogCategoryView: View {
     
     @ViewBuilder
     private func macroText(_ nutrients: NutritionDict) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Carbs: \(nutrients[.TotalCarbs]?.formatted() ?? "0g")")
                 .font(.title3)
                 .foregroundStyle(Colors.carbs)

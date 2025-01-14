@@ -16,8 +16,7 @@ struct LogbookView: View {
         "Breakfast",
         "Lunch",
         "Dinner",
-        "Snacks",
-        "Other"
+        "Snacks"
     ]
     
     @StateObject private var navigationStore = NavigationStore()

@@ -12,12 +12,17 @@ struct LogFoodItemEntryEditView: View {
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationStore: NavigationStore
     @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
+    @Query(sort: \LogFoodItemEntry.date, order: .reverse) var entries: [LogFoodItemEntry]
     
     @State private var item: Item
     @State private var filter: String = ""
     
     init(item: Item) {
         self.item = item
+        var fetchDescriptor = FetchDescriptor<LogFoodItemEntry>(
+            sortBy: [SortDescriptor(\LogFoodItemEntry.date, order: .reverse)])
+        fetchDescriptor.fetchLimit = 100
+        self._entries = Query(fetchDescriptor)
     }
     
     var body: some View {
@@ -81,6 +86,7 @@ struct LogFoodItemEntryEditView: View {
                     }
                 })).keyboardType(.decimalPad)
             }
+            similarEntryView(foodItem)
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading) {
@@ -111,6 +117,49 @@ struct LogFoodItemEntryEditView: View {
                 item.foodItem = nil
             }
         }
+    }
+    
+    @ViewBuilder
+    private func similarEntryView(_ foodItem: FoodItem) -> some View {
+        let similarEntries: [SimilarEntry] = {
+            let entries = entries.filter({ $0.type == item.type && $0.item == foodItem })
+            var similarEntries: [SimilarEntry] = []
+            for entry in entries {
+                if !similarEntries.contains(where: { $0.amount == entry.amount }) {
+                    similarEntries.append(.init(amount: entry.amount, unit: entry.amountUnit))
+                }
+                if similarEntries.count >= 8 {
+                    break
+                }
+            }
+            return similarEntries
+        }()
+        if !similarEntries.isEmpty {
+            ScrollView(.horizontal) {
+                HStack(spacing: 10) {
+                    ForEach(similarEntries, id: \.hashValue) { similarEntry in
+                        Button {
+                            item.amount = similarEntry.amount
+                            item.amountUnit = similarEntry.unit
+                        } label: {
+                            switch similarEntry.unit {
+                            case .none:
+                                Text("\((similarEntry.amount * foodItem.size.servingSizeAmount.value.value).toString(maxDigits: 1)) \(foodItem.size.servingSizeAmount.unit.abbreviation)")
+                            default:
+                                Text("\((similarEntry.amount * foodItem.size.servingAmount.value.value).toString())\(foodItem.size.servingAmount.unit.abbreviation)")
+                            }
+                            
+                        }
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+    
+    private struct SimilarEntry: Hashable, Equatable {
+        var amount: Quantity.Magnitude
+        var unit: Unit?
     }
     
     @ViewBuilder

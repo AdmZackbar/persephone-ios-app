@@ -30,9 +30,9 @@ struct NutrientPieChart: View {
             }.chartLegend(.hidden)
                 .padding(4)
                 .chartForegroundStyleScale([
-                    "Carbs": Color.init("CarbsColor"),
-                    "Fat": Color.init("FatColor"),
-                    "Protein": Color.init("ProteinColor"),
+                    "Carbs": Colors.carbs,
+                    "Fat": Colors.fat,
+                    "Protein": Colors.protein,
                     "None": Color.gray
                 ])
                 .chartBackground { chartProxy in
@@ -49,20 +49,20 @@ struct NutrientPieChart: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Protein")
                         Text("\(protein)g")
-                    }.foregroundStyle(Color.init("ProteinColor"))
+                    }.foregroundStyle(Colors.protein)
                     Spacer()
                     let carbs = amountToString(.TotalCarbs)
                     VStack(alignment: .trailing, spacing: 0) {
                         Text("Carbs")
                         Text("\(carbs)g")
-                    }.foregroundStyle(Color.init("CarbsColor"))
+                    }.foregroundStyle(Colors.carbs)
                 }
                 Spacer()
                 let fat = amountToString(.TotalFat)
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Fat")
                     Text("\(fat)g")
-                }.foregroundStyle(Color.init("FatColor"))
+                }.foregroundStyle(Colors.fat)
             }.font(.caption)
                 .fontWeight(.heavy)
         }

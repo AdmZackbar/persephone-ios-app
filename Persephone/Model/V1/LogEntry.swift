@@ -17,6 +17,7 @@ extension SchemaV1 {
         var date: Date = Date()
         var item: FoodItem! = nil
         var amount: Quantity.Magnitude = Quantity.Magnitude.Raw(1)
+        var amountUnit: Unit? = nil
         var category: String = ""
         var type: LogType = LogType.actual
         var unitPrice: Price? = nil
@@ -34,12 +35,14 @@ extension SchemaV1 {
         init(date: Date = Date(),
              item: FoodItem,
              amount: Quantity.Magnitude = .Raw(1),
+             amountUnit: Unit? = nil,
              category: String = "",
              type: LogType = .actual,
              unitPrice: Price? = nil) {
             self.date = date
             self.item = item
             self.amount = amount
+            self.amountUnit = amountUnit
             self.category = category
             self.type = type
             self.unitPrice = unitPrice

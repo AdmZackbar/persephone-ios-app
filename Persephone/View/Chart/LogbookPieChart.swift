@@ -24,9 +24,9 @@ struct LogbookPieChart: View {
         }.chartLegend(.hidden)
             .padding(4)
             .chartForegroundStyleScale([
-                "Carbs": Color.init("CarbsColor"),
-                "Fat": Color.init("FatColor"),
-                "Protein": Color.init("ProteinColor"),
+                "Carbs": Colors.carbs,
+                "Fat": Colors.fat,
+                "Protein": Colors.protein,
                 "None": Color.gray
             ])
             .chartBackground { chartProxy in

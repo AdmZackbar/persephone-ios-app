@@ -35,34 +35,25 @@ struct LogbookView: View {
             return map
         }()
         NavigationStack(path: $navigationStore.path) {
-            VStack(spacing: 24) {
+            VStack(spacing: 0) {
                 dateHeader()
-                VStack(alignment: .leading, spacing: 20) {
-                    nutrientView(nutrition: items.totalNutrients, price: items.totalPrice)
-                    HStack {
-                        categoryButton(category: "Breakfast", items: itemMap["Breakfast"] ?? [])
-                        Spacer()
-                        categoryButton(category: "Lunch", items: itemMap["Lunch"] ?? [])
-                        Spacer()
-                        categoryButton(category: "Dinner", items: itemMap["Dinner"] ?? [])
-                    }.frame(maxWidth: .infinity)
-                    HStack {
-                        Spacer()
-                        categoryButton(category: "Snacks", items: itemMap["Snacks"] ?? [])
-                        Spacer()
-                        categoryButton(category: "Other", items: itemMap["Other"] ?? [])
-                        Spacer()
-                    }.frame(maxWidth: .infinity)
-                    Button("View All Entries") {
-                        navigationStore.logConfig.selectedCategory = nil
-                        navigationStore.push(LogViewType.entries)
+                    .padding()
+                Form {
+                    Section("Summary") {
+                        nutrientView(nutrition: items.totalNutrients, price: items.totalPrice)
                     }
-                    Spacer()
-                }
-                Spacer()
+                    Section("Meals") {
+                        ForEach(Self.Categories, id: \.hashValue) { category in
+                            categoryButton(category: category, items: itemMap[category, default: []])
+                        }
+                        Button("View All Entries") {
+                            navigationStore.logConfig.selectedCategory = nil
+                            navigationStore.push(LogViewType.entries)
+                        }
+                    }
+                }.headerProminence(.increased)
             }.navigationTitle("Logbook")
                 .navigationBarTitleDisplayMode(.inline)
-                .padding()
                 .toolbar {
                     ToolbarItem(placement: .principal) {
                         Picker("", selection: $navigationStore.logConfig.selectedType) {
@@ -114,34 +105,51 @@ struct LogbookView: View {
             navigationStore.logConfig.selectedCategory = category
             navigationStore.push(LogViewType.entries)
         } label: {
-            VStack(alignment: .leading) {
-                Text(category.uppercased())
-                    .fontWeight(.light)
-                Text("\(items.totalNutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
-                    .font(.title2)
-                    .bold()
-                Text(items.totalPrice.toString())
-                    .font(.title3)
-            }.clipShape(Rectangle())
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(category.capitalized)
+                        .font(.title3)
+                        .bold()
+                    Text(items.totalPrice.toString())
+                        .italic()
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("\(items.totalNutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
+                        .font(.title3)
+                        .bold()
+                    HStack(spacing: 4) {
+                        Text("\(items.totalNutrients[.TotalCarbs]?.formatted() ?? "0g")")
+                            .foregroundStyle(Colors.carbs)
+                        Text("·")
+                        Text("\(items.totalNutrients[.TotalFat]?.formatted() ?? "0g")")
+                            .foregroundStyle(Colors.fat)
+                        Text("·")
+                        Text("\(items.totalNutrients[.Protein]?.formatted() ?? "0g")")
+                            .foregroundStyle(Colors.protein)
+                    }.italic()
+                        .bold()
+                }
+            }.contentShape(Rectangle())
         }.buttonStyle(.plain)
     }
     
     @ViewBuilder
     private func nutrientView(nutrition: NutritionDict, price: Price) -> some View {
-        HStack(alignment: .center) {
+        HStack(alignment: .top) {
             LogbookPieChart(nutrients: nutrition, price: price)
-                .frame(width: 190, height: 190)
+                .frame(width: 180, height: 170)
             VStack(alignment: .leading, spacing: 8) {
-                Text("Carbs: \(nutrition[.TotalCarbs]?.value.toString(maxDigits: 0) ?? "0")g")
+                Text("Carbs: \(nutrition[.TotalCarbs]?.formatted() ?? "0g")")
                     .font(.title3)
-                    .foregroundStyle(Color("CarbsColor"))
-                Text("Fat: \(nutrition[.TotalFat]?.value.toString(maxDigits: 0) ?? "0")g")
+                    .foregroundStyle(Colors.carbs)
+                Text("Fat: \(nutrition[.TotalFat]?.formatted() ?? "0g")")
                     .font(.title3)
-                    .foregroundStyle(Color("FatColor"))
-                Text("Protein: \(nutrition[.Protein]?.value.toString(maxDigits: 0) ?? "0")g")
+                    .foregroundStyle(Colors.fat)
+                Text("Protein: \(nutrition[.Protein]?.formatted() ?? "0g")")
                     .font(.title3)
-                    .foregroundStyle(Color("ProteinColor"))
-                Text("Sodium: \(nutrition[.Sodium]?.value.toString(maxDigits: 0) ?? "0")mg")
+                    .foregroundStyle(Colors.protein)
+                Text("Sodium: \(nutrition[.Sodium]?.formatted() ?? "0mg")")
             }.bold()
         }
     }
@@ -152,7 +160,7 @@ struct LogbookView: View {
         case .entries:
             LogCategoryView()
         case .addFoodItem:
-            LogFoodItemEntryEditView(category: navigationStore.logConfig.selectedCategory ?? "Other", type: navigationStore.logConfig.selectedType)
+            LogFoodItemEntryEditView(item: .init(date: navigationStore.logConfig.date, category: navigationStore.logConfig.selectedCategory ?? "Other", type: navigationStore.logConfig.selectedType))
         case .editFoodItem(let entry):
             LogFoodItemEntryEditView(item: .init(entry: entry))
         }

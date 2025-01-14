@@ -51,22 +51,27 @@ struct LogCategoryView: View {
                         ForEach(LogbookView.Categories, id: \.hashValue) { category in
                             Button(category) {
                                 navigationStore.logConfig.selectedCategory = category
-                            }
+                            }.disabled(category == navigationStore.logConfig.selectedCategory)
                         }
                     } label: {
                         HStack {
                             Text(navigationStore.logConfig.selectedCategory ?? "All Entries")
                                 .font(.title2)
                                 .bold()
+                            Image(systemName: "chevron.down")
                             Spacer()
                         }.clipShape(Rectangle())
                     }.buttonStyle(.plain)
                 }.headerProminence(.increased)
-            }.scrollContentBackground(.hidden)
+                HStack(alignment: .top) {
+                    LogbookPieChart(nutrients: items.totalNutrients, price: items.totalPrice)
+                        .frame(width: 160, height: 160)
+                    macroText(items.totalNutrients)
+                }
+            }
             Spacer()
         }.navigationTitle("Logbook")
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color.init(uiColor: UIColor.secondarySystemBackground))
             .toolbar(content: toolbarContent)
     }
     
@@ -75,28 +80,76 @@ struct LogCategoryView: View {
         Button {
             navigationStore.push(LogViewType.editFoodItem(entry: entry))
         } label: {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    Text(entry.item.name)
-                        .font(.headline)
-                    if let brand = entry.item.metaData.brand {
-                        Text(brand)
-                            .font(.subheadline)
-                            .italic()
-                    }
+            VStack(alignment: .leading, spacing: 2) {
+                let brand = entry.item.metaData.brand
+                if brand != nil || entry.price != nil {
+                    HStack {
+                        if let brand {
+                            Text(brand)
+                                .opacity(0.7)
+                        }
+                        Spacer()
+                        if let price = entry.price {
+                            Text(price.toString())
+                                .italic()
+                        }
+                    }.font(.subheadline)
                 }
-                Spacer()
-                VStack(alignment: .trailing) {
+                Text(entry.item.name)
+                    .bold()
+                HStack {
                     Text("\(entry.nutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
-                        .font(.headline)
-                    if let price = entry.price {
-                        Text(price.toString())
-                            .font(.subheadline)
-                            .italic()
-                    }
-                }
+                        .fontWeight(.semibold)
+                    Spacer()
+                    let amount: String = {
+                        switch entry.amountUnit {
+                        case .none:
+                            return (entry.item.size.servingSizeAmount * entry.amount.value).formatted(maxDigits: 2, includeSpace: true)
+                        default:
+                            return (entry.item.size.servingAmount * entry.amount.value).formatted(maxDigits: 1)
+                        }
+                    }()
+                    Text(amount)
+                }.font(.subheadline)
+                HStack {
+                    macroSummaryText(entry.nutrients)
+                        .fontWeight(.semibold)
+                    Spacer()
+                }.font(.subheadline)
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
+    }
+    
+    @ViewBuilder
+    private func macroSummaryText(_ nutrients: NutritionDict) -> some View {
+        HStack(spacing: 4) {
+            Text("\(nutrients[.TotalCarbs]?.formatted() ?? "0g")")
+                .foregroundStyle(Colors.carbs)
+            Text("·")
+            Text("\(nutrients[.TotalFat]?.formatted() ?? "0g")")
+                .foregroundStyle(Colors.fat)
+            Text("·")
+            Text("\(nutrients[.Protein]?.formatted() ?? "0g")")
+                .foregroundStyle(Colors.protein)
+            Text("·")
+            Text("\(nutrients[.Sodium]?.formatted() ?? "0mg")")
+        }
+    }
+    
+    @ViewBuilder
+    private func macroText(_ nutrients: NutritionDict) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Carbs: \(nutrients[.TotalCarbs]?.formatted() ?? "0g")")
+                .font(.title3)
+                .foregroundStyle(Colors.carbs)
+            Text("Fat: \(nutrients[.TotalFat]?.formatted() ?? "0g")")
+                .font(.title3)
+                .foregroundStyle(Colors.fat)
+            Text("Protein: \(nutrients[.Protein]?.formatted() ?? "0g")")
+                .font(.title3)
+                .foregroundStyle(Colors.protein)
+            Text("Sodium: \(nutrients[.Sodium]?.formatted() ?? "0mg")")
+        }.bold()
     }
     
     @ToolbarContentBuilder

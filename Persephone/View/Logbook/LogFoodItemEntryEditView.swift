@@ -15,14 +15,9 @@ struct LogFoodItemEntryEditView: View {
     
     @State private var item: Item
     @State private var filter: String = ""
-    @State private var isAmountServing: Bool = true
     
     init(item: Item) {
         self.item = item
-    }
-    
-    init(category: String, type: LogType) {
-        self.item = .init(category: category, type: type)
     }
     
     var body: some View {
@@ -61,19 +56,24 @@ struct LogFoodItemEntryEditView: View {
     @ViewBuilder
     private func foodAmountView(_ foodItem: FoodItem) -> some View {
         Section("Food") {
-            Picker(selection: $isAmountServing) {
-                Text(foodItem.size.servingSizeAmount.unit.abbreviation).tag(true)
-                Text(foodItem.size.servingAmount.unit.isWeight ? "g" : "mL").tag(false)
+            Picker(selection: $item.amountUnit) {
+                Text(foodItem.size.servingSizeAmount.unit.abbreviation).tag(nil as Unit?)
+                if foodItem.size.totalAmount.unit.isWeight {
+                    Text(Unit.Gram.abbreviation).tag(Unit.Gram)
+                }
+                if foodItem.size.totalAmount.unit.isVolume {
+                    Text(Unit.Milliliter.abbreviation).tag(Unit.Milliliter)
+                }
             } label: {
                 TextField("Amount", text: Binding(get: {
-                    if isAmountServing {
+                    if item.amountUnit == nil {
                         item.amount.toString()
                     } else {
                         (item.amount * foodItem.size.servingAmount.value.value).toString()
                     }
                 }, set: { str in
                     if let value = Quantity.Magnitude.parseString(str) {
-                        if isAmountServing {
+                        if item.amountUnit == nil {
                             item.amount = value
                         } else {
                             item.amount = value / foodItem.size.servingAmount.value.value
@@ -152,6 +152,15 @@ struct LogFoodItemEntryEditView: View {
                     ForEach(foodItems, id: \.hashValue) { item in
                         Button(item.name) {
                             self.item.foodItem = item
+                            self.item.amountUnit = {
+                                if item.size.totalAmount.unit.isWeight {
+                                    .Gram
+                                } else if item.size.totalAmount.unit.isVolume {
+                                    .Milliliter
+                                } else {
+                                    nil
+                                }
+                            }()
                             if let storeEntry = item.bestStoreEntry {
                                 self.item.hasPrice = true
                                 self.item.unitPrice = storeEntry.costPerUnit(size: item.size)
@@ -174,22 +183,36 @@ struct LogFoodItemEntryEditView: View {
         }
         
         var date: Date
-        var foodItem: FoodItem?
+        var foodItem: FoodItem? = nil
         var amount: Quantity.Magnitude
+        var amountUnit: Unit?
         var category: String
         var type: LogType
         var hasPrice: Bool
         var unitPrice: Price
         
-        init(entry: LogFoodItemEntry? = nil, category: String? = nil, type: LogType? = nil) {
+        init(entry: LogFoodItemEntry) {
             self.entry = entry
-            self.date = entry?.date ?? .now
-            self.foodItem = entry?.item
-            self.amount = entry?.amount ?? .Raw(1)
-            self.category = entry?.category ?? category ?? "Other"
-            self.type = entry?.type ?? type ?? .actual
-            self.hasPrice = entry?.unitPrice != nil
-            self.unitPrice = entry?.unitPrice ?? .Cents(0)
+            self.date = entry.date
+            self.foodItem = entry.item
+            self.amount = entry.amount
+            self.amountUnit = entry.amountUnit
+            self.category = entry.category
+            self.type = entry.type
+            self.hasPrice = entry.unitPrice != nil
+            self.unitPrice = entry.unitPrice ?? .Cents(0)
+        }
+        
+        init(date: Date, category: String, type: LogType) {
+            self.entry = nil
+            self.date = date
+            self.foodItem = nil
+            self.amount = .Raw(1)
+            self.amountUnit = nil
+            self.category = category
+            self.type = type
+            self.hasPrice = false
+            self.unitPrice = .Cents(0)
         }
         
         mutating func save(_ modelContext: ModelContext) {
@@ -198,6 +221,7 @@ struct LogFoodItemEntryEditView: View {
                     entry.date = date
                     entry.item = foodItem
                     entry.amount = amount
+                    entry.amountUnit = amountUnit
                     entry.category = category
                     entry.type = type
                     entry.unitPrice = hasPrice ? unitPrice : nil
@@ -206,6 +230,7 @@ struct LogFoodItemEntryEditView: View {
                 entry = .init(date: date,
                               item: foodItem,
                               amount: amount,
+                              amountUnit: amountUnit,
                               category: category,
                               type: type,
                               unitPrice: hasPrice ? unitPrice : nil)
@@ -218,6 +243,6 @@ struct LogFoodItemEntryEditView: View {
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
     @Previewable @StateObject var navigationStore = NavigationStore()
     NavigationStack(path: $navigationStore.path) {
-        LogFoodItemEntryEditView(category: "Breakfast", type: .actual)
+        LogFoodItemEntryEditView(item: .init(date: .now, category: "Breakfast", type: .actual))
     }.environmentObject(navigationStore)
 }

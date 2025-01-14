@@ -15,6 +15,8 @@ struct LogCategoryView: View {
     @EnvironmentObject
     private var navigationStore: NavigationStore
     
+    @State private var sheetType: SheetType? = nil
+    
     var body: some View {
         let items = foodItems.filter({ navigationStore.logConfig.contains($0.date) && navigationStore.logConfig.selectedType == $0.type }).filter({ navigationStore.logConfig.selectedCategory == nil || $0.category == navigationStore.logConfig.selectedCategory })
         VStack(spacing: 0) {
@@ -68,12 +70,18 @@ struct LogCategoryView: View {
         }.navigationTitle("Logbook")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(content: toolbarContent)
+            .sheet(item: $sheetType) { type in
+                switch type {
+                case .EditFoodItem(let entry):
+                    EditAmountSheet(item: .init(entry: entry))
+                }
+            }
     }
     
     @ViewBuilder
     private func itemView(_ entry: LogFoodItemEntry) -> some View {
         Button {
-            navigationStore.push(LogViewType.editFoodItem(entry: entry))
+            sheetType = .EditFoodItem(entry: entry)
         } label: {
             VStack(alignment: .leading, spacing: 2) {
                 let brand = entry.item.metaData.brand
@@ -125,6 +133,11 @@ struct LogCategoryView: View {
                     }
                 }
                 Button {
+                    edit(entry)
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+                Button {
                     duplicate(entry)
                 } label: {
                     Label("Duplicate", systemImage: "doc.on.doc")
@@ -146,7 +159,16 @@ struct LogCategoryView: View {
                 } label: {
                     Label("Duplicate", systemImage: "doc.on.doc").tint(.blue)
                 }
+                Button {
+                    edit(entry)
+                } label: {
+                    Label("Edit", systemImage: "pencil").tint(.gray)
+                }
             }
+    }
+    
+    private func edit(_ entry: LogFoodItemEntry) {
+        navigationStore.push(LogViewType.editFoodItem(entry: entry))
     }
     
     private func copyToActual(_ entry: LogFoodItemEntry) {
@@ -238,6 +260,126 @@ struct LogCategoryView: View {
                 } label: {
                     Label("Add", systemImage: "plus")
                 }
+            }
+        }
+    }
+}
+
+private enum SheetType: Identifiable {
+    var id: String {
+        switch self {
+        case .EditFoodItem(_):
+            "Edit Food Item"
+        }
+    }
+    
+    case EditFoodItem(entry: LogFoodItemEntry)
+}
+
+struct EditAmountSheet: View {
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) var modelContext
+    
+    @State var item: LogFoodItemEntryEditView.Item
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                let foodItem = item.foodItem!
+                Picker(selection: $item.amountUnit) {
+                    Text(foodItem.size.servingSizeAmount.unit.abbreviation).tag(nil as Unit?)
+                    if foodItem.size.totalAmount.unit.isWeight {
+                        Text(Unit.Gram.abbreviation).tag(Unit.Gram)
+                    }
+                    if foodItem.size.totalAmount.unit.isVolume {
+                        Text(Unit.Milliliter.abbreviation).tag(Unit.Milliliter)
+                    }
+                } label: {
+                    TextField("Amount", text: Binding(get: {
+                        if item.amountUnit == nil {
+                            (item.amount * foodItem.size.servingSizeAmount.value.value).toString()
+                        } else {
+                            (item.amount * foodItem.size.servingAmount.value.value).toString()
+                        }
+                    }, set: { str in
+                        if let value = Quantity.Magnitude.parseString(str) {
+                            if item.amountUnit == nil {
+                                item.amount = value / foodItem.size.servingSizeAmount.value.value
+                            } else {
+                                item.amount = value / foodItem.size.servingAmount.value.value
+                            }
+                        }
+                    })).keyboardType(.decimalPad)
+                        .font(.title)
+                        .bold()
+                }
+                VStack(alignment: .leading) {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading) {
+                            Text(foodItem.name)
+                                .font(.headline)
+                            if let brand = foodItem.metaData.brand {
+                                Text(brand)
+                                    .font(.subheadline)
+                                    .italic()
+                            }
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                            Text("\((foodItem.size.servingSizeAmount.value * item.amount.value).toString()) \(foodItem.size.servingSizeAmount.unit.abbreviation)")
+                                .bold()
+                            Text("\((foodItem.size.servingAmount.value * item.amount.value).toString())\(foodItem.size.servingAmount.unit.abbreviation)")
+                                .font(.subheadline).bold()
+                        }
+                    }
+                    NutrientPieChart(nutrients: foodItem.ingredients.nutrients * item.amount.value)
+                        .frame(width: 160, height: 120)
+                }
+                Toggle(isOn: $item.hasPrice) {
+                    costEntryView(foodItem)
+                }
+            }.navigationTitle("Edit Amount")
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden()
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Save") {
+                            item.save(modelContext)
+                            dismiss()
+                        }
+                    }
+                }
+        }
+    }
+    
+    @ViewBuilder
+    private func costEntryView(_ foodItem: FoodItem) -> some View {
+        HStack {
+            Text("Cost (\(foodItem.size.totalAmount.value.toString(maxDigits: 1))\(foodItem.size.totalAmount.unit.abbreviation)):")
+            if item.hasPrice {
+                CurrencyField(value: Binding(get: {
+                    item.unitPrice.toCents()
+                }, set: { value in
+                    item.unitPrice = .Cents(value)
+                }))
+                if !foodItem.storeEntries.isEmpty {
+                    Menu {
+                        ForEach(foodItem.storeEntries, id: \.hashValue) { storeEntry in
+                            Button("\(storeEntry.storeName)\(storeEntry.sale ? " (Sale)" : ""): \(storeEntry.costType.toString())") {
+                                item.unitPrice = storeEntry.costPerUnit(size: foodItem.size)
+                            }
+                        }
+                    } label: {
+                        Label("Set", systemImage: "chevron.down").labelStyle(.iconOnly)
+                    }
+                }
+            } else {
+                Text("No Price Data")
             }
         }
     }

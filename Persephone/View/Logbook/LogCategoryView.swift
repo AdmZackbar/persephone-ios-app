@@ -18,7 +18,7 @@ struct LogCategoryView: View {
     @State private var sheetType: SheetType? = nil
     
     var body: some View {
-        let items = foodItems.filter({ navigationStore.logConfig.contains($0.date) && navigationStore.logConfig.selectedType == $0.type }).filter({ navigationStore.logConfig.selectedCategory == nil || $0.category == navigationStore.logConfig.selectedCategory })
+        let items = foodItems.filter({ navigationStore.logConfig.contains($0.date) }).filter({ navigationStore.logConfig.selectedCategory == nil || $0.category == navigationStore.logConfig.selectedCategory })
         VStack(spacing: 0) {
             HStack {
                 Button {
@@ -118,16 +118,6 @@ struct LogCategoryView: View {
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
             .contextMenu {
-                if entry.type == .plan {
-                    Menu("Actualize") {
-                        Button("Copy") {
-                            copyToActual(entry)
-                        }
-                        Button("Move") {
-                            moveToActual(entry)
-                        }
-                    }
-                }
                 Button {
                     edit(entry)
                 } label: {
@@ -171,28 +161,12 @@ struct LogCategoryView: View {
         navigationStore.push(LogViewType.editFoodItem(entry: entry))
     }
     
-    private func copyToActual(_ entry: LogFoodItemEntry) {
-        let copy = LogFoodItemEntry(date: entry.date,
-                                    item: entry.item,
-                                    amount: entry.amount,
-                                    amountUnit: entry.amountUnit,
-                                    category: entry.category,
-                                    type: .actual,
-                                    unitPrice: entry.unitPrice)
-        modelContext.insert(copy)
-    }
-    
-    private func moveToActual(_ entry: LogFoodItemEntry) {
-        entry.type = .actual
-    }
-    
     private func duplicate(_ entry: LogFoodItemEntry) {
         let copy = LogFoodItemEntry(date: entry.date,
                                     item: entry.item,
                                     amount: entry.amount,
                                     amountUnit: entry.amountUnit,
                                     category: entry.category,
-                                    type: entry.type,
                                     unitPrice: entry.unitPrice)
         modelContext.insert(copy)
         navigationStore.push(LogViewType.editFoodItem(entry: copy))
@@ -236,13 +210,6 @@ struct LogCategoryView: View {
     
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
-        ToolbarItem(placement: .principal) {
-            Picker("", selection: $navigationStore.logConfig.selectedType) {
-                Text("Actual").tag(LogType.actual)
-                Text("Plan").tag(LogType.plan)
-            }.pickerStyle(.segmented)
-                .frame(width: 150)
-        }
         ToolbarItem(placement: .topBarTrailing) {
             if navigationStore.logConfig.selectedCategory != nil {
                 Button {
@@ -370,7 +337,7 @@ struct EditAmountSheet: View {
     @ViewBuilder
     private func similarEntryView(_ foodItem: FoodItem) -> some View {
         let similarEntries: [SimilarEntry] = {
-            let entries = entries.filter({ $0.type == item.type && $0.item == foodItem })
+            let entries = entries.filter({ $0.item == foodItem })
             var similarEntries: [SimilarEntry] = []
             for entry in entries {
                 if !similarEntries.contains(where: { $0.amount == entry.amount }) {

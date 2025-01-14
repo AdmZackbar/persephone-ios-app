@@ -9,7 +9,6 @@ import Foundation
 import SwiftData
 
 typealias LogFoodItemEntry = SchemaV1.LogFoodItemEntry
-typealias LogType = SchemaV1.LogType
 
 extension SchemaV1 {
     @Model
@@ -19,7 +18,6 @@ extension SchemaV1 {
         var amount: Quantity.Magnitude = Quantity.Magnitude.Raw(1)
         var amountUnit: Unit? = nil
         var category: String = ""
-        var type: LogType = LogType.actual
         var unitPrice: Price? = nil
         var nutrients: NutritionDict {
             item.ingredients.nutrients * amount.value
@@ -37,20 +35,13 @@ extension SchemaV1 {
              amount: Quantity.Magnitude = .Raw(1),
              amountUnit: Unit? = nil,
              category: String = "",
-             type: LogType = .actual,
              unitPrice: Price? = nil) {
             self.date = date
             self.item = item
             self.amount = amount
             self.amountUnit = amountUnit
             self.category = category
-            self.type = type
             self.unitPrice = unitPrice
         }
-    }
-    
-    enum LogType: Codable {
-        case actual
-        case plan
     }
 }

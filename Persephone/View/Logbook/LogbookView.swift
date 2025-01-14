@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct LogbookView: View {
-    @Query(sort: \LogFoodItemEntry.date) var foodItems: [LogFoodItemEntry]
+    @Query(sort: \LogFoodItemEntry.date) var entries: [LogFoodItemEntry]
     @Environment(\.modelContext) var modelContext
     
     static let Categories: [String] = [
@@ -22,14 +22,14 @@ struct LogbookView: View {
     @StateObject private var navigationStore = NavigationStore()
     
     var body: some View {
-        let items = foodItems.filter({ navigationStore.logConfig.contains($0.date) && $0.type == navigationStore.logConfig.selectedType })
-        let itemMap: [String : [LogFoodItemEntry]] = {
+        let entries = entries.filter({ navigationStore.logConfig.contains($0.date) })
+        let entryMap: [String : [LogFoodItemEntry]] = {
             var map: [String : [LogFoodItemEntry]] = [:]
-            items.forEach({ item in
-                if Self.Categories.contains(where: { $0 == item.category }) {
-                    map[item.category, default: []].append(item)
+            entries.forEach({ entry in
+                if Self.Categories.contains(where: { $0 == entry.category }) {
+                    map[entry.category, default: []].append(entry)
                 } else {
-                    map["Other", default: []].append(item)
+                    map["Other", default: []].append(entry)
                 }
             })
             return map
@@ -40,11 +40,11 @@ struct LogbookView: View {
                     .padding()
                 Form {
                     Section("Summary") {
-                        nutrientView(nutrition: items.totalNutrients, price: items.totalPrice)
+                        nutrientView(nutrition: entries.totalNutrients, price: entries.totalPrice)
                     }
                     Section("Meals") {
                         ForEach(Self.Categories, id: \.hashValue) { category in
-                            categoryButton(category: category, entries: itemMap[category, default: []])
+                            categoryButton(category: category, entries: entryMap[category, default: []])
                         }
                         Button("View All Entries") {
                             navigationStore.logConfig.selectedCategory = nil
@@ -56,13 +56,6 @@ struct LogbookView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .background(Color(uiColor: UIColor.secondarySystemBackground))
                 .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Picker("", selection: $navigationStore.logConfig.selectedType) {
-                            Text("Actual").tag(LogType.actual)
-                            Text("Plan").tag(LogType.plan)
-                        }.pickerStyle(.segmented)
-                            .frame(width: 150)
-                    }
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
                             ForEach(Self.Categories, id: \.hashValue) { category in
@@ -134,27 +127,6 @@ struct LogbookView: View {
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
             .contextMenu {
-                if navigationStore.logConfig.selectedType == .plan {
-                    Menu("Actualize") {
-                        Button("Copy") {
-                            for entry in entries {
-                                let copy = LogFoodItemEntry(date: entry.date,
-                                                            item: entry.item,
-                                                            amount: entry.amount,
-                                                            amountUnit: entry.amountUnit,
-                                                            category: entry.category,
-                                                            type: .actual,
-                                                            unitPrice: entry.unitPrice)
-                                modelContext.insert(copy)
-                            }
-                        }
-                        Button("Move") {
-                            for entry in entries {
-                                entry.type = .actual
-                            }
-                        }
-                    }
-                }
                 Button(role: .destructive) {
                     for entry in entries {
                         modelContext.delete(entry)
@@ -191,7 +163,7 @@ struct LogbookView: View {
         case .entries:
             LogCategoryView()
         case .addFoodItem(let category):
-            LogFoodItemEntryEditView(item: .init(date: navigationStore.logConfig.date, category: category ?? navigationStore.logConfig.selectedCategory ?? "Other", type: navigationStore.logConfig.selectedType))
+            LogFoodItemEntryEditView(item: .init(date: navigationStore.logConfig.date, category: category ?? navigationStore.logConfig.selectedCategory ?? "Other"))
         case .editFoodItem(let entry):
             LogFoodItemEntryEditView(item: .init(entry: entry))
         }

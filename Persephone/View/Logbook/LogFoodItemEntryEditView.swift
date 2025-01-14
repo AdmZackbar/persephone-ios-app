@@ -27,7 +27,7 @@ struct LogFoodItemEntryEditView: View {
     
     var body: some View {
         Form {
-            Section("\(item.type)") {
+            Section {
                 DatePicker("Date:", selection: $item.date, displayedComponents: .date)
                 Picker("Meal:", selection: $item.category) {
                     ForEach(LogbookView.Categories, id: \.hashValue) { category in
@@ -122,7 +122,7 @@ struct LogFoodItemEntryEditView: View {
     @ViewBuilder
     private func similarEntryView(_ foodItem: FoodItem) -> some View {
         let similarEntries: [SimilarEntry] = {
-            let entries = entries.filter({ $0.type == item.type && $0.item == foodItem })
+            let entries = entries.filter({ $0.item == foodItem })
             var similarEntries: [SimilarEntry] = []
             for entry in entries {
                 if !similarEntries.contains(where: { $0.amount == entry.amount }) {
@@ -236,7 +236,6 @@ struct LogFoodItemEntryEditView: View {
         var amount: Quantity.Magnitude
         var amountUnit: Unit?
         var category: String
-        var type: LogType
         var hasPrice: Bool
         var unitPrice: Price
         
@@ -247,19 +246,17 @@ struct LogFoodItemEntryEditView: View {
             self.amount = entry.amount
             self.amountUnit = entry.amountUnit
             self.category = entry.category
-            self.type = entry.type
             self.hasPrice = entry.unitPrice != nil
             self.unitPrice = entry.unitPrice ?? .Cents(0)
         }
         
-        init(date: Date, category: String, type: LogType) {
+        init(date: Date, category: String) {
             self.entry = nil
             self.date = date
             self.foodItem = nil
             self.amount = .Raw(1)
             self.amountUnit = nil
             self.category = category
-            self.type = type
             self.hasPrice = false
             self.unitPrice = .Cents(0)
         }
@@ -272,7 +269,6 @@ struct LogFoodItemEntryEditView: View {
                     entry.amount = amount
                     entry.amountUnit = amountUnit
                     entry.category = category
-                    entry.type = type
                     entry.unitPrice = hasPrice ? unitPrice : nil
                 }
             } else if let foodItem {
@@ -281,7 +277,6 @@ struct LogFoodItemEntryEditView: View {
                               amount: amount,
                               amountUnit: amountUnit,
                               category: category,
-                              type: type,
                               unitPrice: hasPrice ? unitPrice : nil)
                 modelContext.insert(entry!)
             }
@@ -292,6 +287,6 @@ struct LogFoodItemEntryEditView: View {
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
     @Previewable @StateObject var navigationStore = NavigationStore()
     NavigationStack(path: $navigationStore.path) {
-        LogFoodItemEntryEditView(item: .init(date: .now, category: "Breakfast", type: .actual))
+        LogFoodItemEntryEditView(item: .init(date: .now, category: "Breakfast"))
     }.environmentObject(navigationStore)
 }

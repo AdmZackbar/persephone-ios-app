@@ -56,7 +56,7 @@ struct MockDataPreviewModifier: PreviewModifier {
                 FoodItem.StoreEntry(storeName: "Store 2", costType: .Collection(cost: .Cents(1099), quantity: 3)),
                 FoodItem.StoreEntry(storeName: "Store 3", costType: .PerAmount(cost: .Cents(1000), amount: Quantity(value: .Raw(1), unit: .Pound)))
             ])
-        item.logEntries.append(.init(item: item, amount: .Raw(1.5), category: "Breakfast", type: .actual, unitPrice: .Cents(240)))
+        item.logEntries.append(.init(item: item, amount: .Raw(1.5), category: "Breakfast", unitPrice: .Cents(240)))
 //        item.instances = [
 //            FoodInstance(
 //                foodItem: item,

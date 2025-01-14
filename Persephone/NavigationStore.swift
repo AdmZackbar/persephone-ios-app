@@ -48,7 +48,6 @@ final class NavigationStore: ObservableObject {
 
 struct LogConfig: Hashable, Equatable {
     var date: Date = Date()
-    var selectedType: LogType = .actual
     var selectedCategory: String? = nil
     
     func contains(_ date: Date) -> Bool {

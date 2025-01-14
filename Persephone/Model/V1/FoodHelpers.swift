@@ -13,37 +13,21 @@ typealias Unit = SchemaV1.Unit
 typealias RatingTier = SchemaV1.RatingTier
 typealias NutritionDict = [Nutrient : Quantity]
 
-extension NutritionDict {
-    var calories: Double {
-        return self[.Energy]?.value.value ?? 0
-    }
-    
-    static func + (lhs: NutritionDict, rhs: NutritionDict) -> NutritionDict {
-        lhs.merging(rhs) { x, y in
-            if x.unit == y.unit {
-                return .init(value: x.value + y.value, unit: x.unit)
-            } else if x.unit.isWeight {
-                return try! .init(value: x.convert(unit: .Gram).value + y.convert(unit: .Gram).value, unit: .Gram)
-            }
-            return try! .init(value: x.convert(unit: .Milliliter).value + y.convert(unit: .Milliliter).value, unit: .Milliliter)
-        }
-    }
-    
-    static func * (lhs: NutritionDict, rhs: Double) -> NutritionDict {
-        lhs.mapValues { x in
-            return .init(value: x.value * rhs, unit: x.unit)
-        }
-    }
-    
-    static func / (lhs: NutritionDict, rhs: Double) -> NutritionDict {
-        lhs.mapValues { x in
-            return .init(value: x.value / rhs, unit: x.unit)
-        }
-    }
-}
-
 extension SchemaV1 {
     struct Quantity: Codable, Equatable, Hashable {
+        // The raw value of the amount
+        var value: Magnitude
+        // The unit of the amount
+        var unit: Unit
+        
+        func convert(unit: Unit) throws -> Quantity {
+            if self.unit.isWeight && unit.isWeight || self.unit.isVolume && unit.isVolume {
+                Quantity(value: self.value * self.unit.conversionModifier / unit.conversionModifier, unit: unit)
+            } else {
+                throw ParseError.invalidUnit(unitFrom: self.unit, unitTo: unit)
+            }
+        }
+        
         enum Magnitude: Codable, Equatable, Hashable {
             case Raw(_ value: Double)
             case Rational(num: Double, den: Double)
@@ -57,124 +41,6 @@ extension SchemaV1 {
                         return num / den
                     }
                 }
-            }
-            
-            func abs() -> Magnitude {
-                switch self {
-                case .Raw(let value):
-                    return .Raw(value >= 0 ? value : -value)
-                case .Rational(let num, let den):
-                    return .Rational(num: num >= 0 ? num : -num, den: den >= 0 ? den : -den)
-                }
-            }
-            
-            static func parseString(_ str: String) -> Magnitude? {
-                if let match = try? /([\d.]+)\/([\d.]+)/.wholeMatch(in: str) {
-                    if let num = Double(match.1), let den = Double(match.2) {
-                        return .Rational(num: num, den: den)
-                    }
-                }
-                if let value = Double(str) {
-                    return .Raw(value)
-                }
-                return nil
-            }
-            
-            static func + (lhs: Magnitude, rhs: Magnitude) -> Magnitude {
-                switch lhs {
-                case .Raw(let l):
-                    switch rhs {
-                    case .Raw(let r):
-                        return .Raw(l + r)
-                    case .Rational(let rNum, let rDen):
-                        return .Rational(num: l * rDen + rNum, den: rDen)
-                    }
-                case .Rational(let lNum, let lDen):
-                    switch rhs {
-                    case .Raw(let r):
-                        return .Rational(num: r * lDen + lNum, den: lDen)
-                    case .Rational(let rNum, let rDen):
-                        return .Rational(num: rNum * lDen + lNum * rDen, den: lDen * rDen)
-                    }
-                }
-            }
-            
-            static func - (lhs: Magnitude, rhs: Magnitude) -> Magnitude {
-                switch lhs {
-                case .Raw(let l):
-                    switch rhs {
-                    case .Raw(let r):
-                        return .Raw(l - r)
-                    case .Rational(let rNum, let rDen):
-                        return .Rational(num: l * rDen - rNum, den: rDen)
-                    }
-                case .Rational(let lNum, let lDen):
-                    switch rhs {
-                    case .Raw(let r):
-                        return .Rational(num: r * lDen - lNum, den: lDen)
-                    case .Rational(let rNum, let rDen):
-                        return .Rational(num: rNum * lDen - lNum * rDen, den: lDen * rDen)
-                    }
-                }
-            }
-            
-            static func * (lhs: Magnitude, rhs: Double) -> Magnitude {
-                switch lhs {
-                case .Raw(let value):
-                    return .Raw(value * rhs)
-                case .Rational(let num, let den):
-                    return rhs > 1 ? .Rational(num: num * rhs, den: den) : .Rational(num: num, den: den / rhs)
-                }
-            }
-            
-            static func / (lhs: Magnitude, rhs: Double) -> Magnitude {
-                switch lhs {
-                case .Raw(let value):
-                    return .Raw(value / rhs)
-                case .Rational(let num, let den):
-                    return rhs > 1 ? .Rational(num: num, den: den * rhs) : .Rational(num: num / rhs, den: den)
-                }
-            }
-            
-            func toString(maxDigits: Int = 2) -> String {
-                let formatter: NumberFormatter = {
-                    let formatter = NumberFormatter()
-                    formatter.numberStyle = .decimal
-                    formatter.maximumFractionDigits = maxDigits
-                    formatter.groupingSeparator = ""
-                    return formatter
-                }()
-                switch self {
-                case .Raw(let raw):
-                    return formatter.string(for: raw)!
-                case .Rational(let num, let den):
-                    return "\(formatter.string(for: num)!)/\(formatter.string(for: den)!)"
-                }
-            }
-        }
-        
-        static func calories(_ value: Double) -> Quantity {
-            Quantity(value: .Raw(value), unit: .Calorie)
-        }
-        
-        static func grams(_ value: Double) -> Quantity {
-            Quantity(value: .Raw(value), unit: .Gram)
-        }
-        
-        static func milligrams(_ value: Double) -> Quantity {
-            Quantity(value: .Raw(value), unit: .Milligram)
-        }
-        
-        // The raw value of the amount
-        var value: Magnitude
-        // The unit of the amount
-        var unit: Unit
-        
-        func convert(unit: Unit) throws -> Quantity {
-            if self.unit.isWeight && unit.isWeight || self.unit.isVolume && unit.isVolume {
-                Quantity(value: self.value * self.unit.conversionModifier / unit.conversionModifier, unit: unit)
-            } else {
-                throw ParseError.invalidUnit(unitFrom: self.unit, unitTo: unit)
             }
         }
     }

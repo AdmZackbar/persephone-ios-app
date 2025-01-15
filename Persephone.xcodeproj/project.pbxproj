@@ -42,7 +42,6 @@
 		E8828ED12C4F529A006C7CB3 /* FoodHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ED02C4F529A006C7CB3 /* FoodHelpers.swift */; };
 		E8828ED52C4F5871006C7CB3 /* FoodIngredients.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ED42C4F5871006C7CB3 /* FoodIngredients.swift */; };
 		E8828ED72C502F37006C7CB3 /* FoodInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ED62C502F37006C7CB3 /* FoodInstance.swift */; };
-		E8828ED92C5031F3006C7CB3 /* RecipeInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ED82C5031F3006C7CB3 /* RecipeInstance.swift */; };
 		E8828EDC2C503550006C7CB3 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828EDB2C503550006C7CB3 /* LogEntry.swift */; };
 		E8828EE32C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828EE22C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift */; };
 		E8828EE52C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828EE42C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift */; };
@@ -54,6 +53,8 @@
 		E89D08D12C861914005AE1EF /* RecipePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08D02C861914005AE1EF /* RecipePreview.swift */; };
 		E8AD4B672D3499C100C1B30A /* LogFoodItemEntryEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD4B662D3499AB00C1B30A /* LogFoodItemEntryEditView.swift */; };
 		E8AD4B692D35FEA300C1B30A /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD4B682D35FEA000C1B30A /* Colors.swift */; };
+		E8AD4B6D2D38425B00C1B30A /* CookedFood.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD4B6C2D3841E900C1B30A /* CookedFood.swift */; };
+		E8AD4B6F2D384E3C00C1B30A /* CookedFoodEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD4B6E2D384E2E00C1B30A /* CookedFoodEditView.swift */; };
 		E8B236DF2C94B52800D5AC66 /* CommercialFood.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B236DE2C94B52800D5AC66 /* CommercialFood.swift */; };
 		E8B236E12C94B72900D5AC66 /* CommercialFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B236E02C94B72900D5AC66 /* CommercialFoodView.swift */; };
 		E8B236E32C94C12200D5AC66 /* CommercialFoodPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B236E22C94C12200D5AC66 /* CommercialFoodPreview.swift */; };
@@ -133,7 +134,6 @@
 		E8828ED02C4F529A006C7CB3 /* FoodHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodHelpers.swift; sourceTree = "<group>"; };
 		E8828ED42C4F5871006C7CB3 /* FoodIngredients.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodIngredients.swift; sourceTree = "<group>"; };
 		E8828ED62C502F37006C7CB3 /* FoodInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodInstance.swift; sourceTree = "<group>"; };
-		E8828ED82C5031F3006C7CB3 /* RecipeInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeInstance.swift; sourceTree = "<group>"; };
 		E8828EDB2C503550006C7CB3 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
 		E8828EE22C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseEndpoint.swift; sourceTree = "<group>"; };
 		E8828EE42C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDataCentralEndpoint.swift; sourceTree = "<group>"; };
@@ -145,6 +145,8 @@
 		E89D08D02C861914005AE1EF /* RecipePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipePreview.swift; sourceTree = "<group>"; };
 		E8AD4B662D3499AB00C1B30A /* LogFoodItemEntryEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFoodItemEntryEditView.swift; sourceTree = "<group>"; };
 		E8AD4B682D35FEA000C1B30A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		E8AD4B6C2D3841E900C1B30A /* CookedFood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookedFood.swift; sourceTree = "<group>"; };
+		E8AD4B6E2D384E2E00C1B30A /* CookedFoodEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookedFoodEditView.swift; sourceTree = "<group>"; };
 		E8B236DE2C94B52800D5AC66 /* CommercialFood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommercialFood.swift; sourceTree = "<group>"; };
 		E8B236E02C94B72900D5AC66 /* CommercialFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommercialFoodView.swift; sourceTree = "<group>"; };
 		E8B236E22C94C12200D5AC66 /* CommercialFoodPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommercialFoodPreview.swift; sourceTree = "<group>"; };
@@ -226,6 +228,7 @@
 		E847B1E82C58315B0084CD13 /* V1 */ = {
 			isa = PBXGroup;
 			children = (
+				E8AD4B6C2D3841E900C1B30A /* CookedFood.swift */,
 				E8828ED02C4F529A006C7CB3 /* FoodHelpers.swift */,
 				E8828ED42C4F5871006C7CB3 /* FoodIngredients.swift */,
 				E80E2C472C400BC400D35BE7 /* FoodItem.swift */,
@@ -233,7 +236,6 @@
 				E8B236DE2C94B52800D5AC66 /* CommercialFood.swift */,
 				E8828EDB2C503550006C7CB3 /* LogEntry.swift */,
 				E8D72EF02C463D3A0053CA26 /* Recipe.swift */,
-				E8828ED82C5031F3006C7CB3 /* RecipeInstance.swift */,
 			);
 			path = V1;
 			sourceTree = "<group>";
@@ -241,6 +243,7 @@
 		E847B1E92C5AA4650084CD13 /* Inventory */ = {
 			isa = PBXGroup;
 			children = (
+				E8AD4B6E2D384E2E00C1B30A /* CookedFoodEditView.swift */,
 				E847B1EA2C5AA4D00084CD13 /* InventoryView.swift */,
 				E847B1EC2C5AA93E0084CD13 /* InventoryFoodView.swift */,
 				E8EB2A582CD94707000E4B67 /* AddFoodInstanceView.swift */,
@@ -552,8 +555,8 @@
 				E847B1FB2C6046A40084CD13 /* RecipeIngredientSheet.swift in Sources */,
 				E867E6662D343B05001917C0 /* LogbookPieChart.swift in Sources */,
 				E8E7024D2D33F9CD00FB7013 /* NavigationStore.swift in Sources */,
-				E8828ED92C5031F3006C7CB3 /* RecipeInstance.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
+				E8AD4B6F2D384E3C00C1B30A /* CookedFoodEditView.swift in Sources */,
 				E8D72EED2C4381010053CA26 /* ScanFoodView.swift in Sources */,
 				E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */,
 				E8B236DF2C94B52800D5AC66 /* CommercialFood.swift in Sources */,
@@ -568,6 +571,7 @@
 				E8B236E12C94B72900D5AC66 /* CommercialFoodView.swift in Sources */,
 				E847B2012C66B8360084CD13 /* RecipeInstructionsSheet.swift in Sources */,
 				E8AD4B672D3499C100C1B30A /* LogFoodItemEntryEditView.swift in Sources */,
+				E8AD4B6D2D38425B00C1B30A /* CookedFood.swift in Sources */,
 				E8828ED52C4F5871006C7CB3 /* FoodIngredients.swift in Sources */,
 				E89D08C32C7B896C005AE1EF /* FoodDatabaseExportView.swift in Sources */,
 				E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */,

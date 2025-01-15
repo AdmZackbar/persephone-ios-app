@@ -55,8 +55,8 @@ extension SchemaV1 {
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.recipe)
         var ingredients: [RecipeIngredient]! = []
-        @Relationship(deleteRule: .cascade, inverse: \RecipeInstance.recipe)
-        var instances: [RecipeInstance]! = []
+        @Relationship(deleteRule: .nullify, inverse: \CookedFood.recipe)
+        var cookedFood: [CookedFood]! = []
         
         init(name: String = "",
              metaData: MetaData = .init(),

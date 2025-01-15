@@ -22,9 +22,6 @@ extension SchemaV1 {
         // Relevant dates pertaining to the food
         var dates: Dates = Dates(acqDate: .now)
         
-        @Relationship(deleteRule: .cascade, inverse: \RecipeInstanceIngredient.food)
-        var recipes: [RecipeInstanceIngredient]! = []
-        
         init(foodItem: FoodItem,
              origin: Origin? = nil,
              amount: Amount = .Collection(total: 1, remaining: 1),

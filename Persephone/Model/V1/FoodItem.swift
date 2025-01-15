@@ -39,6 +39,8 @@ extension SchemaV1 {
         var logEntries: [LogFoodItemEntry]! = []
         @Relationship(deleteRule: .nullify, inverse: \RecipeIngredient.food)
         var recipeEntries: [RecipeIngredient]! = []
+        @Relationship(deleteRule: .nullify, inverse: \CookedFoodIngredient.foodItem)
+        var cookedIngredients: [CookedFoodIngredient]! = []
         
         init(name: String = "",
              details: String = "",

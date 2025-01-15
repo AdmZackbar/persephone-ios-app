@@ -219,3 +219,21 @@ extension [LogFoodItemEntry] {
         self.map{ $0.price ?? .Cents(0) }.reduce(.Cents(0), +)
     }
 }
+
+extension CookedFood {
+    var isAvailable: Bool {
+        remaining > 0
+    }
+    
+    var totalNutrition: NutritionDict {
+        self.ingredients!.map({ $0.foodItem.ingredients.nutrients }).reduce(adjustNutrition, +)
+    }
+    
+    var totalCost: Price? {
+        let prices = self.ingredients!.filter({ $0.price != nil }).map({ $0.price! })
+        if prices.isEmpty {
+            return nil
+        }
+        return prices.reduce(.Cents(0), +)
+    }
+}

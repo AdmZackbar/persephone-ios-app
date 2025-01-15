@@ -11,40 +11,23 @@ import SwiftUI
 struct InventoryView: View {
     @Environment(\.modelContext) var modelContext
     @Query var foodInstances: [FoodInstance]
-    @Query var recipeInstances: [RecipeInstance]
+    @Query(sort: \CookedFood.date, order: .reverse) var cookedFood: [CookedFood]
     
     enum ViewType: Hashable {
         case AddItem
         case InstanceView(item: FoodInstance)
+        case addCookedFood
+        case editCookedFood(food: CookedFood)
     }
     
     @State private var path: [ViewType] = []
     @State private var searchText: String = ""
     
     var body: some View {
-        let items = foodInstances.filter({ isFiltered($0) })
         return NavigationStack(path: $path) {
-            VStack {
-                if items.isEmpty {
-                    Text("No food on record")
-                } else {
-                    List(items, id: \.hashValue) { food in
-                        NavigationLink(value: ViewType.InstanceView(item: food)) {
-                            Text(food.foodItem.name)
-                        }.contextMenu {
-                            Button {
-                                path.append(.InstanceView(item: food))
-                            } label: {
-                                Label("View", image: "magnifyingglass")
-                            }
-                            Button(role: .destructive) {
-                                modelContext.delete(food)
-                            } label: {
-                                Label("Delete", image: "trash.fill")
-                            }
-                        }
-                    }
-                }
+            Form {
+                foodSection()
+                cookedFoodSection()
             }.searchable(text: $searchText)
                 .navigationTitle("Inventory")
                 .navigationBarTitleDisplayMode(.inline)
@@ -57,9 +40,9 @@ struct InventoryView: View {
                                 Label("Add Food", systemImage: "fork.knife")
                             }
                             Button {
-                                // TODO
+                                path.append(.addCookedFood)
                             } label: {
-                                Label("Record Recipe", systemImage: "list.bullet.rectangle.portrait")
+                                Label("Add Cooked Food", systemImage: "list.bullet.rectangle.portrait")
                             }
                         } label: {
                             Label("Add...", systemImage: "plus")
@@ -67,6 +50,66 @@ struct InventoryView: View {
                     }
                 }
                 .navigationDestination(for: ViewType.self, destination: handleNavigation)
+        }
+    }
+    
+    @ViewBuilder
+    private func foodSection() -> some View {
+        let items = foodInstances.filter({ isFiltered($0) })
+        Section("Food") {
+            if items.isEmpty {
+                Text("No food on record")
+            } else {
+                ForEach(items, id: \.hashValue) { food in
+                    NavigationLink(value: ViewType.InstanceView(item: food)) {
+                        Text(food.foodItem.name)
+                    }.contextMenu {
+                        Button {
+                            path.append(.InstanceView(item: food))
+                        } label: {
+                            Label("View", image: "magnifyingglass")
+                        }
+                        Button(role: .destructive) {
+                            modelContext.delete(food)
+                        } label: {
+                            Label("Delete", image: "trash.fill")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func cookedFoodSection() -> some View {
+        Section("Cooked Food") {
+            ForEach(cookedFood, id: \.hashValue) { food in
+                NavigationLink(value: ViewType.editCookedFood(food: food)) {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading) {
+                            Text(food.date.formatted(date: .abbreviated, time: .omitted))
+                                .font(.headline)
+                            Text(food.name)
+                                .font(.subheadline)
+                            if let cost = food.totalCost {
+                                Text(cost.toString())
+                                    .font(.subheadline)
+                                    .italic()
+                            }
+                        }
+                        Spacer()
+                        Gauge(value: food.remaining, in: 0...food.total) {
+                            Text("\(food.remaining.formatted())g")
+                        }.gaugeStyle(.accessoryCircularCapacity)
+                    }
+                }.contextMenu {
+                    Button(role: .destructive) {
+                        modelContext.delete(food)
+                    } label: {
+                        Label("Delete", image: "trash.fill")
+                    }
+                }
+            }
         }
     }
     
@@ -84,6 +127,10 @@ struct InventoryView: View {
             AddFoodInstanceView(path: $path)
         case .InstanceView(let item):
             InventoryFoodView(item: item)
+        case .addCookedFood:
+            CookedFoodEditView(item: .init())
+        case .editCookedFood(let food):
+            CookedFoodEditView(item: .init(cookedFood: food))
         }
     }
 }

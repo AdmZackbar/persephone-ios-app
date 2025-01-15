@@ -212,7 +212,7 @@ extension NutritionDict {
 
 extension [LogFoodItemEntry] {
     var totalNutrients: NutritionDict {
-        self.map({ $0.item.ingredients.nutrients * $0.amount.value }).reduce([:], +)
+        self.map({ $0.nutrients }).reduce([:], +)
     }
     
     var totalPrice: Price {

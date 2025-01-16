@@ -226,11 +226,27 @@ extension CookedFood {
     }
     
     var totalNutrition: NutritionDict {
-        self.ingredients!.map({ $0.foodItem.ingredients.nutrients }).reduce(adjustNutrition, +)
+        adjustNutrition + ingredients.totalNutrition
     }
     
     var totalCost: Price? {
-        let prices = self.ingredients!.filter({ $0.price != nil }).map({ $0.price! })
+        ingredients.totalCost
+    }
+}
+
+extension CookedFoodIngredient {
+    var nutrients: NutritionDict {
+        foodItem.ingredients.nutrients * amount.value
+    }
+}
+
+extension [CookedFoodIngredient] {
+    var totalNutrition: NutritionDict {
+        self.map({ $0.nutrients }).reduce([:], +)
+    }
+    
+    var totalCost: Price? {
+        let prices = self.filter({ $0.price != nil }).map({ $0.price! })
         if prices.isEmpty {
             return nil
         }

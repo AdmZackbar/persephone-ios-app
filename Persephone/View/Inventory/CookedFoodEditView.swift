@@ -55,7 +55,7 @@ struct CookedFoodEditView: View {
                 }
             }.headerProminence(.increased)
             Section {
-                NutrientTableView(nutrients: item.totalNutrition)
+                NutrientTableView(nutrients: item.ingredients.totalNutrition + item.adjustNutrition)
             } header: {
                 HStack {
                     Text("Nutrition")

@@ -24,12 +24,6 @@ struct CookedFoodEditView: View {
             Section {
                 DatePicker("Date:", selection: $item.date)
                 TextField("Name", text: $item.name)
-                let formatter = {
-                    let formatter = NumberFormatter()
-                    formatter.maximumFractionDigits = 0
-                    formatter.zeroSymbol = ""
-                    return formatter
-                }()
                 if let recipe = item.recipe {
                     Button("Recipe: \(recipe.name)") {
                         sheetType = .recipe
@@ -37,22 +31,6 @@ struct CookedFoodEditView: View {
                 } else {
                     Button("Set Recipe:") {
                         sheetType = .recipe
-                    }
-                }
-                HStack {
-                    Text("Total Weight:")
-                    TextField("g", value: $item.total, formatter: formatter)
-                        .keyboardType(.numberPad)
-                    if item.total > 0 {
-                        Text("g")
-                    }
-                }
-                HStack {
-                    Text("Remaining Weight:")
-                    TextField("g", value: $item.remaining, formatter: formatter)
-                        .keyboardType(.numberPad)
-                    if item.total > 0 {
-                        Text("g")
                     }
                 }
                 TextField("Notes", text: $item.notes, axis: .vertical)
@@ -63,7 +41,7 @@ struct CookedFoodEditView: View {
                     Button {
                         sheetType = .ingredient(ingredient: ingredient)
                     } label: {
-                        ingredientView(ingredient)
+                        CookedFoodIngredientEntryView(ingredient)
                     }.buttonStyle(.plain)
                 }.onDelete { indices in
                     for index in indices {
@@ -81,6 +59,7 @@ struct CookedFoodEditView: View {
                     }
                 }
             }.headerProminence(.increased)
+            sizeSection()
             Section {
                 NutrientTableView(nutrients: item.ingredients.totalNutrition + item.adjustNutrition)
             } header: {
@@ -127,31 +106,55 @@ struct CookedFoodEditView: View {
     }
     
     @ViewBuilder
-    private func ingredientView(_ ingredient: CookedFoodIngredient) -> some View {
-        let amount: String = {
-            if ingredient.amountUnit == nil {
-                "\((ingredient.amount * ingredient.foodItem.size.servingSizeAmount.value.value).toString()) \(ingredient.foodItem.size.servingSizeAmount.unit.abbreviation)"
-            } else {
-                "\((ingredient.amount * ingredient.foodItem.size.servingAmount.value.value).toString())\(ingredient.amountUnit!.abbreviation)"
-            }
+    private func sizeSection() -> some View {
+        let formatter: NumberFormatter = {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 2
+            formatter.zeroSymbol = ""
+            formatter.groupingSeparator = ""
+            return formatter
         }()
-        VStack(alignment: .leading) {
-            HStack(alignment: .top) {
-                Text(ingredient.foodItem.name)
-                    .font(.headline)
-                Spacer()
-                Text(amount)
+        Section {
+            HStack {
+                Text("Total Weight:")
+                TextField("g", value: $item.total, formatter: formatter)
+                    .keyboardType(.numberPad)
+                if item.total > 0 {
+                    Text("g")
+                }
             }
-            HStack(alignment: .top) {
-                if let brand = ingredient.foodItem.metaData.brand {
-                    Text(brand)
+            HStack {
+                Text("Remaining Weight:")
+                TextField("g", value: $item.remaining, formatter: formatter)
+                    .keyboardType(.numberPad)
+                if item.total > 0 {
+                    Text("g")
                 }
-                Spacer()
-                if let cost = ingredient.price {
-                    Text(cost.toString())
-                        .italic()
+            }
+            HStack {
+                Text("Num Servings:").fontWeight(.light)
+                TextField("required", value: $item.numServings, formatter: formatter)
+                    .keyboardType(.decimalPad)
+            }
+            HStack {
+                Text("Serving Size:").fontWeight(.light)
+                if item.numServings > 0 {
+                    HStack {
+                        TextField("required", text: $item.servingSize)
+                            .textInputAutocapitalization(.words)
+                            .autocorrectionDisabled()
+                        Spacer()
+                        Text("(\(formatter.string(for: item.total / item.numServings)!)g)")
+                            .fontWeight(.light)
+                            .italic()
+                    }
+                } else {
+                    TextField("required", text: $item.servingSize)
+                        .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
                 }
-            }.font(.subheadline)
+            }
         }
     }
     
@@ -186,6 +189,8 @@ struct CookedFoodEditView: View {
         var remaining: Double
         var adjustNutrition: NutritionDict
         var ingredients: [CookedFoodIngredient]
+        var numServings: Double
+        var servingSize: String
         
         var totalNutrition: NutritionDict {
             ingredients.map({ $0.foodItem.ingredients.nutrients }).reduce(adjustNutrition, +)
@@ -201,6 +206,8 @@ struct CookedFoodEditView: View {
             self.remaining = cookedFood.remaining
             self.adjustNutrition = cookedFood.adjustNutrition
             self.ingredients = cookedFood.ingredients
+            self.numServings = cookedFood.size.numServings
+            self.servingSize = cookedFood.size.servingSize
         }
         
         init() {
@@ -212,6 +219,8 @@ struct CookedFoodEditView: View {
             self.remaining = 0
             self.adjustNutrition = [:]
             self.ingredients = []
+            self.numServings = 1
+            self.servingSize = ""
         }
         
         mutating func save(_ modelContext: ModelContext) {
@@ -224,8 +233,9 @@ struct CookedFoodEditView: View {
                 cookedFood.remaining = remaining
                 cookedFood.adjustNutrition = adjustNutrition
                 cookedFood.ingredients = ingredients
+                cookedFood.size = .init(totalAmount: .grams(total), numServings: numServings, servingSize: servingSize)
             } else {
-                cookedFood = .init(date: date, name: name, recipe: recipe, ingredients: ingredients, notes: notes, total: total, remaining: remaining, adjustNutrition: adjustNutrition)
+                cookedFood = .init(date: date, name: name, recipe: recipe, ingredients: ingredients, notes: notes, total: total, remaining: remaining, adjustNutrition: adjustNutrition, size: .init(totalAmount: .grams(total), numServings: numServings, servingSize: servingSize))
                 modelContext.insert(cookedFood!)
             }
         }
@@ -483,6 +493,42 @@ struct CookedFoodEditView: View {
                     cookedFoodItem.ingredients.append(ingredient!)
                 }
             }
+        }
+    }
+}
+
+struct CookedFoodIngredientEntryView: View {
+    let ingredient: CookedFoodIngredient
+    
+    init(_ ingredient: CookedFoodIngredient) {
+        self.ingredient = ingredient
+    }
+    
+    var body: some View {
+        let amount: String = {
+            if ingredient.amountUnit == nil {
+                "\((ingredient.amount * ingredient.foodItem.size.servingSizeAmount.value.value).toString()) \(ingredient.foodItem.size.servingSizeAmount.unit.abbreviation)"
+            } else {
+                "\((ingredient.amount * ingredient.foodItem.size.servingAmount.value.value).toString())\(ingredient.amountUnit!.abbreviation)"
+            }
+        }()
+        VStack(alignment: .leading) {
+            HStack(alignment: .top) {
+                Text(ingredient.foodItem.name)
+                    .font(.headline)
+                Spacer()
+                Text(amount)
+            }
+            HStack(alignment: .top) {
+                if let brand = ingredient.foodItem.metaData.brand {
+                    Text(brand)
+                }
+                Spacer()
+                if let cost = ingredient.price {
+                    Text(cost.toString())
+                        .italic()
+                }
+            }.font(.subheadline)
         }
     }
 }

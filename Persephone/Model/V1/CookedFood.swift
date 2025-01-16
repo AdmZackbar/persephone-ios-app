@@ -23,6 +23,7 @@ extension SchemaV1 {
         var total: Double = 0
         var remaining: Double = 0
         var adjustNutrition: NutritionDict = [:]
+        var size: FoodItem.Size = FoodItem.Size.init()
         
         init(date: Date = Date(),
              name: String = "",
@@ -31,7 +32,8 @@ extension SchemaV1 {
              notes: String = "",
              total: Double = 0,
              remaining: Double = 0,
-             adjustNutrition: NutritionDict = [:]) {
+             adjustNutrition: NutritionDict = [:],
+             size: FoodItem.Size = .init()) {
             self.name = name
             self.recipe = recipe
             self.ingredients = ingredients
@@ -39,6 +41,7 @@ extension SchemaV1 {
             self.total = total
             self.remaining = remaining
             self.adjustNutrition = adjustNutrition
+            self.size = size
         }
     }
     

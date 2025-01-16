@@ -11,6 +11,7 @@ import SwiftUI
 struct AddFoodInstanceView: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort: \FoodItem.name) var foodItems: [FoodItem]
+    @EnvironmentObject var navigationStore: NavigationStore
     
     private enum OriginType: String, CaseIterable {
         case Store, Gift, Grown
@@ -20,7 +21,6 @@ struct AddFoodInstanceView: View {
         case Single, Collection
     }
     
-    @Binding private var path: [InventoryView.ViewType]
     @State private var foodItem: FoodItem? = nil
     @State private var showFoodItemSheet: Bool = false
     @State private var purchaseDate: Date = Date()
@@ -35,10 +35,6 @@ struct AddFoodInstanceView: View {
     @State private var grownLocation: String = ""
     @State private var amountType: AmountType = .Single
     @State private var numItems: Int = 1
-    
-    init(path: Binding<[InventoryView.ViewType]>) {
-        self._path = path
-    }
     
     var body: some View {
         Form {
@@ -88,7 +84,7 @@ struct AddFoodInstanceView: View {
                 }
             }.toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", action: back)
+                    Button("Cancel", action: navigationStore.pop)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button("Save", action: save).disabled(isInvalid())
@@ -164,12 +160,6 @@ struct AddFoodInstanceView: View {
         }
     }
     
-    private func back() {
-        if !path.isEmpty {
-            path.removeLast()
-        }
-    }
-    
     private func save() {
         var item: FoodInstance? = nil
         switch amountType {
@@ -182,8 +172,7 @@ struct AddFoodInstanceView: View {
             item = createItem()
             modelContext.insert(item!)
         }
-        back()
-        path.append(.InstanceView(item: item!))
+        navigationStore.replace(InventoryView.ViewType.InstanceView(item: item!))
     }
     
     private func createItem() -> FoodInstance {
@@ -219,7 +208,9 @@ struct AddFoodInstanceView: View {
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
+    @Previewable @StateObject var navigationStore = NavigationStore()
     NavigationStack {
-        AddFoodInstanceView(path: .constant([]))
+        AddFoodInstanceView()
+            .environmentObject(navigationStore)
     }
 }

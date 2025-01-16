@@ -16,15 +16,16 @@ struct InventoryView: View {
     enum ViewType: Hashable {
         case AddItem
         case InstanceView(item: FoodInstance)
+        case viewCookedFood(food: CookedFood)
         case addCookedFood
         case editCookedFood(food: CookedFood)
     }
     
-    @State private var path: [ViewType] = []
+    @StateObject private var navigationStore = NavigationStore()
     @State private var searchText: String = ""
     
     var body: some View {
-        return NavigationStack(path: $path) {
+        return NavigationStack(path: $navigationStore.path) {
             Form {
                 foodSection()
                 cookedFoodSection()
@@ -35,12 +36,12 @@ struct InventoryView: View {
                     ToolbarItem(placement: .primaryAction) {
                         Menu {
                             Button {
-                                path.append(.AddItem)
+                                navigationStore.push(ViewType.AddItem)
                             } label: {
                                 Label("Add Food", systemImage: "fork.knife")
                             }
                             Button {
-                                path.append(.addCookedFood)
+                                navigationStore.push(ViewType.addCookedFood)
                             } label: {
                                 Label("Add Cooked Food", systemImage: "list.bullet.rectangle.portrait")
                             }
@@ -50,7 +51,7 @@ struct InventoryView: View {
                     }
                 }
                 .navigationDestination(for: ViewType.self, destination: handleNavigation)
-        }
+        }.environmentObject(navigationStore)
     }
     
     @ViewBuilder
@@ -61,11 +62,17 @@ struct InventoryView: View {
                 Text("No food on record")
             } else {
                 ForEach(items, id: \.hashValue) { food in
-                    NavigationLink(value: ViewType.InstanceView(item: food)) {
-                        Text(food.foodItem.name)
-                    }.contextMenu {
+                    Button {
+                        navigationStore.push(ViewType.InstanceView(item: food))
+                    } label: {
+                        HStack {
+                            Text(food.foodItem.name)
+                            Spacer()
+                        }.contentShape(Rectangle())
+                    }.buttonStyle(.plain)
+                        .contextMenu {
                         Button {
-                            path.append(.InstanceView(item: food))
+                            navigationStore.push(ViewType.InstanceView(item: food))
                         } label: {
                             Label("View", image: "magnifyingglass")
                         }
@@ -84,7 +91,9 @@ struct InventoryView: View {
     private func cookedFoodSection() -> some View {
         Section("Cooked Food") {
             ForEach(cookedFood, id: \.hashValue) { food in
-                NavigationLink(value: ViewType.editCookedFood(food: food)) {
+                Button {
+                    navigationStore.push(ViewType.viewCookedFood(food: food))
+                } label: {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading) {
                             Text(food.date.formatted(date: .abbreviated, time: .omitted))
@@ -101,8 +110,8 @@ struct InventoryView: View {
                         Gauge(value: food.remaining, in: 0...food.total) {
                             Text("\(food.remaining.formatted())g")
                         }.gaugeStyle(.accessoryCircularCapacity)
-                    }
-                }.contextMenu {
+                    }.contentShape(Rectangle())
+                }.buttonStyle(.plain).contextMenu {
                     Button(role: .destructive) {
                         modelContext.delete(food)
                     } label: {
@@ -124,9 +133,11 @@ struct InventoryView: View {
     private func handleNavigation(viewType: ViewType) -> some View {
         switch viewType {
         case .AddItem:
-            AddFoodInstanceView(path: $path)
+            AddFoodInstanceView()
         case .InstanceView(let item):
             InventoryFoodView(item: item)
+        case .viewCookedFood(let food):
+            CookedFoodView(cookedFood: food)
         case .addCookedFood:
             CookedFoodEditView(item: .init())
         case .editCookedFood(let food):

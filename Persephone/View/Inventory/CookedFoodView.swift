@@ -17,6 +17,24 @@ struct CookedFoodView: View {
     var body: some View {
         VStack {
             Form {
+                Section {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Total:")
+                            Text((cookedFood.size.servingSizeAmount * cookedFood.size.numServings).formatted(maxDigits: 2, includeSpace: true))
+                            Text(cookedFood.size.totalAmount.formatted())
+                        }
+                        VStack(alignment: .leading) {
+                            Text("Serving:")
+                            Text(cookedFood.size.servingSizeAmount.formatted(includeSpace: true))
+                            Text(cookedFood.size.servingAmount.formatted(maxDigits: 1))
+                        }
+                        Spacer()
+                        Gauge(value: cookedFood.remaining, in: 0...cookedFood.size.totalAmount.value.value) {
+                            Text("\(cookedFood.remaining.formatted())g")
+                        }.gaugeStyle(.accessoryCircularCapacity)
+                    }
+                }
                 if let instructions = cookedFood.recipe?.instructions {
                     Section("Instructions") {
                         ForEach(instructions, id: \.hashValue) { part in
@@ -49,13 +67,8 @@ struct CookedFoodView: View {
                             1 / cookedFood.size.numServings
                         }
                     }()
-                    HStack {
-                        Gauge(value: cookedFood.remaining, in: 0...cookedFood.total) {
-                            Text("\(cookedFood.remaining.formatted())g")
-                        }.gaugeStyle(.accessoryCircularCapacity)
-                        LogbookPieChart(nutrients: cookedFood.totalNutrition * scale, price: (cookedFood.totalCost ?? .Cents(0)) * scale)
-                            .frame(width: 180, height: 200)
-                    }
+                    LogbookPieChart(nutrients: cookedFood.totalNutrition * scale, price: (cookedFood.totalCost ?? .Cents(0)) * scale)
+                        .frame(width: 180, height: 180)
                     NutrientTableView(nutrients: cookedFood.totalNutrition * scale)
                 }
             }
@@ -104,7 +117,10 @@ struct CookedFoodView: View {
                             .init(storeName: "Publix", costType: .PerAmount(cost: .Cents(1599), amount: .init(value: .Raw(1), unit: .Pound)))
                         ]),
                     amount: .Raw(3.56),
-                    unitPrice: .Cents(1599))]
+                    unitPrice: .Cents(1599))],
+            notes: "Some notes about the prep",
+            remaining: 200,
+            size: .init(totalAmount: .grams(400), numServings: 4.5, servingSize: "1 portion")
         )
         ).environmentObject(navigationStore)
     }

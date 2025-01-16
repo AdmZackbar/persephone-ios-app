@@ -202,7 +202,7 @@ struct CookedFoodEditView: View {
             self.name = cookedFood.name
             self.recipe = cookedFood.recipe
             self.notes = cookedFood.notes
-            self.total = cookedFood.total
+            self.total = cookedFood.size.totalAmount.value.value
             self.remaining = cookedFood.remaining
             self.adjustNutrition = cookedFood.adjustNutrition
             self.ingredients = cookedFood.ingredients
@@ -229,13 +229,12 @@ struct CookedFoodEditView: View {
                 cookedFood.name = name
                 cookedFood.recipe = recipe
                 cookedFood.notes = notes
-                cookedFood.total = total
                 cookedFood.remaining = remaining
                 cookedFood.adjustNutrition = adjustNutrition
                 cookedFood.ingredients = ingredients
                 cookedFood.size = .init(totalAmount: .grams(total), numServings: numServings, servingSize: servingSize)
             } else {
-                cookedFood = .init(date: date, name: name, recipe: recipe, ingredients: ingredients, notes: notes, total: total, remaining: remaining, adjustNutrition: adjustNutrition, size: .init(totalAmount: .grams(total), numServings: numServings, servingSize: servingSize))
+                cookedFood = .init(date: date, name: name, recipe: recipe, ingredients: ingredients, notes: notes, remaining: remaining, adjustNutrition: adjustNutrition, size: .init(totalAmount: .grams(total), numServings: numServings, servingSize: servingSize))
                 modelContext.insert(cookedFood!)
             }
         }
@@ -529,6 +528,14 @@ struct CookedFoodIngredientEntryView: View {
                         .italic()
                 }
             }.font(.subheadline)
+        }.contextMenu {
+            Button {
+                // TODO
+            } label: {
+                Label("View", systemImage: "magnifyingglass")
+            }
+        } preview: {
+            FoodItemPreview(item: ingredient.foodItem)
         }
     }
 }

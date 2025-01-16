@@ -107,7 +107,7 @@ struct InventoryView: View {
                             }
                         }
                         Spacer()
-                        Gauge(value: food.remaining, in: 0...food.total) {
+                        Gauge(value: food.remaining, in: 0...food.size.totalAmount.value.value) {
                             Text("\(food.remaining.formatted())g")
                         }.gaugeStyle(.accessoryCircularCapacity)
                     }.contentShape(Rectangle())

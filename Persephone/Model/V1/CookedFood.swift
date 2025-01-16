@@ -20,7 +20,6 @@ extension SchemaV1 {
         @Relationship(deleteRule: .cascade, inverse: \CookedFoodIngredient.cookedFood)
         var ingredients: [CookedFoodIngredient]! = []
         var notes: String = ""
-        var total: Double = 0
         var remaining: Double = 0
         var adjustNutrition: NutritionDict = [:]
         var size: FoodItem.Size = FoodItem.Size.init()
@@ -30,7 +29,6 @@ extension SchemaV1 {
              recipe: Recipe? = nil,
              ingredients: [CookedFoodIngredient] = [],
              notes: String = "",
-             total: Double = 0,
              remaining: Double = 0,
              adjustNutrition: NutritionDict = [:],
              size: FoodItem.Size = .init()) {
@@ -38,7 +36,6 @@ extension SchemaV1 {
             self.recipe = recipe
             self.ingredients = ingredients
             self.notes = notes
-            self.total = total
             self.remaining = remaining
             self.adjustNutrition = adjustNutrition
             self.size = size

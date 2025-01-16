@@ -24,23 +24,50 @@ struct CookedFoodEditView: View {
             Section {
                 DatePicker("Date:", selection: $item.date)
                 TextField("Name", text: $item.name)
-                TextField("Total Weight", value: $item.total, format: .number.precision(.fractionLength(0)))
-                    .keyboardType(.numberPad)
-                TextField("Remaining Weight", value: $item.remaining, format: .number.precision(.fractionLength(0)))
-                    .keyboardType(.numberPad)
+                let formatter = {
+                    let formatter = NumberFormatter()
+                    formatter.maximumFractionDigits = 0
+                    formatter.zeroSymbol = ""
+                    return formatter
+                }()
+                if let recipe = item.recipe {
+                    Button("Recipe: \(recipe.name)") {
+                        sheetType = .recipe
+                    }
+                } else {
+                    Button("Set Recipe:") {
+                        sheetType = .recipe
+                    }
+                }
+                HStack {
+                    Text("Total Weight:")
+                    TextField("g", value: $item.total, formatter: formatter)
+                        .keyboardType(.numberPad)
+                    if item.total > 0 {
+                        Text("g")
+                    }
+                }
+                HStack {
+                    Text("Remaining Weight:")
+                    TextField("g", value: $item.remaining, formatter: formatter)
+                        .keyboardType(.numberPad)
+                    if item.total > 0 {
+                        Text("g")
+                    }
+                }
                 TextField("Notes", text: $item.notes, axis: .vertical)
-                    .lineLimit(1...9)
+                    .lineLimit(3...12)
             }
             Section {
                 ForEach(item.ingredients, id: \.hashValue) { ingredient in
                     Button {
                         sheetType = .ingredient(ingredient: ingredient)
                     } label: {
-                        HStack {
-                            Text(ingredient.foodItem.name)
-                            Spacer()
-                            Text(ingredient.amount.toString())
-                        }
+                        ingredientView(ingredient)
+                    }.buttonStyle(.plain)
+                }.onDelete { indices in
+                    for index in indices {
+                        item.ingredients.remove(at: index)
                     }
                 }
             } header: {
@@ -93,8 +120,39 @@ struct CookedFoodEditView: View {
                     }
                 case .nutrition:
                     NutrientSheet(nutrients: $item.adjustNutrition)
+                case .recipe:
+                    SelectRecipeSheet(item: $item)
                 }
             }
+    }
+    
+    @ViewBuilder
+    private func ingredientView(_ ingredient: CookedFoodIngredient) -> some View {
+        let amount: String = {
+            if ingredient.amountUnit == nil {
+                "\((ingredient.amount * ingredient.foodItem.size.servingSizeAmount.value.value).toString()) \(ingredient.foodItem.size.servingSizeAmount.unit.abbreviation)"
+            } else {
+                "\((ingredient.amount * ingredient.foodItem.size.servingAmount.value.value).toString())\(ingredient.amountUnit!.abbreviation)"
+            }
+        }()
+        VStack(alignment: .leading) {
+            HStack(alignment: .top) {
+                Text(ingredient.foodItem.name)
+                    .font(.headline)
+                Spacer()
+                Text(amount)
+            }
+            HStack(alignment: .top) {
+                if let brand = ingredient.foodItem.metaData.brand {
+                    Text(brand)
+                }
+                Spacer()
+                if let cost = ingredient.price {
+                    Text(cost.toString())
+                        .italic()
+                }
+            }.font(.subheadline)
+        }
     }
     
     private enum SheetType: Identifiable {
@@ -104,11 +162,14 @@ struct CookedFoodEditView: View {
                 return "Ingredient"
             case .nutrition:
                 return "Nutrition"
+            case .recipe:
+                return "Recipe"
             }
         }
         
         case ingredient(ingredient: CookedFoodIngredient? = nil)
         case nutrition
+        case recipe
     }
     
     struct Item {
@@ -423,6 +484,61 @@ struct CookedFoodEditView: View {
                 }
             }
         }
+    }
+}
+
+struct SelectRecipeSheet: View {
+    @Environment(\.dismiss) var dismiss
+    @Query(sort: \Recipe.name) var recipes: [Recipe]
+    
+    @Binding private var item: CookedFoodEditView.Item
+    @State private var filter: String = ""
+    
+    init(item: Binding<CookedFoodEditView.Item>) {
+        self._item = item
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                let recipes = recipes.filter({ filter.isEmpty || $0.name.localizedCaseInsensitiveContains(filter) })
+                if recipes.isEmpty {
+                    Text("No Recipes")
+                } else {
+                    ForEach(recipes, id: \.hashValue) { recipe in
+                        Button {
+                            item.recipe = recipe
+                            dismiss()
+                        } label: {
+                            VStack(alignment: .leading) {
+                                Text(recipe.name)
+                                    .font(.headline)
+                                if let author = recipe.metaData.author {
+                                    Text(author)
+                                        .font(.subheadline)
+                                        .italic()
+                                }
+                            }
+                        }
+                    }
+                }
+            }.navigationTitle("Select Recipe")
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden()
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Back") {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Clear") {
+                            item.recipe = nil
+                            dismiss()
+                        }.disabled(item.recipe == nil)
+                    }
+                }
+        }.searchable(text: $filter)
     }
 }
 

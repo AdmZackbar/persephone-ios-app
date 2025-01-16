@@ -217,12 +217,12 @@
 		E82CFBDE2C3F0E1F0055C6B2 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				E82CFBD92C3F078D0055C6B2 /* MainView.swift */,
 				E8E702522D34089A00FB7013 /* Chart */,
 				E8743BB12C58306800E1B871 /* Cookbook */,
 				E8743BB02C58302A00E1B871 /* FoodDatabase */,
 				E847B1E92C5AA4650084CD13 /* Inventory */,
 				E86D48012C972BD4006AB0BF /* Logbook */,
-				E82CFBD92C3F078D0055C6B2 /* MainView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";

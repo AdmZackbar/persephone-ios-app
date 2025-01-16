@@ -497,6 +497,8 @@ struct CookedFoodEditView: View {
 }
 
 struct CookedFoodIngredientEntryView: View {
+    @EnvironmentObject private var navigationStore: NavigationStore
+    
     let ingredient: CookedFoodIngredient
     
     init(_ ingredient: CookedFoodIngredient) {
@@ -530,7 +532,7 @@ struct CookedFoodIngredientEntryView: View {
             }.font(.subheadline)
         }.contextMenu {
             Button {
-                // TODO
+                navigationStore.push(FoodDatabaseView.ViewType.ItemView(item: ingredient.foodItem))
             } label: {
                 Label("View", systemImage: "magnifyingglass")
             }

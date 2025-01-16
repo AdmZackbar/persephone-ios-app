@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct CommercialFoodView: View {
-    @Binding private var path: [FoodDatabaseView.ViewType]
+    @EnvironmentObject private var navigationStore: NavigationStore
     
     let food: CommercialFood
     
-    init(path: Binding<[FoodDatabaseView.ViewType]>, food: CommercialFood) {
-        self._path = path
+    init(food: CommercialFood) {
         self.food = food
     }
     
@@ -82,7 +81,7 @@ struct CommercialFoodView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button("Edit") {
-                        path.append(.CommercialFoodEdit(food: food))
+                        navigationStore.push(FoodDatabaseView.ViewType.CommercialFoodEdit(food: food))
                     }
                 }
             }
@@ -92,7 +91,8 @@ struct CommercialFoodView: View {
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
-    return NavigationStack {
-        CommercialFoodView(path: .constant([]), food: .init())
-    }
+    @Previewable @StateObject var navigationStore = NavigationStore()
+    NavigationStack(path: $navigationStore.path) {
+        CommercialFoodView(food: .init())
+    }.environmentObject(navigationStore)
 }

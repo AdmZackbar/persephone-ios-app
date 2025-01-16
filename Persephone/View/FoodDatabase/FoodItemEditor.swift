@@ -10,6 +10,7 @@ import SwiftUI
 
 struct FoodItemEditor: View {
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject private var navigationStore: NavigationStore
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
     enum Mode {
@@ -30,7 +31,6 @@ struct FoodItemEditor: View {
     let item: FoodItem
     let mode: Mode
     
-    @Binding private var path: [FoodDatabaseView.ViewType]
     // Name details
     @State private var name: String = ""
     @State private var brand: String = ""
@@ -65,8 +65,7 @@ struct FoodItemEditor: View {
         return formatter
     }()
     
-    init(path: Binding<[FoodDatabaseView.ViewType]>, item: FoodItem? = nil, mode: Mode? = nil) {
-        self._path = path
+    init(item: FoodItem? = nil, mode: Mode? = nil) {
         self.item = item ?? FoodItem(name: "", details: "", metaData: FoodItem.MetaData(), ingredients: FoodIngredients(nutrients: [:]), size: FoodItem.Size(totalAmount: Quantity(value: .Raw(0), unit: .Gram), numServings: 1, servingSize: ""), storeEntries: [])
         self.mode = mode ?? (item == nil ? .Add : .Edit)
     }
@@ -124,11 +123,11 @@ struct FoodItemEditor: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
-                        path.removeLast()
-                    }.disabled(path.isEmpty)
+                        navigationStore.pop()
+                    }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Save", action: save).disabled(path.isEmpty || isMainInfoInvalid() || isSizeInvalid())
+                    Button("Save", action: save).disabled(isMainInfoInvalid() || isSizeInvalid())
                 }
             }
     }
@@ -202,7 +201,6 @@ struct FoodItemEditor: View {
                 .onTapGesture {
                     sheetCoordinator.presentSheet(.Nutrients(nutrients: $nutrients))
                 }
-            
         }
     }
     
@@ -303,16 +301,16 @@ struct FoodItemEditor: View {
         }
         switch mode {
         case .Confirm:
-            path.removeAll()
-            path.append(.ItemView(item: item))
+            navigationStore.replace(FoodDatabaseView.ViewType.ItemView(item: item))
         default:
-            path.removeLast()
+            navigationStore.pop()
         }
     }
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
-    NavigationStack {
-        FoodItemEditor(path: .constant([]), item: .init())
-    }
+    @Previewable @StateObject var navigationStore = NavigationStore()
+    NavigationStack(path: $navigationStore.path) {
+        FoodItemEditor(item: .init())
+    }.environmentObject(navigationStore)
 }

@@ -48,19 +48,20 @@ struct LogbookView: View {
                         }
                         Button("View All Entries") {
                             navigationStore.logConfig.selectedCategory = nil
-                            navigationStore.push(LogViewType.entries)
+                            navigationStore.push(ViewType.entries)
                         }
                     }
                 }.headerProminence(.increased)
             }.navigationTitle("Logbook")
                 .navigationBarTitleDisplayMode(.inline)
                 .background(Color(uiColor: UIColor.secondarySystemBackground))
+                .handleDestinations(navigationStore)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
                             ForEach(Self.Categories, id: \.hashValue) { category in
                                 Button(category) {
-                                    navigationStore.push(LogViewType.addFoodItem(category: category))
+                                    navigationStore.push(ViewType.addFoodItem(category: category))
                                 }
                             }
                         } label: {
@@ -68,7 +69,6 @@ struct LogbookView: View {
                         }
                     }
                 }
-                .navigationDestination(for: LogViewType.self, destination: handleLogViewType)
         }.environmentObject(navigationStore)
     }
     
@@ -97,7 +97,7 @@ struct LogbookView: View {
     private func categoryButton(category: String, entries: [LogFoodItemEntry]) -> some View {
         Button {
             navigationStore.logConfig.selectedCategory = category
-            navigationStore.push(LogViewType.entries)
+            navigationStore.push(ViewType.entries)
         } label: {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -157,23 +157,11 @@ struct LogbookView: View {
         }
     }
     
-    @ViewBuilder
-    private func handleLogViewType(_ type: LogViewType) -> some View {
-        switch type {
-        case .entries:
-            LogCategoryView()
-        case .addFoodItem(let category):
-            LogFoodItemEntryEditView(item: .init(date: navigationStore.logConfig.date, category: category ?? navigationStore.logConfig.selectedCategory ?? "Other"))
-        case .editFoodItem(let entry):
-            LogFoodItemEntryEditView(item: .init(entry: entry))
-        }
+    enum ViewType: Hashable {
+        case entries
+        case addFoodItem(category: String? = nil)
+        case editFoodItem(entry: LogFoodItemEntry)
     }
-}
-
-enum LogViewType: Hashable {
-    case entries
-    case addFoodItem(category: String? = nil)
-    case editFoodItem(entry: LogFoodItemEntry)
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {

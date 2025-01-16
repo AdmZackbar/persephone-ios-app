@@ -17,15 +17,14 @@ private let currencyFormatter: NumberFormatter = {
 }()
 
 struct FoodItemView: View {
+    @Environment(\.modelContext) var modelContext
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @EnvironmentObject var navigationStore: NavigationStore
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
     @State var item: FoodItem
     
-    @Binding private var path: [FoodDatabaseView.ViewType]
-    
-    init(path: Binding<[FoodDatabaseView.ViewType]>, item: FoodItem) {
-        self._path = path
+    init(item: FoodItem) {
         self.item = item
     }
     
@@ -81,12 +80,13 @@ struct FoodItemView: View {
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Button("Edit") {
-                        path.append(.ItemEdit(item: item))
+                        navigationStore.push(FoodDatabaseView.ViewType.ItemEdit(item: item))
                     }
                 }
                 ToolbarItem(placement: .secondaryAction) {
                     Button(role: .destructive) {
-                        path.append(.ItemEdit(item: item))
+                        modelContext.delete(item)
+                        navigationStore.pop()
                     } label: {
                         Label("Delete", systemImage: "trash.fill")
                     }
@@ -428,7 +428,8 @@ private struct MainTabView: View {
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
-    NavigationStack {
-        FoodItemView(path: .constant([]), item: .init(name: "Test", details: "details", metaData: .init(), ingredients: .init(nutrients: [:]), size: .init(totalAmount: .grams(100), numServings: 1, servingSize: "1 unit"), storeEntries: []))
-    }
+    @Previewable @StateObject var navigationStore = NavigationStore()
+    NavigationStack(path: $navigationStore.path) {
+        FoodItemView(item: .init(name: "Test", details: "details", metaData: .init(), ingredients: .init(nutrients: [:]), size: .init(totalAmount: .grams(100), numServings: 1, servingSize: "1 unit"), storeEntries: []))
+    }.environmentObject(navigationStore)
 }

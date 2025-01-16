@@ -13,14 +13,6 @@ struct InventoryView: View {
     @Query var foodInstances: [FoodInstance]
     @Query(sort: \CookedFood.date, order: .reverse) var cookedFood: [CookedFood]
     
-    enum ViewType: Hashable {
-        case AddItem
-        case InstanceView(item: FoodInstance)
-        case viewCookedFood(food: CookedFood)
-        case addCookedFood
-        case editCookedFood(food: CookedFood)
-    }
-    
     @StateObject private var navigationStore = NavigationStore()
     @State private var searchText: String = ""
     
@@ -32,6 +24,7 @@ struct InventoryView: View {
             }.searchable(text: $searchText)
                 .navigationTitle("Inventory")
                 .navigationBarTitleDisplayMode(.inline)
+                .handleDestinations(navigationStore)
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
                         Menu {
@@ -50,7 +43,6 @@ struct InventoryView: View {
                         }
                     }
                 }
-                .navigationDestination(for: ViewType.self, destination: handleNavigation)
         }.environmentObject(navigationStore)
     }
     
@@ -129,20 +121,12 @@ struct InventoryView: View {
         return item.foodItem.name.localizedCaseInsensitiveContains(searchText)
     }
     
-    @ViewBuilder
-    private func handleNavigation(viewType: ViewType) -> some View {
-        switch viewType {
-        case .AddItem:
-            AddFoodInstanceView()
-        case .InstanceView(let item):
-            InventoryFoodView(item: item)
-        case .viewCookedFood(let food):
-            CookedFoodView(cookedFood: food)
-        case .addCookedFood:
-            CookedFoodEditView(item: .init())
-        case .editCookedFood(let food):
-            CookedFoodEditView(item: .init(cookedFood: food))
-        }
+    enum ViewType: Hashable {
+        case AddItem
+        case InstanceView(item: FoodInstance)
+        case viewCookedFood(food: CookedFood)
+        case addCookedFood
+        case editCookedFood(food: CookedFood)
     }
 }
 

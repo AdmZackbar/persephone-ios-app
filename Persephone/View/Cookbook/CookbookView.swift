@@ -12,6 +12,7 @@ struct CookbookView: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort: \Recipe.name) var recipes: [Recipe]
     
+    @StateObject private var navigationStore = NavigationStore()
     @State private var searchText = ""
     @State private var showDuplicateDialog = false
     @State private var duplicateName = ""
@@ -26,18 +27,21 @@ struct CookbookView: View {
     
     var body: some View {
         let filteredRecipes = recipes.filter(isRecipeFiltered)
-        return NavigationStack {
+        return NavigationStack(path: $navigationStore.path) {
             List(filteredRecipes) { recipe in
-                NavigationLink {
-                    RecipeView(recipe: recipe)
+                Button {
+                    navigationStore.push(ViewType.viewRecipe(recipe: recipe))
                 } label: {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(recipe.name)
                         HStack(spacing: 12) {
                             Label(recipe.metaData.tags.joined(separator: ", "), systemImage: "tag.fill").font(.caption).fontWeight(.semibold).labelStyle(CustomTagLabel())
                             Label("\(formatter.string(for: recipe.metaData.totalTime)!) min", systemImage: "clock.fill").font(.caption).fontWeight(.semibold).labelStyle(CustomTagLabel())
+                            Spacer()
                         }
-                    }.swipeActions(allowsFullSwipe: false) {
+                    }.contentShape(Rectangle())
+                }.buttonStyle(.plain)
+                    .swipeActions(allowsFullSwipe: false) {
                         Button(role: .destructive) {
                             modelContext.delete(recipe)
                         } label: {
@@ -48,19 +52,19 @@ struct CookbookView: View {
                         } label: {
                             Label("Duplicate", systemImage: "doc.on.doc.fill").tint(.teal)
                         }
-                        NavigationLink {
-                            RecipeEditor(recipe: recipe)
+                        Button {
+                            navigationStore.push(ViewType.editRecipe(recipe: recipe))
                         } label: {
                             Label("Edit", systemImage: "pencil").tint(.blue)
                         }
                     }.contextMenu {
-                        NavigationLink {
-                            RecipeView(recipe: recipe)
+                        Button {
+                            navigationStore.push(ViewType.viewRecipe(recipe: recipe))
                         } label: {
                             Label("View", systemImage: "magnifyingglass")
                         }
-                        NavigationLink {
-                            RecipeEditor(recipe: recipe)
+                        Button {
+                            navigationStore.push(ViewType.editRecipe(recipe: recipe))
                         } label: {
                             Label("Edit", systemImage: "pencil")
                         }
@@ -87,7 +91,6 @@ struct CookbookView: View {
                             duplicateName = ""
                         }
                     }
-                }
             }
             .overlay(Group {
                 if (filteredRecipes.isEmpty) {
@@ -96,16 +99,18 @@ struct CookbookView: View {
             })
             .navigationTitle("Cookbook")
             .navigationBarTitleDisplayMode(.inline)
+            .handleDestinations(navigationStore)
             .toolbar {
                 ToolbarItem {
-                    NavigationLink {
-                        RecipeEditor()
+                    Button {
+                        navigationStore.push(ViewType.addRecipe)
                     } label: {
                         Label("Create Recipe", systemImage: "plus")
                     }
                 }
             }
         }.searchable(text: $searchText, prompt: "Filter...")
+            .environmentObject(navigationStore)
     }
     
     private func isRecipeFiltered(_ recipe: Recipe) -> Bool {
@@ -133,6 +138,12 @@ struct CookbookView: View {
             modelContext.insert(duplicateEntry)
         }
     }
+    
+    enum ViewType: Hashable {
+        case viewRecipe(recipe: Recipe)
+        case addRecipe
+        case editRecipe(recipe: Recipe)
+    }
 }
 
 private struct CustomTagLabel: LabelStyle {
@@ -147,5 +158,7 @@ private struct CustomTagLabel: LabelStyle {
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
+    @Previewable @StateObject var navigationStore = NavigationStore()
     CookbookView()
+        .environmentObject(navigationStore)
 }

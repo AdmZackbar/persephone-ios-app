@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LookupFoodView: View {
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var navigationStore: NavigationStore
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
     private enum ViewState {
@@ -19,13 +20,8 @@ struct LookupFoodView: View {
         case ResultList(items: [FoodItem])
     }
     
-    @Binding private var path: [FoodDatabaseView.ViewType]
     @State private var viewState: ViewState = .GetQuery
     @State private var query: String = ""
-    
-    init(path: Binding<[FoodDatabaseView.ViewType]>) {
-        self._path = path
-    }
     
     var body: some View {
         VStack {
@@ -55,7 +51,7 @@ struct LookupFoodView: View {
             case .ResultList(let items):
                 List(items, id: \.name) { item in
                     Button {
-                        path.append(.ItemConfirm(item: item))
+                        navigationStore.push(FoodDatabaseView.ViewType.ItemConfirm(item: item))
                     } label: {
                         HStack {
                             VStack(alignment: .leading) {
@@ -105,7 +101,8 @@ struct LookupFoodView: View {
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
-    NavigationStack {
-        LookupFoodView(path: .constant([]))
-    }
+    @Previewable @StateObject var navigationStore = NavigationStore()
+    NavigationStack(path: $navigationStore.path) {
+        LookupFoodView()
+    }.environmentObject(navigationStore)
 }

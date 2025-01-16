@@ -11,22 +11,11 @@ import SwiftUI
 
 struct ScanFoodView: View {
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject private var navigationStore: NavigationStore
     @StateObject var sheetCoordinator = SheetCoordinator<FoodSheetEnum>()
     
-    private enum ViewState {
-        case Scan
-        case Lookup(barcode: String)
-        case NoResult(barcode: String)
-        case ResultList(items: [FoodItem])
-    }
-    
-    @Binding private var path: [FoodDatabaseView.ViewType]
     @State private var viewState: ViewState = .Scan
     @State private var torchOn: Bool = false
-    
-    init(path: Binding<[FoodDatabaseView.ViewType]>) {
-        self._path = path
-    }
     
     var body: some View {
         ZStack {
@@ -39,7 +28,7 @@ struct ScanFoodView: View {
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                path.removeLast()
+                                navigationStore.pop()
                             }
                         }
                         ToolbarItem(placement: .primaryAction) {
@@ -70,14 +59,14 @@ struct ScanFoodView: View {
                         }
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                path.removeLast()
+                                navigationStore.pop()
                             }
                         }
                     }
             case .ResultList(let items):
                 List(items) { item in
                     Button(item.name) {
-                        path.append(.ItemConfirm(item: item))
+                        navigationStore.push(FoodDatabaseView.ViewType.ItemConfirm(item: item))
                     }
                 }.navigationTitle("Select Scanned Item")
                     .toolbarTitleDisplayMode(.inline)
@@ -91,7 +80,7 @@ struct ScanFoodView: View {
                         }
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") {
-                                path.removeLast()
+                                navigationStore.pop()
                             }
                         }
                     }
@@ -152,8 +141,17 @@ extension ScanFoodView: ScannerDelegate {
             viewState = .ResultList(items: results)
         }
     }
+    
+    private enum ViewState {
+        case Scan
+        case Lookup(barcode: String)
+        case NoResult(barcode: String)
+        case ResultList(items: [FoodItem])
+    }
 }
 
 #Preview {
+    @Previewable @StateObject var navigationStore = NavigationStore()
     ScannerView()
+        .environmentObject(navigationStore)
 }

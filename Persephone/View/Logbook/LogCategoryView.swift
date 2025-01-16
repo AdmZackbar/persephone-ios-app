@@ -158,7 +158,7 @@ struct LogCategoryView: View {
     }
     
     private func edit(_ entry: LogFoodItemEntry) {
-        navigationStore.push(LogViewType.editFoodItem(entry: entry))
+        navigationStore.push(LogbookView.ViewType.editFoodItem(entry: entry))
     }
     
     private func duplicate(_ entry: LogFoodItemEntry) {
@@ -169,7 +169,7 @@ struct LogCategoryView: View {
                                     category: entry.category,
                                     unitPrice: entry.unitPrice)
         modelContext.insert(copy)
-        navigationStore.push(LogViewType.editFoodItem(entry: copy))
+        navigationStore.push(LogbookView.ViewType.editFoodItem(entry: copy))
     }
     
     private func delete(_ entry: LogFoodItemEntry) {
@@ -213,7 +213,7 @@ struct LogCategoryView: View {
         ToolbarItem(placement: .topBarTrailing) {
             if navigationStore.logConfig.selectedCategory != nil {
                 Button {
-                    navigationStore.push(LogViewType.addFoodItem())
+                    navigationStore.push(LogbookView.ViewType.addFoodItem())
                 } label: {
                     Label("Add", systemImage: "plus")
                 }
@@ -221,7 +221,7 @@ struct LogCategoryView: View {
                 Menu {
                     ForEach(LogbookView.Categories, id: \.hashValue) { category in
                         Button(category) {
-                            navigationStore.push(LogViewType.addFoodItem(category: category))
+                            navigationStore.push(LogbookView.ViewType.addFoodItem(category: category))
                         }
                     }
                 } label: {

@@ -9,6 +9,7 @@ import SwiftData
 import SwiftUI
 
 struct RecipeView: View {
+    @EnvironmentObject private var navigationStore: NavigationStore
     @StateObject var sheetCoordinator = SheetCoordinator<CookbookSheetEnum>()
     
     @State var recipe: Recipe
@@ -116,8 +117,8 @@ struct RecipeView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    NavigationLink {
-                        RecipeEditor(recipe: recipe)
+                    Button {
+                        navigationStore.push(CookbookView.ViewType.editRecipe(recipe: recipe))
                     } label: {
                         Label("Edit", systemImage: "pencil.line").labelStyle(.titleOnly)
                     }
@@ -240,7 +241,8 @@ struct RecipeView: View {
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
-    NavigationStack {
+    @Previewable @StateObject var navigationStore = NavigationStore()
+    NavigationStack(path: $navigationStore.path) {
         RecipeView(recipe: .init(
             name: "Test Recipe",
             metaData: Recipe.MetaData(
@@ -264,5 +266,5 @@ struct RecipeView: View {
                 .init(name: "Water", amount: Quantity(value: .Raw(1.2), unit: .Liter), notes: "Tap water or else"),
                 .init(name: "Salt", amount: Quantity(value: .Raw(600), unit: .Milligram))
             ]))
-    }
+    }.environmentObject(navigationStore)
 }

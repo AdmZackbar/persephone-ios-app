@@ -8,7 +8,7 @@
 import Foundation
 
 struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
-    static func lookupBarcode(_ barcode: String) async throws -> [FoodItem] {
+    static func lookupBarcode(_ barcode: String) async throws -> [Food] {
         var code = barcode
         if (code.count == 13) {
             // Barcode is in EAN13 format, we want UPC-A which has
@@ -34,7 +34,7 @@ struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
         return parseFoodDataResult(data)
     }
     
-    private static func parseFoodDataResult(_ data: Data) -> [FoodItem] {
+    private static func parseFoodDataResult(_ data: Data) -> [Food] {
         let decoder = JSONDecoder()
         if let jsonData = try? decoder.decode(BarcodeResult.self, from: data) {
             return [parseProduct(jsonData.product)]
@@ -42,40 +42,47 @@ struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
         return []
     }
     
-    private static func parseProduct(_ product: Product) -> FoodItem {
-        var allergens: String? = nil
-        if let allergenMatches = product.allergens?.matches(of: /\w+:([^,]+)/) {
-            allergens = allergenMatches.map { match in
-                match.1.capitalized
-            }.joined(separator: ", ")
-        }
-        let rawServingSize = product.serving_size
-        let servingSize = rawServingSize?.replacing(/\(.+\)/, with: "").trimmingCharacters(in: .whitespacesAndNewlines).capitalized
-        return FoodItem(name: product.product_name?.capitalized ?? "Unknown",
-                        details: "",
-                        metaData: FoodItem.MetaData(barcode: product.code, brand: product.brands?.capitalized),
-                        ingredients: FoodIngredients(nutrients: [
-                            .Energy: Quantity.calories(product.nutriments?.calories ?? 0),
-                            .TotalFat: Quantity.grams(product.nutriments?.totalFat ?? 0),
-                            .SaturatedFat: Quantity.grams(product.nutriments?.satFat ?? 0),
-                            .TransFat: Quantity.grams(product.nutriments?.transFat ?? 0),
-                            .PolyunsaturatedFat: Quantity.grams(product.nutriments?.polyFat ?? 0),
-                            .MonounsaturatedFat: Quantity.grams(product.nutriments?.monoFat ?? 0),
-                            .Cholesterol: try! Quantity.grams(product.nutriments?.cholesterol ?? 0).convert(unit: .Milligram),
-                            .Sodium: try! Quantity.grams(product.nutriments?.sodium ?? 0).convert(unit: .Milligram),
-                            .TotalCarbs: Quantity.grams(product.nutriments?.totalCarbs ?? 0),
-                            .DietaryFiber: Quantity.grams(product.nutriments?.dietaryFiber ?? 0),
-                            .TotalSugars: Quantity.grams(product.nutriments?.totalSugars ?? 0),
-                            .Protein: Quantity.grams(product.nutriments?.protein ?? 0),
-                            .Calcium: try! Quantity.grams(product.nutriments?.calcium ?? 0).convert(unit: .Milligram),
-                            .Iron: try! Quantity.grams(product.nutriments?.iron ?? 0).convert(unit: .Milligram),
-                            .Potassium: try! Quantity.grams(product.nutriments?.potassium ?? 0).convert(unit: .Milligram)
-                        ], all: product.ingredients_text?.capitalized ?? "", allergens: allergens ?? ""),
-                        size: FoodItem.Size(totalAmount: Quantity.grams(0), numServings: 0, servingSize: servingSize ?? ""),
-                storeEntries: [])
+    private static func parseProduct(_ product: Product) -> Food {
+//        var allergens: String? = nil
+//        if let allergenMatches = product.allergens?.matches(of: /\w+:([^,]+)/) {
+//            allergens = allergenMatches.map { match in
+//                match.1.capitalized
+//            }.joined(separator: ", ")
+//        }
+//        let rawServingSize = product.serving_size
+//        let servingSize = rawServingSize?.replacing(/\(.+\)/, with: "").trimmingCharacters(in: .whitespacesAndNewlines).capitalized
+//        let nutrients = [
+//            .Energy: product.nutriments?.calories ?? 0,
+//            .TotalFat: product.nutriments?.totalFat ?? 0,
+//            .SaturatedFat: product.nutriments?.satFat ?? 0,
+//            .TransFat: product.nutriments?.transFat ?? 0,
+//            .PolyunsaturatedFat: product.nutriments?.polyFat ?? 0,
+//            .MonounsaturatedFat: product.nutriments?.monoFat ?? 0,
+//            .Cholesterol: toMg(product.nutriments?.cholesterol) ?? 0,
+//            .Sodium: toMg(product.nutriments?.sodium) ?? 0,
+//            .TotalCarbs: product.nutriments?.totalCarbs ?? 0,
+//            .DietaryFiber: product.nutriments?.dietaryFiber ?? 0,
+//            .TotalSugars: product.nutriments?.totalSugars ?? 0,
+//            .Protein: product.nutriments?.protein ?? 0,
+//            .Calcium: toMg(product.nutriments?.calcium) ?? 0,
+//            .Iron: toMg(product.nutriments?.iron) ?? 0,
+//            .Potassium: toMg(product.nutriments?.potassium ?? 0)
+//        ]
+//        return .init(name: product.product_name?.capitalized ?? "Unknown",
+//                     metaData: .init(barcode: product.code, brand: product.brands?.capitalized ?? ""),
+//                     ingredients: .init(nutrients: nutrients, all: product.ingredients_text?.capitalized ?? "", allergens: allergens ?? ""),
+//                     servingSize: FoodSize(str: servingSize ?? ""))
+        return .init()
     }
     
-    static func lookup(query: String, maxResults: Int) async throws -> [FoodItem] {
+    static func toMg(_ amount: Double?) -> Double? {
+        if let amount {
+            return amount * 1000.0
+        }
+        return nil
+    }
+    
+    static func lookup(query: String, maxResults: Int) async throws -> [Food] {
         let str = "https://us.openfoodfacts.org/cgi/search.pl?action=process&search_terms=\(query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!)&sort_by=unique_scans_n&page_size=\(maxResults)&json=true"
         guard let url = URL(string: str) else {
             return []
@@ -96,7 +103,7 @@ struct OpenFoodFactsEndpoint: FoodDatabaseEndpoint {
         return parseQueryResult(data)
     }
     
-    private static func parseQueryResult(_ data: Data) -> [FoodItem] {
+    private static func parseQueryResult(_ data: Data) -> [Food] {
         let decoder = JSONDecoder()
         do {
             let jsonData = try decoder.decode(QueryResult.self, from: data)

@@ -2,17 +2,20 @@
 //  LogbookView.swift
 //  Persephone
 //
-//  Created by Zach Wassynger on 9/15/24.
+//  Created by Zach Wassynger on 1/17/25.
 //
 
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct LogbookView: View {
-    @Query(sort: \LogFoodItemEntry.date) var entries: [LogFoodItemEntry]
     @Environment(\.modelContext) var modelContext
     
-    static let Categories: [String] = [
+    @Query(sort: \FoodLogEntry.date) private var entries: [FoodLogEntry]
+    @Query(sort: \Food.name) private var foods: [Food]
+    
+    static let Meals: [String] = [
         "Breakfast",
         "Lunch",
         "Dinner",
@@ -21,13 +24,15 @@ struct LogbookView: View {
     
     @StateObject private var navigationStore = NavigationStore()
     
+    @State private var importing = false
+    
     var body: some View {
         let entries = entries.filter({ navigationStore.logConfig.contains($0.date) })
-        let entryMap: [String : [LogFoodItemEntry]] = {
-            var map: [String : [LogFoodItemEntry]] = [:]
+        let entryMap: [String : [FoodLogEntry]] = {
+            var map: [String : [FoodLogEntry]] = [:]
             entries.forEach({ entry in
-                if Self.Categories.contains(where: { $0 == entry.category }) {
-                    map[entry.category, default: []].append(entry)
+                if Self.Meals.contains(where: { $0 == entry.meal }) {
+                    map[entry.meal, default: []].append(entry)
                 } else {
                     map["Other", default: []].append(entry)
                 }
@@ -40,35 +45,34 @@ struct LogbookView: View {
                     .padding()
                 Form {
                     Section("Summary") {
-                        nutrientView(nutrition: entries.totalNutrients, price: entries.totalPrice)
+                        nutrientView(nutrients: entries.totalNutrients, price: entries.totalCost ?? .zero)
                     }
                     Section("Meals") {
-                        ForEach(Self.Categories, id: \.hashValue) { category in
-                            categoryButton(category: category, entries: entryMap[category, default: []])
+                        ForEach(Self.Meals, id: \.hashValue) { meal in
+                            mealButton(meal: meal, entries: entryMap[meal, default: []])
                         }
                         Button("View All Entries") {
-                            navigationStore.logConfig.selectedCategory = nil
-                            navigationStore.push(ViewType.entries)
+                            navigationStore.logConfig.selectedMeal = nil
+                            navigationStore.push(LogViewType.entries)
                         }
                     }
                 }.headerProminence(.increased)
             }.navigationTitle("Logbook")
                 .navigationBarTitleDisplayMode(.inline)
                 .background(Color(uiColor: UIColor.secondarySystemBackground))
-                .handleDestinations(navigationStore)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
-                            ForEach(Self.Categories, id: \.hashValue) { category in
-                                Button(category) {
-                                    navigationStore.push(ViewType.addFoodItem(category: category))
+                            ForEach(Self.Meals, id: \.hashValue) { meal in
+                                Button(meal) {
+                                    navigationStore.push(LogViewType.add(meal: meal))
                                 }
                             }
                         } label: {
                             Label("Add", systemImage: "plus")
                         }
                     }
-                }
+                }.handleDestinations(navigationStore)
         }.environmentObject(navigationStore)
     }
     
@@ -94,36 +98,21 @@ struct LogbookView: View {
     }
     
     @ViewBuilder
-    private func categoryButton(category: String, entries: [LogFoodItemEntry]) -> some View {
+    private func mealButton(meal: String, entries: [FoodLogEntry]) -> some View {
         Button {
-            navigationStore.logConfig.selectedCategory = category
-            navigationStore.push(ViewType.entries)
+            navigationStore.logConfig.selectedMeal = meal
+            navigationStore.push(LogViewType.entries)
         } label: {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(category.capitalized)
+                    Text(meal.capitalized)
                         .font(.title3)
                         .bold()
-                    Text(entries.totalPrice.toString())
+                    Text((entries.totalCost ?? .zero).formatted())
                         .italic()
                 }
                 Spacer()
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(entries.totalNutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
-                        .font(.title3)
-                        .bold()
-                    HStack(spacing: 4) {
-                        Text("\(entries.totalNutrients[.TotalCarbs]?.formatted() ?? "0g")")
-                            .foregroundStyle(Colors.carbs)
-                        Text("·")
-                        Text("\(entries.totalNutrients[.TotalFat]?.formatted() ?? "0g")")
-                            .foregroundStyle(Colors.fat)
-                        Text("·")
-                        Text("\(entries.totalNutrients[.Protein]?.formatted() ?? "0g")")
-                            .foregroundStyle(Colors.protein)
-                    }.italic()
-                        .bold()
-                }
+                horizontalMacroView(entries.totalNutrients)
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
             .contextMenu {
@@ -138,32 +127,55 @@ struct LogbookView: View {
     }
     
     @ViewBuilder
-    private func nutrientView(nutrition: NutritionDict, price: Price) -> some View {
+    private func nutrientView(nutrients: Nutrients, price: Currency) -> some View {
         HStack(alignment: .top) {
-            LogbookPieChart(nutrients: nutrition, price: price)
+            LogbookPieChart(nutrients: nutrients, price: price)
                 .frame(width: 180, height: 170)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Carbs: \(nutrition[.TotalCarbs]?.formatted() ?? "0g")")
-                    .font(.title3)
-                    .foregroundStyle(Colors.carbs)
-                Text("Fat: \(nutrition[.TotalFat]?.formatted() ?? "0g")")
-                    .font(.title3)
-                    .foregroundStyle(Colors.fat)
-                Text("Protein: \(nutrition[.Protein]?.formatted() ?? "0g")")
-                    .font(.title3)
-                    .foregroundStyle(Colors.protein)
-                Text("Sodium: \(nutrition[.Sodium]?.formatted() ?? "0mg")")
-            }.bold()
+            verticalMacroView(nutrients)
         }
     }
     
-    enum ViewType: Hashable {
-        case entries
-        case addFoodItem(category: String? = nil)
-        case editFoodItem(entry: LogFoodItemEntry)
+    @ViewBuilder
+    private func horizontalMacroView(_ nutrients: Nutrients) -> some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            Text(nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
+                .font(.title3)
+                .bold()
+            HStack(spacing: 4) {
+                Text("\(nutrients.get(.TotalCarbs)?.formatted(maxDigits: 0) ?? "0g")")
+                    .foregroundStyle(Colors.carbs)
+                Text("·")
+                Text("\(nutrients.get(.TotalFat)?.formatted(maxDigits: 0) ?? "0g")")
+                    .foregroundStyle(Colors.fat)
+                Text("·")
+                Text("\(nutrients.get(.Protein)?.formatted(maxDigits: 0) ?? "0g")")
+                    .foregroundStyle(Colors.protein)
+                Text("·")
+                Text("\(nutrients.get(.Sodium)?.formatted(maxDigits: 0) ?? "0mg")")
+            }.italic()
+                .bold()
+        }
+    }
+    
+    @ViewBuilder
+    private func verticalMacroView(_ nutrients: Nutrients) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Carbs: \(nutrients.get(.TotalCarbs)?.formatted(maxDigits: 1) ?? "0g")")
+                .font(.title3)
+                .foregroundStyle(Colors.carbs)
+            Text("Fat: \(nutrients.get(.TotalFat)?.formatted(maxDigits: 1) ?? "0g")")
+                .font(.title3)
+                .foregroundStyle(Colors.fat)
+            Text("Protein: \(nutrients.get(.Protein)?.formatted(maxDigits: 1) ?? "0g")")
+                .font(.title3)
+                .foregroundStyle(Colors.protein)
+            Text("Sodium: \(nutrients.get(.Sodium)?.formatted(maxDigits: 0) ?? "0mg")")
+        }.bold()
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
-    LogbookView()
+enum LogViewType: Hashable {
+    case entries
+    case add(meal: String? = nil)
+    case edit(_ entry: FoodLogEntry)
 }

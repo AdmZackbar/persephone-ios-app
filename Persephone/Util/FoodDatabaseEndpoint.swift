@@ -8,7 +8,7 @@
 import Foundation
 
 protocol FoodDatabaseEndpoint {
-    static func lookupBarcode(_ barcode: String) async throws -> [FoodItem]
+    static func lookupBarcode(_ barcode: String) async throws -> [Food]
     
-    static func lookup(query: String, maxResults: Int) async throws -> [FoodItem]
+    static func lookup(query: String, maxResults: Int) async throws -> [Food]
 }

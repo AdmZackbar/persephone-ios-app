@@ -2,68 +2,38 @@
 //  LogCategoryView.swift
 //  Persephone
 //
-//  Created by Zach Wassynger on 1/12/25.
+//  Created by Zach Wassynger on 1/17/25.
 //
 
 import SwiftData
 import SwiftUI
 
 struct LogCategoryView: View {
-    @Query(sort: \LogFoodItemEntry.date) var foodItems: [LogFoodItemEntry]
+    @Query(sort: \FoodLogEntry.date) private var entries: [FoodLogEntry]
     @Environment(\.modelContext) var modelContext
     
     @EnvironmentObject
     private var navigationStore: NavigationStore
     
-    @State private var sheetType: SheetType? = nil
+//    @State private var sheetType: SheetType? = nil
     
     var body: some View {
-        let items = foodItems.filter({ navigationStore.logConfig.contains($0.date) }).filter({ navigationStore.logConfig.selectedCategory == nil || $0.category == navigationStore.logConfig.selectedCategory })
+        let items = entries.filter({ navigationStore.logConfig.contains($0.date) })
+            .filter({ navigationStore.logConfig.selectedMeal == nil || $0.meal == navigationStore.logConfig.selectedMeal })
         VStack(spacing: 0) {
-            HStack {
-                Button {
-                    navigationStore.logConfig.prev()
-                } label: {
-                    Label("Prev", systemImage: "chevron.left").labelStyle(.iconOnly)
-                }
-                Spacer()
-                Text(navigationStore.logConfig.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.headline)
-                    .bold()
-                Spacer()
-                Button {
-                    navigationStore.logConfig.next()
-                } label: {
-                    Label("Next", systemImage: "chevron.right").labelStyle(.iconOnly)
-                }
-            }.padding()
+            dateHeader()
+                .padding([.top, .bottom], 8)
+                .padding([.leading, .trailing], 24)
             Form {
                 Section {
                     ForEach(items, id: \.hashValue, content: itemView)
                 } header: {
-                    Menu {
-                        Button("All Entries") {
-                            navigationStore.logConfig.selectedCategory = nil
-                        }
-                        ForEach(LogbookView.Categories, id: \.hashValue) { category in
-                            Button(category) {
-                                navigationStore.logConfig.selectedCategory = category
-                            }.disabled(category == navigationStore.logConfig.selectedCategory)
-                        }
-                    } label: {
-                        HStack {
-                            Text(navigationStore.logConfig.selectedCategory ?? "All Entries")
-                                .font(.title2)
-                                .bold()
-                            Image(systemName: "chevron.down")
-                            Spacer()
-                        }.clipShape(Rectangle())
-                    }.buttonStyle(.plain)
+                    mealButton()
                 }.headerProminence(.increased)
                 HStack(alignment: .top) {
-                    LogbookPieChart(nutrients: items.totalNutrients, price: items.totalPrice)
+                    LogbookPieChart(nutrients: items.totalNutrients, price: items.totalCost ?? .zero)
                         .frame(width: 160, height: 160)
-                    macroText(items.totalNutrients)
+                    verticalMacroView(items.totalNutrients)
                 }
             }
             Spacer()
@@ -71,47 +41,83 @@ struct LogCategoryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(uiColor: UIColor.secondarySystemBackground))
             .toolbar(content: toolbarContent)
-            .sheet(item: $sheetType) { type in
-                switch type {
-                case .EditFoodItem(let entry):
-                    EditAmountSheet(item: .init(entry: entry))
-                }
-            }
+//            .sheet(item: $sheetType) { type in
+//                switch type {
+//                case .EditFoodItem(let entry):
+//                    EditAmountSheet(item: .init(entry: entry))
+//                }
+//            }
     }
     
     @ViewBuilder
-    private func itemView(_ entry: LogFoodItemEntry) -> some View {
+    private func dateHeader() -> some View {
+        HStack {
+            Button {
+                navigationStore.logConfig.prev()
+            } label: {
+                Label("Prev", systemImage: "chevron.left").labelStyle(.iconOnly)
+            }
+            Spacer()
+            Text(navigationStore.logConfig.date.formatted(date: .abbreviated, time: .omitted))
+                .font(.headline)
+                .bold()
+            Spacer()
+            Button {
+                navigationStore.logConfig.next()
+            } label: {
+                Label("Next", systemImage: "chevron.right").labelStyle(.iconOnly)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func mealButton() -> some View {
+        Menu {
+            Button("All Entries") {
+                navigationStore.logConfig.selectedMeal = nil
+            }.disabled(navigationStore.logConfig.selectedMeal == nil)
+            ForEach(LogbookView.Meals, id: \.hashValue) { meal in
+                Button(meal) {
+                    navigationStore.logConfig.selectedMeal = meal
+                }.disabled(meal == navigationStore.logConfig.selectedMeal)
+            }
+        } label: {
+            HStack {
+                Text(navigationStore.logConfig.selectedMeal ?? "All Entries")
+                    .font(.title2)
+                    .bold()
+                Image(systemName: "chevron.down")
+                Spacer()
+            }.clipShape(Rectangle())
+        }.buttonStyle(.plain)
+    }
+    
+    @ViewBuilder
+    private func itemView(_ entry: FoodLogEntry) -> some View {
         Button {
-            sheetType = .EditFoodItem(entry: entry)
+            navigationStore.push(LogViewType.edit(entry))
         } label: {
             VStack(alignment: .leading, spacing: 2) {
-                if let brand = entry.item.metaData.brand {
+                if let brand = entry.food.brand {
                     Text(brand)
                         .font(.subheadline)
                         .opacity(0.7)
                 }
-                Text(entry.item.name)
+                Text(entry.food.name)
                     .bold()
                 HStack {
-                    Text("\(entry.nutrients.calories.formatted(.number.precision(.fractionLength(0)))) Cal")
+                    Text(entry.nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
                     Spacer()
-                    let amount: String = {
-                        switch entry.amountUnit {
-                        case .none:
-                            return (entry.item.size.servingSizeAmount * entry.amount.value).formatted(maxDigits: 2, includeSpace: true)
-                        default:
-                            return (entry.item.size.servingAmount * entry.amount.value).formatted(maxDigits: 1)
-                        }
-                    }()
-                    Text(amount)
+                    Text(entry.amount.formatted(includeSpace: true))
                 }.font(.subheadline)
                     .fontWeight(.semibold)
                 HStack {
-                    macroSummaryText(entry.nutrients)
+                    MacroSummaryView(entry.nutrients)
+                        .italic()
                         .fontWeight(.semibold)
                     Spacer()
-                    if let price = entry.price {
-                        Text(price.toString())
+                    if let cost = entry.cost {
+                        Text(cost.formatted())
                             .italic()
                     }
                 }.font(.subheadline)
@@ -134,7 +140,7 @@ struct LogCategoryView: View {
                     Label("Delete", systemImage: "trash")
                 }
             } preview: {
-                LogFoodItemEntryPreview(entry: entry)
+                FoodLogEntryPreview(entry: entry)
                     .padding()
                     .frame(width: 300)
             }
@@ -157,71 +163,54 @@ struct LogCategoryView: View {
             }
     }
     
-    private func edit(_ entry: LogFoodItemEntry) {
-        navigationStore.push(LogbookView.ViewType.editFoodItem(entry: entry))
+    private func edit(_ entry: FoodLogEntry) {
+        navigationStore.push(LogViewType.edit(entry))
     }
     
-    private func duplicate(_ entry: LogFoodItemEntry) {
-        let copy = LogFoodItemEntry(date: entry.date,
-                                    item: entry.item,
-                                    amount: entry.amount,
-                                    amountUnit: entry.amountUnit,
-                                    category: entry.category,
-                                    unitPrice: entry.unitPrice)
+    private func duplicate(_ entry: FoodLogEntry) {
+        let copy = FoodLogEntry(date: entry.date,
+                                food: entry.food,
+                                amount: entry.amount,
+                                meal: entry.meal,
+                                servingCost: entry.servingCost)
         modelContext.insert(copy)
-        navigationStore.push(LogbookView.ViewType.editFoodItem(entry: copy))
+        navigationStore.push(LogViewType.edit(copy))
     }
     
-    private func delete(_ entry: LogFoodItemEntry) {
+    private func delete(_ entry: FoodLogEntry) {
         modelContext.delete(entry)
     }
     
     @ViewBuilder
-    private func macroSummaryText(_ nutrients: NutritionDict) -> some View {
-        HStack(spacing: 4) {
-            Text("\(nutrients[.TotalCarbs]?.formatted() ?? "0g")")
-                .foregroundStyle(Colors.carbs)
-            Text("·")
-            Text("\(nutrients[.TotalFat]?.formatted() ?? "0g")")
-                .foregroundStyle(Colors.fat)
-            Text("·")
-            Text("\(nutrients[.Protein]?.formatted() ?? "0g")")
-                .foregroundStyle(Colors.protein)
-            Text("·")
-            Text("\(nutrients[.Sodium]?.formatted() ?? "0mg")")
-        }
-    }
-    
-    @ViewBuilder
-    private func macroText(_ nutrients: NutritionDict) -> some View {
+    private func verticalMacroView(_ nutrients: Nutrients) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Carbs: \(nutrients[.TotalCarbs]?.formatted() ?? "0g")")
+            Text("Carbs: \(nutrients.get(.TotalCarbs)?.formatted(maxDigits: 1) ?? "0g")")
                 .font(.title3)
                 .foregroundStyle(Colors.carbs)
-            Text("Fat: \(nutrients[.TotalFat]?.formatted() ?? "0g")")
+            Text("Fat: \(nutrients.get(.TotalFat)?.formatted(maxDigits: 1) ?? "0g")")
                 .font(.title3)
                 .foregroundStyle(Colors.fat)
-            Text("Protein: \(nutrients[.Protein]?.formatted() ?? "0g")")
+            Text("Protein: \(nutrients.get(.Protein)?.formatted(maxDigits: 1) ?? "0g")")
                 .font(.title3)
                 .foregroundStyle(Colors.protein)
-            Text("Sodium: \(nutrients[.Sodium]?.formatted() ?? "0mg")")
+            Text("Sodium: \(nutrients.get(.Sodium)?.formatted(maxDigits: 0) ?? "0mg")")
         }.bold()
     }
     
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            if navigationStore.logConfig.selectedCategory != nil {
+            if navigationStore.logConfig.selectedMeal != nil {
                 Button {
-                    navigationStore.push(LogbookView.ViewType.addFoodItem())
+                    navigationStore.push(LogViewType.add())
                 } label: {
                     Label("Add", systemImage: "plus")
                 }
             } else {
                 Menu {
-                    ForEach(LogbookView.Categories, id: \.hashValue) { category in
-                        Button(category) {
-                            navigationStore.push(LogbookView.ViewType.addFoodItem(category: category))
+                    ForEach(LogbookView.Meals, id: \.hashValue) { meal in
+                        Button(meal) {
+                            navigationStore.push(LogViewType.add(meal: meal))
                         }
                     }
                 } label: {
@@ -232,211 +221,25 @@ struct LogCategoryView: View {
     }
 }
 
-private enum SheetType: Identifiable {
-    var id: String {
-        switch self {
-        case .EditFoodItem(_):
-            "Edit Food Item"
-        }
-    }
+struct MacroSummaryView: View {
+    let nutrients: Nutrients
     
-    case EditFoodItem(entry: LogFoodItemEntry)
-}
-
-struct EditAmountSheet: View {
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.modelContext) var modelContext
-    @Query(sort: \LogFoodItemEntry.date, order: .reverse) var entries: [LogFoodItemEntry]
-    
-    @State var item: LogFoodItemEntryEditView.Item
-    
-    init(item: LogFoodItemEntryEditView.Item) {
-        self.item = item
-        var fetchDescriptor = FetchDescriptor<LogFoodItemEntry>(
-            sortBy: [SortDescriptor(\LogFoodItemEntry.date, order: .reverse)])
-        fetchDescriptor.fetchLimit = 100
-        self._entries = Query(fetchDescriptor)
+    init(_ nutrients: Nutrients) {
+        self.nutrients = nutrients
     }
     
     var body: some View {
-        NavigationStack {
-            Form {
-                let foodItem = item.foodItem!
-                Picker(selection: $item.amountUnit) {
-                    Text(foodItem.size.servingSizeAmount.unit.abbreviation).tag(nil as Unit?)
-                    if foodItem.size.totalAmount.unit.isWeight {
-                        Text(Unit.Gram.abbreviation).tag(Unit.Gram)
-                    }
-                    if foodItem.size.totalAmount.unit.isVolume {
-                        Text(Unit.Milliliter.abbreviation).tag(Unit.Milliliter)
-                    }
-                } label: {
-                    TextField("Amount", text: Binding(get: {
-                        if item.amountUnit == nil {
-                            (item.amount * foodItem.size.servingSizeAmount.value.value).toString()
-                        } else {
-                            (item.amount * foodItem.size.servingAmount.value.value).toString()
-                        }
-                    }, set: { str in
-                        if let value = Quantity.Magnitude.parseString(str) {
-                            if item.amountUnit == nil {
-                                item.amount = value / foodItem.size.servingSizeAmount.value.value
-                            } else {
-                                item.amount = value / foodItem.size.servingAmount.value.value
-                            }
-                        }
-                    })).keyboardType(.decimalPad)
-                        .font(.title)
-                        .bold()
-                }
-                similarEntryView(foodItem)
-                VStack(alignment: .leading) {
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading) {
-                            Text(foodItem.name)
-                                .font(.headline)
-                            if let brand = foodItem.metaData.brand {
-                                Text(brand)
-                                    .font(.subheadline)
-                                    .italic()
-                            }
-                        }
-                        Spacer()
-                        VStack(alignment: .trailing) {
-                            Text("\((foodItem.size.servingSizeAmount.value * item.amount.value).toString()) \(foodItem.size.servingSizeAmount.unit.abbreviation)")
-                                .bold()
-                            Text("\((foodItem.size.servingAmount.value * item.amount.value).toString())\(foodItem.size.servingAmount.unit.abbreviation)")
-                                .font(.subheadline).bold()
-                        }
-                    }
-                    NutrientPieChart(nutrients: foodItem.ingredients.nutrients * item.amount.value)
-                        .frame(width: 160, height: 120)
-                }
-                Toggle(isOn: $item.hasPrice) {
-                    costEntryView(foodItem)
-                }
-            }.navigationTitle("Edit Amount")
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarBackButtonHidden()
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            dismiss()
-                        }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("Save") {
-                            item.save(modelContext)
-                            dismiss()
-                        }
-                    }
-                }
-        }.presentationDetents([.medium])
-    }
-    
-    @ViewBuilder
-    private func similarEntryView(_ foodItem: FoodItem) -> some View {
-        let similarEntries: [SimilarEntry] = {
-            let entries = entries.filter({ $0.item == foodItem })
-            var similarEntries: [SimilarEntry] = []
-            for entry in entries {
-                if !similarEntries.contains(where: { $0.amount == entry.amount }) {
-                    similarEntries.append(.init(amount: entry.amount, unit: entry.amountUnit))
-                }
-                if similarEntries.count >= 8 {
-                    break
-                }
-            }
-            return similarEntries
-        }()
-        if !similarEntries.isEmpty {
-            ScrollView(.horizontal) {
-                HStack(spacing: 10) {
-                    ForEach(similarEntries, id: \.hashValue) { similarEntry in
-                        Button {
-                            item.amount = similarEntry.amount
-                            item.amountUnit = similarEntry.unit
-                        } label: {
-                            switch similarEntry.unit {
-                            case .none:
-                                Text("\((similarEntry.amount * foodItem.size.servingSizeAmount.value.value).toString(maxDigits: 1)) \(foodItem.size.servingSizeAmount.unit.abbreviation)")
-                            default:
-                                Text("\((similarEntry.amount * foodItem.size.servingAmount.value.value).toString())\(foodItem.size.servingAmount.unit.abbreviation)")
-                            }
-                            
-                        }
-                        Divider()
-                    }
-                }
-            }
+        HStack(spacing: 4) {
+            Text("\(nutrients.get(.TotalCarbs)?.formatted(maxDigits: 0) ?? "0g")")
+                .foregroundStyle(Colors.carbs)
+            Text("·")
+            Text("\(nutrients.get(.TotalFat)?.formatted(maxDigits: 0) ?? "0g")")
+                .foregroundStyle(Colors.fat)
+            Text("·")
+            Text("\(nutrients.get(.Protein)?.formatted(maxDigits: 0) ?? "0g")")
+                .foregroundStyle(Colors.protein)
+            Text("·")
+            Text("\(nutrients.get(.Sodium)?.formatted(maxDigits: 0) ?? "0mg")")
         }
     }
-    
-    private struct SimilarEntry: Hashable, Equatable {
-        var amount: Quantity.Magnitude
-        var unit: Unit?
-    }
-    
-    @ViewBuilder
-    private func costEntryView(_ foodItem: FoodItem) -> some View {
-        HStack {
-            Text("Cost (\(foodItem.size.totalAmount.value.toString(maxDigits: 1))\(foodItem.size.totalAmount.unit.abbreviation)):")
-            if item.hasPrice {
-                CurrencyField(value: Binding(get: {
-                    item.unitPrice.toCents()
-                }, set: { value in
-                    item.unitPrice = .Cents(value)
-                }))
-                if !foodItem.storeEntries.isEmpty {
-                    Menu {
-                        ForEach(foodItem.storeEntries, id: \.hashValue) { storeEntry in
-                            Button("\(storeEntry.storeName)\(storeEntry.sale ? " (Sale)" : ""): \(storeEntry.costType.toString())") {
-                                item.unitPrice = storeEntry.costPerUnit(size: foodItem.size)
-                            }
-                        }
-                    } label: {
-                        Label("Set", systemImage: "chevron.down").labelStyle(.iconOnly)
-                    }
-                }
-            } else {
-                Text("No Price Data")
-            }
-        }
-    }
-}
-
-struct LogFoodItemEntryPreview: View {
-    let entry: LogFoodItemEntry
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    Text(entry.item.name)
-                        .font(.headline)
-                    if let brand = entry.item.metaData.brand {
-                        Text(brand)
-                            .font(.subheadline)
-                            .italic()
-                    }
-                }
-                Spacer()
-                VStack(alignment: .trailing) {
-                    Text("\((entry.item.size.servingSizeAmount.value * entry.amount.value).toString()) \(entry.item.size.servingSizeAmount.unit.abbreviation)")
-                        .bold()
-                    Text("\((entry.item.size.servingAmount.value * entry.amount.value).toString())\(entry.item.size.servingAmount.unit.abbreviation)")
-                        .font(.subheadline).bold()
-                }
-            }
-            NutrientPieChart(nutrients: entry.item.ingredients.nutrients * entry.amount.value)
-                .frame(width: 160, height: 120)
-        }
-    }
-}
-
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
-    @Previewable @StateObject var navigationStore = NavigationStore()
-    NavigationStack(path: $navigationStore.path) {
-        LogCategoryView()
-    }.environmentObject(navigationStore)
 }

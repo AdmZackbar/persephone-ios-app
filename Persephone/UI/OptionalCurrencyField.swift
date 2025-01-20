@@ -1,24 +1,29 @@
 //
-//  CurrencyField.swift
+//  OptionalCurrencyField.swift
 //  Persephone
 //
-//  Created by Zach Wassynger on 1/12/25.
+//  Created by Zach Wassynger on 1/18/25.
 //
 
 import SwiftUI
 import UIKit
 
-public struct CurrencyField: View {
-    @Binding var value: Currency
-    var formatter: NumberFormatter
+public struct OptionalCurrencyField: View {
+    private var formatter: NumberFormatter
+    @Binding private var value: Currency?
+    @State private var prevValue: Int
 
     private var label: String {
         let mag = pow(10, formatter.maximumFractionDigits)
-        return formatter.string(for: Decimal(value.cents) / mag) ?? ""
+        if let value {
+            return formatter.string(for: Decimal(value.cents) / mag) ?? ""
+        }
+        return ""
     }
 
-    init(value: Binding<Currency>, formatter: NumberFormatter? = nil) {
+    init(value: Binding<Currency?>, formatter: NumberFormatter? = nil) {
         self._value = value
+        self.prevValue = value.wrappedValue?.cents ?? 0
         self.formatter = formatter ?? {
             let formatter = NumberFormatter()
             formatter.numberStyle = .currency
@@ -30,20 +35,32 @@ public struct CurrencyField: View {
     }
 
     public var body: some View {
-        ZStack {
-            // Text view to display the formatted currency
-            // Set as priority so CurrencyInputField size doesn't affect parent
-            HStack {
-                Text(label)
-                Spacer()
-            }.layoutPriority(1)
+        HStack {
+            if value != nil {
+                ZStack {
+                    // Text view to display the formatted currency
+                    // Set as priority so CurrencyInputField size doesn't affect parent
+                    HStack {
+                        Text(label)
+                        Spacer()
+                    }.layoutPriority(1)
 
-            // Input text field to handle UI
-            CurrencyInputField(value: Binding(get: {
-                value.cents
-            }, set: { cents in
-                value = .usd(cents)
-            }), formatter: formatter)
+                    // Input text field to handle UI
+                    CurrencyInputField(value: Binding(get: {
+                        value?.cents ?? prevValue
+                    }, set: { cents in
+                        prevValue = cents
+                        value = .usd(cents)
+                    }), formatter: formatter)
+                }
+            } else {
+                Spacer()
+            }
+            Toggle("", isOn: Binding(get: {
+                value != nil
+            }, set: { isOn in
+                value = isOn ? .usd(prevValue) : nil
+            }))
         }
     }
 }
@@ -190,12 +207,15 @@ private struct CurrencyInputField: UIViewRepresentable {
 }
 
 #Preview {
-    @Previewable @State var value: Currency = .usd(501)
+    @Previewable @State var value: Currency? = .usd(501)
     Form {
-        Text("Value: \(value.formatted())")
-        CurrencyField(value: $value)
+        Text("Value: \(value?.formatted() ?? "None")")
+        OptionalCurrencyField(value: $value)
         Button("Clear") {
             value = .zero
+        }
+        Button("Nullify") {
+            value = nil
         }
     }
 }

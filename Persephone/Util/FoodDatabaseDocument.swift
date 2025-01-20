@@ -33,10 +33,9 @@ struct FoodDatabaseDocument: FileDocument {
     
     struct Entry: Codable {
         var name: String
-        var details: String
-        var metaData: FoodItem.MetaData
+        var metaData: Food.MetaData
         var ingredients: FoodIngredients
-        var size: FoodItem.Size
-        var storeEntries: [FoodItem.StoreEntry]
+        var servingSize: FoodSize
+        var storeEntries: [Food.StoreEntry]
     }
 }

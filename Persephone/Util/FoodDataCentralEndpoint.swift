@@ -8,7 +8,7 @@
 import Foundation
 
 struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
-    static func lookupBarcode(_ barcode: String) async throws -> [FoodItem] {
+    static func lookupBarcode(_ barcode: String) async throws -> [Food] {
         var code = barcode
         if (code.count == 13) {
             // Barcode is in EAN13 format, we want UPC-A which has
@@ -18,7 +18,7 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
         return try await lookup(query: code, maxResults: 5)
     }
     
-    static func lookup(query: String, maxResults: Int) async throws -> [FoodItem] {
+    static func lookup(query: String, maxResults: Int) async throws -> [Food] {
         guard let url = URL(string: "https://api.nal.usda.gov/fdc/v1/foods/search?query=\(query)&pageSize=\(maxResults)&dataType=Branded") else {
             return []
         }
@@ -38,7 +38,7 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
         return parseFoodDataResult(data)
     }
     
-    private static func parseFoodDataResult(_ data: Data) -> [FoodItem] {
+    private static func parseFoodDataResult(_ data: Data) -> [Food] {
         let decoder = JSONDecoder()
         if let jsonData = try? decoder.decode(SearchResult.self, from: data) {
             if let foods = jsonData.foods {
@@ -50,7 +50,7 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
         return []
     }
     
-    private static func parseFood(_ food: BrandedFoodItem) -> FoodItem {
+    private static func parseFood(_ food: BrandedFoodItem) -> Food {
         let gramPattern = /([\d.]+)\s*[gG]/
         let kgPattern = /([\d.]+)\s*[kK][gG]/
         var totalAmount: Double? = nil
@@ -67,31 +67,35 @@ struct FoodDataCentralEndpoint: FoodDatabaseEndpoint {
         if (food.servingSize != nil && food.servingSizeUnit == "g") {
             ratio = food.servingSize! / 100.0
         }
-        var nutrientMap: NutritionDict = [:]
+        var nutrientMap: Nutrients = [:]
         food.foodNutrients?.forEach({ nutrient in
             let adjValue = nutrient.value * ratio
             // Round to nearest half
             if let nutrient = getNutrient(nutrient.nutrientName) {
-                nutrientMap[nutrient] = Quantity(value: .Raw(round(adjValue * 2.0) / 2.0), unit: nutrient.getCommonUnit())
+                nutrientMap[nutrient] = round(adjValue * 2.0) / 2.0
             }
         })
-        let metaData = FoodItem.MetaData(
+        let metaData = Food.MetaData(
             barcode: food.gtinUpc,
-            brand: food.brandName?.capitalized)
-        let size = FoodItem.Size(
-            totalAmount: Quantity.grams(totalAmount ?? 0),
-            numServings: numServings ?? 0,
-            servingSize: food.householdServingFullText?.capitalized ?? "")
+            brand: food.brandName?.capitalized ?? "")
+        let valueSize: Double? = {
+            if let totalAmount, let numServings {
+                totalAmount / numServings
+            } else {
+                nil
+            }
+        }()
+        let size = FoodSize(
+            str: food.householdServingFullText?.capitalized ?? "",
+            val: valueSize ?? 0)
         let ingredients = FoodIngredients(
             nutrients: nutrientMap,
             all: food.ingredients?.capitalized ?? "")
-        return FoodItem(
+        return Food(
             name: food.description?.capitalized ?? "",
-            details: "",
             metaData: metaData,
             ingredients: ingredients,
-            size: size,
-            storeEntries: [])
+            servingSize: size)
     }
     
     private static func getNutrient(_ name: String) -> Nutrient? {

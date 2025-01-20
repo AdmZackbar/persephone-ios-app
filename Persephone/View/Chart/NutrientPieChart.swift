@@ -9,11 +9,7 @@ import Charts
 import SwiftUI
 
 struct NutrientPieChart: View {
-    let nutrients: NutritionDict
-    
-    init(nutrients: NutritionDict) {
-        self.nutrients = nutrients
-    }
+    let nutrients: Nutrients
     
     var body: some View {
         ZStack {
@@ -43,23 +39,23 @@ struct NutrientPieChart: View {
                 }
             VStack(alignment: .leading) {
                 HStack {
-                    let protein = amountToString(.Protein)
+                    let protein = getNutrientString(.Protein)
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Protein")
-                        Text("\(protein)g")
+                        Text(protein)
                     }.foregroundStyle(Colors.protein)
                     Spacer()
-                    let carbs = amountToString(.TotalCarbs)
+                    let carbs = getNutrientString(.TotalCarbs)
                     VStack(alignment: .trailing, spacing: 0) {
                         Text("Carbs")
-                        Text("\(carbs)g")
+                        Text(carbs)
                     }.foregroundStyle(Colors.carbs)
                 }
                 Spacer()
-                let fat = amountToString(.TotalFat)
+                let fat = getNutrientString(.TotalFat)
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Fat")
-                    Text("\(fat)g")
+                    Text(fat)
                 }.foregroundStyle(Colors.fat)
             }.font(.caption)
                 .fontWeight(.heavy)
@@ -69,7 +65,7 @@ struct NutrientPieChart: View {
     @ViewBuilder
     private func chartOverlay(_ frame: CGRect) -> some View {
         VStack(spacing: 2) {
-            Text(nutrients.calories.formatted(.number.precision(.fractionLength(0))))
+            Text(nutrients.calories.value.formatted(maxDigits: 0))
                 .font(.title3).fontWeight(.heavy)
             Text("Cal")
                 .font(.caption).bold()
@@ -78,9 +74,9 @@ struct NutrientPieChart: View {
     
     private func createData() -> [(name: String, amount: Double)] {
         let data = [
-            (name: "Carbs", amount: computeAmount(.TotalCarbs) * 4),
-            (name: "Fat", amount: computeAmount(.TotalFat) * 9),
-            (name: "Protein", amount: computeAmount(.Protein) * 4)
+            (name: "Carbs", amount: nutrients[.TotalCarbs, default: 0] * 4),
+            (name: "Fat", amount: nutrients[.TotalFat, default: 0] * 9),
+            (name: "Protein", amount: nutrients[.Protein, default: 0] * 4)
         ]
         if data.allSatisfy({ (name: String, amount: Double) in amount <= 0 }) {
             return [(name: "None", amount: 1)]
@@ -88,29 +84,20 @@ struct NutrientPieChart: View {
         return data
     }
     
-    private func computeAmount(_ nutrient: Nutrient) -> Double {
-        if let amount = try? nutrients[nutrient]?.convert(unit: .Gram).value {
-            amount.value
-        } else {
-            0
+    private func getNutrientString(_ nutrient: Nutrient) -> String {
+        if let amount = nutrients.get(nutrient) {
+            return amount.formatted(maxDigits: 0)
         }
-    }
-    
-    private func amountToString(_ nutrient: Nutrient) -> String {
-        if let amount = try? nutrients[nutrient]?.convert(unit: .Gram).value {
-            amount.toString(maxDigits: 1)
-        } else {
-            "0"
-        }
+        return "0g"
     }
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
     NutrientPieChart(nutrients: [
-        .Energy: .calories(120),
-        .TotalCarbs: .grams(14),
-        .Protein: .grams(11),
-        .TotalFat: .grams(4.5),
-        .Sodium: .milligrams(120)
+        .Energy: 120,
+        .TotalCarbs: 14,
+        .Protein: 11,
+        .TotalFat: 4.5,
+        .Sodium: 120
     ]).frame(width: 200, height: 200)
 }

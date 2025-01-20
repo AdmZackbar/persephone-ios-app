@@ -9,6 +9,11 @@ import SwiftData
 import SwiftUI
 
 struct MainView: View {
+    init() {
+        UIPageControl.appearance().currentPageIndicatorTintColor = .accent
+        UIPageControl.appearance().pageIndicatorTintColor = UIColor.gray
+    }
+    
     var body: some View {
         TabView {
             FoodDatabaseView()
@@ -19,7 +24,7 @@ struct MainView: View {
                 .tabItem {
                     Label("Cookbook", systemImage: "book")
                 }
-            InventoryView()
+            Text("Inventory")
                 .tabItem {
                     Label("Inventory", systemImage: "list.clipboard")
                 }

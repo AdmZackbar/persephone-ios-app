@@ -7,6 +7,12 @@
 
 import Foundation
 
+extension Bool {
+    static func ^ (lhs: Bool, rhs: Bool) -> Bool {
+        return lhs != rhs
+    }
+}
+
 extension Int {
     func monthText() -> String {
         Calendar.current.monthSymbols[self - 1]
@@ -44,5 +50,12 @@ extension Date {
         components.month = month
         components.day = day
         return Calendar.current.date(from: components)!
+    }
+}
+
+extension Sequence where Element: Hashable {
+    func uniqued() -> [Element] {
+        var set = Set<Element>()
+        return filter { set.insert($0).inserted }
     }
 }

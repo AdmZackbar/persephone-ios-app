@@ -9,8 +9,8 @@ import Charts
 import SwiftUI
 
 struct LogbookPieChart: View {
-    let nutrients: NutritionDict
-    let price: Price
+    let nutrients: Nutrients
+    let price: Currency
     
     var body: some View {
         Chart(createData(), id: \.name) { name, amount in
@@ -42,44 +42,36 @@ struct LogbookPieChart: View {
     @ViewBuilder
     private func chartOverlay(_ frame: CGRect) -> some View {
         VStack(spacing: 2) {
-            if let cal = nutrients[.Energy] {
-                Text("\(cal.value.toString(maxDigits: 0)) Cal")
+            if let cal = nutrients.get(.Energy) {
+                Text(cal.formatted(maxDigits: 0, includeSpace: true))
                     .font(.title3).fontWeight(.heavy)
             } else {
                 Text("0 Cal")
                     .font(.title3).fontWeight(.heavy)
             }
-            Text("\(price.toString())").bold()
+            Text(price.formatted()).bold()
         }.position(x: frame.midX, y: frame.midY)
     }
     
     private func createData() -> [(name: String, amount: Double)] {
         let data = [
-            (name: "Carbs", amount: computeAmount(.TotalCarbs) * 4),
-            (name: "Fat", amount: computeAmount(.TotalFat) * 9),
-            (name: "Protein", amount: computeAmount(.Protein) * 4)
+            (name: "Carbs", amount: nutrients[.TotalCarbs, default: 0] * 4),
+            (name: "Fat", amount: nutrients[.TotalFat, default: 0] * 9),
+            (name: "Protein", amount: nutrients[.Protein, default: 0] * 4)
         ]
         if data.allSatisfy({ (name: String, amount: Double) in amount <= 0 }) {
             return [(name: "None", amount: 1)]
         }
         return data
     }
-    
-    private func computeAmount(_ nutrient: Nutrient) -> Double {
-        (try? nutrients[nutrient]?.convert(unit: .Gram).value)?.value ?? 0
-    }
-    
-    private func amountToString(_ nutrient: Nutrient) -> String {
-        (try? nutrients[nutrient]?.convert(unit: .Gram).value)?.toString(maxDigits: 1) ?? "0"
-    }
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
     LogbookPieChart(nutrients: [
-        .Energy: .calories(120),
-        .TotalCarbs: .grams(14),
-        .Protein: .grams(11),
-        .TotalFat: .grams(4.5),
-        .Sodium: .milligrams(120)
-    ], price: .Cents(1345)).frame(width: 200, height: 200)
+        .Energy: 120,
+        .TotalCarbs: 14,
+        .Protein: 11,
+        .TotalFat: 4.5,
+        .Sodium: 120
+    ], price: .dollars(13.45)).frame(width: 200, height: 200)
 }

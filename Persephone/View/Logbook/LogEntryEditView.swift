@@ -180,7 +180,7 @@ struct LogEntryEditView: View {
     
     @ViewBuilder
     private func recipeView(_ recipe: RecipeEntry) -> some View {
-        let scale = item.numServings / recipe.totalNumServings
+        let scale = item.numServings
         HStack {
             VStack(alignment: .leading) {
                 Text(recipe.name)

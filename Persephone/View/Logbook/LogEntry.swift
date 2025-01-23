@@ -5,34 +5,66 @@
 //  Created by Zach Wassynger on 1/22/25.
 //
 
+import Foundation
+
 enum LogEntry: Hashable {
-    case food(_ food: FoodLogEntry)
-    case recipe(_ recipe: RecipeLogEntry)
+    case food(_ foodEntry: FoodLogEntry)
+    case recipe(_ recipeEntry: RecipeLogEntry)
     
+    var date: Date {
+        switch self {
+        case .food(let entry):
+            entry.date
+        case .recipe(let entry):
+            entry.date
+        }
+    }
+    var name: String {
+        switch self {
+        case .food(let entry):
+            entry.food.name
+        case .recipe(let entry):
+            entry.recipe.name
+        }
+    }
     var meal: String {
         switch self {
-        case .food(let food):
-            food.meal
-        case .recipe(let recipe):
-            recipe.meal
+        case .food(let entry):
+            entry.meal
+        case .recipe(let entry):
+            entry.meal
         }
     }
-    
+    var amount: Amount {
+        switch self {
+        case .food(let entry):
+            entry.amount
+        case .recipe(let entry):
+            entry.amount
+        }
+    }
     var nutrients: Nutrients {
         switch self {
-        case .food(let food):
-            food.nutrients
-        case .recipe(let recipe):
-            recipe.nutrients
+        case .food(let entry):
+            entry.nutrients
+        case .recipe(let entry):
+            entry.nutrients
         }
     }
-    
     var cost: Currency? {
         switch self {
-        case .food(let food):
-            food.cost
-        case .recipe(let recipe):
-            recipe.cost
+        case .food(let entry):
+            entry.cost
+        case .recipe(let entry):
+            entry.cost
+        }
+    }
+    var brand: String? {
+        switch self {
+        case .food(let entry):
+            entry.food.brand
+        default:
+            nil
         }
     }
 }

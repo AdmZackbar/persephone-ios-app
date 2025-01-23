@@ -103,12 +103,8 @@ struct LogCategoryView: View {
         Button {
             // TODO show sheet
         } label: {
-            switch entry {
-            case .food(let food):
-                foodLogEntry(food)
-            case .recipe(let recipe):
-                recipeLogEntry(recipe)
-            }
+            logEntryView(entry)
+                .contentShape(Rectangle())
         }.buttonStyle(.plain)
             .contextMenu {
                 Button {
@@ -159,14 +155,14 @@ struct LogCategoryView: View {
     }
     
     @ViewBuilder
-    private func foodLogEntry(_ entry: FoodLogEntry) -> some View {
+    private func logEntryView(_ entry: LogEntry) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            if let brand = entry.food.brand {
+            if let brand = entry.brand {
                 Text(brand)
                     .font(.subheadline)
                     .opacity(0.7)
             }
-            Text(entry.food.name)
+            Text(entry.name)
                 .bold()
             HStack {
                 Text(entry.nutrients.calories.formatted())
@@ -184,31 +180,7 @@ struct LogCategoryView: View {
                         .italic()
                 }
             }.font(.subheadline)
-        }.contentShape(Rectangle())
-    }
-    
-    @ViewBuilder
-    private func recipeLogEntry(_ entry: RecipeLogEntry) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(entry.recipe.name)
-                .bold()
-            HStack {
-                Text(entry.nutrients.calories.formatted())
-                Spacer()
-                Text(entry.size.formatted())
-            }.font(.subheadline)
-                .fontWeight(.semibold)
-            HStack {
-                MacroSummaryView(entry.nutrients)
-                    .italic()
-                    .fontWeight(.semibold)
-                Spacer()
-                if let cost = entry.cost {
-                    Text(cost.formatted())
-                        .italic()
-                }
-            }.font(.subheadline)
-        }.contentShape(Rectangle())
+        }
     }
     
     private func edit(_ entry: LogEntry) {
@@ -234,7 +206,6 @@ struct LogCategoryView: View {
             navigationStore.push(LogViewType.edit(.recipe(recipe)))
             break
         }
-        
     }
     
     private func delete(_ entry: LogEntry) {

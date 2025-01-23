@@ -13,11 +13,9 @@ struct LogCategoryView: View {
     @Query(sort: \RecipeLogEntry.date) private var recipeEntries: [RecipeLogEntry]
     
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var navigationStore: NavigationStore
     
-    @EnvironmentObject
-    private var navigationStore: NavigationStore
-    
-//    @State private var sheetType: SheetType? = nil
+    @State private var sheetType: SheetType? = nil
     
     var body: some View {
         let entries: [LogEntry] = foodEntries.filter({ navigationStore.logConfig.contains($0.date) })
@@ -47,12 +45,12 @@ struct LogCategoryView: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(uiColor: UIColor.secondarySystemBackground))
             .toolbar(content: toolbarContent)
-//            .sheet(item: $sheetType) { type in
-//                switch type {
-//                case .EditFoodItem(let entry):
-//                    EditAmountSheet(item: .init(entry: entry))
-//                }
-//            }
+            .sheet(item: $sheetType) { type in
+                switch type {
+                case .amount(let entry):
+                    LogEntryAmountSheet(item: .init(entry: entry))
+                }
+            }
     }
     
     @ViewBuilder
@@ -101,7 +99,7 @@ struct LogCategoryView: View {
     @ViewBuilder
     private func entryView(_ entry: LogEntry) -> some View {
         Button {
-            // TODO show sheet
+            sheetType = .amount(entry)
         } label: {
             logEntryView(entry)
                 .contentShape(Rectangle())
@@ -257,6 +255,17 @@ struct LogCategoryView: View {
     }
 }
 
+private enum SheetType: Identifiable {
+    var id: String {
+        switch self {
+        case .amount(_):
+            "Amount"
+        }
+    }
+    
+    case amount(_ entry: LogEntry)
+}
+
 struct MacroSummaryView: View {
     let nutrients: Nutrients
     
@@ -276,6 +285,139 @@ struct MacroSummaryView: View {
                 .foregroundStyle(Colors.protein)
             Text("·")
             Text("\(nutrients.get(.Sodium)?.formatted(includeSpace: false) ?? "0mg")")
+        }
+    }
+}
+
+struct LogEntryAmountSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query private var recentEntries: [FoodLogEntry]
+    
+    @State private var item: LogEntryItem
+    
+    init(item: LogEntryItem) {
+        self.item = item
+        var descriptor = FetchDescriptor<FoodLogEntry>(
+            sortBy: [
+                .init(\.date, order: .reverse)
+            ]
+        )
+        descriptor.fetchLimit = 100
+        self._recentEntries = .init(descriptor)
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                let units: [Amount.Unit] = {
+                    switch item.type {
+                    case .food:
+                        let food = item.food!
+                        let servingUnit = Amount.Unit(name: "Serving", abbreviation: food.servingSize.amount.unit?.abbreviation ?? "serving", modifier: food.servingSize.val / food.servingSize.amount.value.raw)
+                        if food.servingSize.isMass {
+                            return [servingUnit, Units.gram, Units.ounce, Units.pound]
+                        } else {
+                            return [servingUnit, Units.milliliter, Units.fluidounce]
+                        }
+                    case .recipe:
+                        let recipe = item.recipe!
+                        let servingUnit = Amount.Unit(name: "Serving", abbreviation: recipe.total.amount.unit?.abbreviation ?? "serving", modifier: recipe.total.val / recipe.total.amount.value.raw)
+                        if recipe.total.isMass {
+                            return [servingUnit, Units.gram, Units.ounce, Units.pound]
+                        } else {
+                            return [servingUnit, Units.milliliter, Units.fluidounce]
+                        }
+                    }
+                }()
+                ScaledAmountField(amount: $item.amount, units: units)
+                switch item.type {
+                case .food:
+                    latestAmountView(item.food!)
+                    ScaledFoodView(food: item.food!, size: item.size!, servingCost: item.servingCost, numServings: item.numServings)
+                case .recipe:
+                    otherAmountView(item.recipe!)
+                    recipeView(item.recipe!)
+                }
+            }.navigationTitle("Edit Amount")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(content: toolbarContent)
+        }.presentationDetents([.medium])
+    }
+    
+    @ViewBuilder
+    private func latestAmountView(_ food: Food) -> some View {
+        let amounts = recentEntries.filter({ $0.food == food }).map({ $0.amount }).uniqued()
+        if !amounts.isEmpty {
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 12) {
+                    ForEach(amounts, id: \.hashValue) { amount in
+                        Button(amount.formatted(maxDigits: 1)) {
+                            // TODO fix bug with switching units
+                            item.amount = amount
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func otherAmountView(_ recipe: RecipeEntry) -> some View {
+        let amounts = (recipe.logEntries ?? []).sorted(by: { $0.date > $1.date }).map({ $0.amount }).uniqued()
+        if !amounts.isEmpty {
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 12) {
+                    ForEach(amounts, id: \.hashValue) { amount in
+                        Button(amount.formatted(maxDigits: 1, includeSpace: true)) {
+                            // TODO fix bug with switching units
+                            item.amount = amount
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func recipeView(_ recipe: RecipeEntry) -> some View {
+        let scale = item.numServings
+        HStack {
+            VStack(alignment: .leading) {
+                Text(recipe.name)
+                    .font(.headline)
+                Text((recipe.total * scale).formatted())
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                if let totalCost = recipe.cost {
+                    Text((totalCost * scale).formatted())
+                        .font(.subheadline)
+                        .italic()
+                }
+                Gauge(value: item.remainingScale ?? 1, in: 0...1) {
+                    EmptyView()
+                }
+                Spacer()
+            }.padding(.top, 8)
+            Spacer()
+            NutrientPieChart(nutrients: recipe.nutrients * scale)
+                .frame(width: 120, height: 120)
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button("Cancel") {
+                dismiss()
+            }
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Button("Save") {
+                item.save(modelContext)
+                dismiss()
+            }
         }
     }
 }

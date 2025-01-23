@@ -63,7 +63,7 @@ struct NutrientsView: View {
             if (nutrient == .Energy) {
                 Text(amount.value.formatted(maxDigits: maxDigits))
             } else {
-                Text(amount.formatted(maxDigits: maxDigits, includeSpace: true))
+                Text(amount.formatted(maxDigits: maxDigits))
             }
         }
         .italic(indented).padding(EdgeInsets(top: 0.0, leading: indented ? 8.0 : 0.0, bottom: 0.0, trailing: 0.0))
@@ -72,6 +72,13 @@ struct NutrientsView: View {
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
     NavigationStack {
-        NutrientsView(nutrients: [:])
+        Form {
+            NutrientsView(nutrients: [
+                .Energy: 120.5,
+                .TotalCarbs: 13,
+                .TotalFat: 2.4,
+                .Protein: 6.7
+            ])
+        }
     }
 }

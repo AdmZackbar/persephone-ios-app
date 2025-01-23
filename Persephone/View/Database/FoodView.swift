@@ -52,9 +52,7 @@ struct FoodView: View {
                 HStack(spacing: 4) {
                     Text("Serving Size:")
                     Spacer()
-                    Text(food.servingSize.amount.formatted(includeSpace: true))
-                    Text("(\(food.servingSize.value.formatted()))")
-                        .italic()
+                    Text(food.servingSize.formatted())
                 }.font(.headline)
                     .fontWeight(.semibold)
             }.headerProminence(.increased)
@@ -104,10 +102,8 @@ struct FoodView: View {
             VStack(alignment: .leading) {
                 Text(storeEntry.store)
                     .font(.headline)
-                HStack(spacing: 4) {
-                    Text(storeEntry.amount.amount.formatted(includeSpace: true))
-                    Text("(\(storeEntry.amount.value.formatted()))")
-                }.font(.subheadline)
+                Text(storeEntry.amount.formatted())
+                    .font(.subheadline)
                 Text(storeEntry.cost.formatted())
                     .font(.subheadline)
                     .italic()

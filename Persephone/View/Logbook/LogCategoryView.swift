@@ -169,9 +169,9 @@ struct LogCategoryView: View {
             Text(entry.food.name)
                 .bold()
             HStack {
-                Text(entry.nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
+                Text(entry.nutrients.calories.formatted())
                 Spacer()
-                Text(entry.amount.formatted(includeSpace: true))
+                Text(entry.amount.formatted(maxDigits: 1))
             }.font(.subheadline)
                 .fontWeight(.semibold)
             HStack {
@@ -193,7 +193,7 @@ struct LogCategoryView: View {
             Text(entry.recipe.name)
                 .bold()
             HStack {
-                Text(entry.nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
+                Text(entry.nutrients.calories.formatted())
                 Spacer()
                 Text(entry.size.formatted())
             }.font(.subheadline)
@@ -249,16 +249,16 @@ struct LogCategoryView: View {
     @ViewBuilder
     private func verticalMacroView(_ nutrients: Nutrients) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Carbs: \(nutrients.get(.TotalCarbs)?.formatted(maxDigits: 1) ?? "0g")")
+            Text("Carbs: \(nutrients.get(.TotalCarbs)?.formatted(maxDigits: 1, includeSpace: false) ?? "0g")")
                 .font(.title3)
                 .foregroundStyle(Colors.carbs)
-            Text("Fat: \(nutrients.get(.TotalFat)?.formatted(maxDigits: 1) ?? "0g")")
+            Text("Fat: \(nutrients.get(.TotalFat)?.formatted(maxDigits: 1, includeSpace: false) ?? "0g")")
                 .font(.title3)
                 .foregroundStyle(Colors.fat)
-            Text("Protein: \(nutrients.get(.Protein)?.formatted(maxDigits: 1) ?? "0g")")
+            Text("Protein: \(nutrients.get(.Protein)?.formatted(maxDigits: 1, includeSpace: false) ?? "0g")")
                 .font(.title3)
                 .foregroundStyle(Colors.protein)
-            Text("Sodium: \(nutrients.get(.Sodium)?.formatted(maxDigits: 0) ?? "0mg")")
+            Text("Sodium: \(nutrients.get(.Sodium)?.formatted(includeSpace: false) ?? "0mg")")
         }.bold()
     }
     
@@ -295,16 +295,16 @@ struct MacroSummaryView: View {
     
     var body: some View {
         HStack(spacing: 4) {
-            Text("\(nutrients.get(.TotalCarbs)?.formatted(maxDigits: 0) ?? "0g")")
+            Text("\(nutrients.get(.TotalCarbs)?.formatted(includeSpace: false) ?? "0g")")
                 .foregroundStyle(Colors.carbs)
             Text("·")
-            Text("\(nutrients.get(.TotalFat)?.formatted(maxDigits: 0) ?? "0g")")
+            Text("\(nutrients.get(.TotalFat)?.formatted(includeSpace: false) ?? "0g")")
                 .foregroundStyle(Colors.fat)
             Text("·")
-            Text("\(nutrients.get(.Protein)?.formatted(maxDigits: 0) ?? "0g")")
+            Text("\(nutrients.get(.Protein)?.formatted(includeSpace: false) ?? "0g")")
                 .foregroundStyle(Colors.protein)
             Text("·")
-            Text("\(nutrients.get(.Sodium)?.formatted(maxDigits: 0) ?? "0mg")")
+            Text("\(nutrients.get(.Sodium)?.formatted(includeSpace: false) ?? "0mg")")
         }
     }
 }

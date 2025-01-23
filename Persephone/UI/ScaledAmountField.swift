@@ -28,7 +28,7 @@ struct ScaledAmountField: View {
             }
         } label: {
             TextField("", text: Binding(get: {
-                amount.value.formatted()
+                amount.value.formatted(maxDigits: 7)
             }, set: { text in
                 if let value: Amount.Value = .parse(text) {
                     amount.value = value
@@ -50,7 +50,7 @@ struct ScaledAmountField: View {
 #Preview {
     @Previewable @State var amount: Amount = .init(value: .raw(30.2), unit: Units.gram)
     Form {
-        Text(amount.formatted(includeSpace: true))
+        Text(amount.formatted(maxDigits: 7))
         ScaledAmountField(amount: $amount, units: [.init(name: "serving", abbreviation: "serving", modifier: 84.0), Units.gram, Units.ounce])
         Button("Clear") {
             amount = .init(value: .zero, unit: .none)

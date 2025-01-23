@@ -65,7 +65,7 @@ struct NutrientPieChart: View {
     @ViewBuilder
     private func chartOverlay(_ frame: CGRect) -> some View {
         VStack(spacing: 2) {
-            Text(nutrients.calories.value.formatted(maxDigits: 0))
+            Text(nutrients.calories.value.formatted())
                 .font(.title3).fontWeight(.heavy)
             Text("Cal")
                 .font(.caption).bold()
@@ -86,7 +86,7 @@ struct NutrientPieChart: View {
     
     private func getNutrientString(_ nutrient: Nutrient) -> String {
         if let amount = nutrients.get(nutrient) {
-            return amount.formatted(maxDigits: 0)
+            return amount.formatted(includeSpace: false)
         }
         return "0g"
     }

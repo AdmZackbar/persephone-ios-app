@@ -27,16 +27,16 @@ struct RecipeEntryView: View {
                         Text("Total Amount")
                             .font(.subheadline)
                             .opacity(0.7)
-                        Text(entry.total.amount.formatted(includeSpace: true).capitalized)
+                        Text(entry.total.amount.formatted(maxDigits: 2).capitalized)
                             .font(.headline)
-                        Text(entry.total.value.formatted())
+                        Text(entry.total.value.formatted(maxDigits: 1, includeSpace: false))
                             .font(.subheadline)
                             .fontWeight(.semibold)
                     }
                     Spacer()
                     // TODO
                     Gauge(value: entry.usedScale, in: 0...1) {
-                        Text(entry.total.value.formatted(maxDigits: 0))
+                        Text(entry.total.value.formatted())
                             .font(.subheadline)
                             .fontWeight(.semibold)
                     }.gaugeStyle(.accessoryCircularCapacity)
@@ -117,12 +117,12 @@ struct RecipeEntryIngredientListEntryView: View {
                 Text(ingredient.food.name)
                     .font(.headline)
                 Spacer()
-                Text(ingredient.amount.formatted(includeSpace: true))
+                Text(ingredient.amount.formatted(maxDigits: 1))
             }
             HStack {
                 MacroSummaryView(ingredient.nutrients)
                 Spacer()
-                Text(ingredient.nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
+                Text(ingredient.nutrients.calories.formatted())
             }.font(.subheadline)
                 .fontWeight(.semibold)
             if let notes = ingredient.notes {

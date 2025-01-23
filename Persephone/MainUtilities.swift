@@ -51,6 +51,15 @@ extension Date {
         components.day = day
         return Calendar.current.date(from: components)!
     }
+    
+    func atCurrentTime() -> Date {
+        var components = Calendar.current.dateComponents(in: .current, from: self)
+        let current = Calendar.current.dateComponents(in: .current, from: .now)
+        components.hour = current.hour
+        components.minute = current.minute
+        components.second = current.second
+        return Calendar.current.date(from: components)!
+    }
 }
 
 extension Sequence where Element: Hashable {

@@ -10,7 +10,7 @@ import Foundation
 // Amount
 
 extension Amount {
-    func formatted(maxDigits: Int = 2, includeSpace: Bool = false) -> String {
+    func formatted(maxDigits: Int = 0, includeSpace: Bool = true) -> String {
         let valueStr = self.value.formatted(maxDigits: maxDigits)
         if let unitStr {
             return "\(valueStr)\(includeSpace ? " " : "")\(unitStr)"
@@ -71,7 +71,7 @@ extension Amount.Value {
         return isNegative ? -self : self
     }
     
-    func formatted(maxDigits: Int = 2) -> String {
+    func formatted(maxDigits: Int = 0) -> String {
         let formatter: NumberFormatter = {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -181,12 +181,12 @@ extension Amount.Value {
 // FoodSize
 
 extension FoodSize {
-    func formatted(maxDigits: Int = 2) -> String {
-        "\(str) (\(value.formatted(maxDigits: maxDigits)))"
+    func formatted() -> String {
+        "\(amount.formatted(maxDigits: 2)) (\(value.formatted(maxDigits: 1, includeSpace: false)))"
     }
     
     static func * (lhs: FoodSize, rhs: Double) -> FoodSize {
-        return .init(str: (lhs.amount * rhs).formatted(), val: lhs.val * rhs, isMass: lhs.isMass)
+        return .init(str: (lhs.amount * rhs).formatted(maxDigits: 12), val: lhs.val * rhs, isMass: lhs.isMass)
     }
 }
 

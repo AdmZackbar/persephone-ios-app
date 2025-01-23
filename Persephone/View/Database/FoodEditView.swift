@@ -172,10 +172,8 @@ struct FoodEditView: View {
                     .font(.headline)
                 Text(entry.cost.formatted())
                     .font(.subheadline)
-                HStack(spacing: 4) {
-                    Text(entry.amount.amount.formatted(includeSpace: true))
-                    Text("(\(entry.amount.value.formatted()))")
-                }.font(.subheadline)
+                Text(entry.amount.formatted())
+                    .font(.subheadline)
                 HStack(spacing: 4) {
                     if !entry.isAvailable {
                         Text("Retired")

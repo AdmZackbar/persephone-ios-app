@@ -42,13 +42,8 @@ struct LogbookPieChart: View {
     @ViewBuilder
     private func chartOverlay(_ frame: CGRect) -> some View {
         VStack(spacing: 2) {
-            if let cal = nutrients.get(.Energy) {
-                Text(cal.formatted(maxDigits: 0, includeSpace: true))
-                    .font(.title3).fontWeight(.heavy)
-            } else {
-                Text("0 Cal")
-                    .font(.title3).fontWeight(.heavy)
-            }
+            Text((nutrients.get(.Energy) ?? .init(value: .zero, unit: Units.calorie)).formatted())
+                .font(.title3).fontWeight(.heavy)
             Text(price.formatted()).bold()
         }.position(x: frame.midX, y: frame.midY)
     }

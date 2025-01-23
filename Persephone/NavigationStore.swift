@@ -63,12 +63,8 @@ final class NavigationStore: ObservableObject {
         case .entries:
             LogCategoryView()
         case .add(let meal):
-            let date: Date = {
-                let current = Date()
-                let time = current.timeIntervalSince(Date.from(year: current.year, month: current.month, day: current.day))
-                return logConfig.date.addingTimeInterval(time)
-            }()
-            LogEntryEditView(item: .init(date: date, meal: meal ?? "Breakfast"))
+            LogEntryEditView(item: .init(date: logConfig.date.atCurrentTime(),
+                                         meal: meal ?? logConfig.selectedMeal ?? "Breakfast"))
         case .edit(let entry):
             LogEntryEditView(item: .init(entry: entry))
         }
@@ -97,6 +93,7 @@ extension View {
 
 struct LogConfig: Hashable, Equatable {
     var date: Date = Date()
+    
     var selectedMeal: String? = nil
     
     func contains(_ date: Date) -> Bool {

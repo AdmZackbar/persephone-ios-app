@@ -24,9 +24,9 @@ struct FoodPreview: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
-                    Text(food.servingSize.amount.formatted(includeSpace: true))
+                    Text(food.servingSize.str)
                         .bold()
-                    Text(food.servingSize.value.formatted(includeSpace: true))
+                    Text(food.servingSize.value.formatted(maxDigits: 2))
                         .font(.subheadline).bold()
                 }
             }

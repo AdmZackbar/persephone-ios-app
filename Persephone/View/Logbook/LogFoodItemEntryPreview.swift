@@ -24,9 +24,9 @@ struct FoodLogEntryPreview: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
-                    Text(entry.size.amount.formatted(includeSpace: true))
+                    Text(entry.size.amount.formatted(maxDigits: 2))
                         .bold()
-                    Text(entry.size.value.formatted(includeSpace: true))
+                    Text(entry.size.value.formatted(maxDigits: 1, includeSpace: false))
                         .font(.subheadline).bold()
                 }
             }

@@ -92,7 +92,7 @@ struct RecipeEntryIngredientSheet: View {
                 Menu {
                     ForEach(storeEntries, id: \.hashValue) { storeEntry in
                         let servingCost = storeEntry.costPerServing(food.servingSize)
-                        Button("\(storeEntry.store)\(storeEntry.isSale ? " (Sale)" : ""):\n\(storeEntry.amount.formatted(maxDigits: 0)) \(servingCost.formatted())") {
+                        Button("\(storeEntry.store)\(storeEntry.isSale ? " (Sale)" : ""):\n\(storeEntry.amount.formatted()) \(servingCost.formatted())") {
                             item.servingCost = servingCost
                         }
                     }

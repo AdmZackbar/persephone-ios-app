@@ -119,7 +119,7 @@ struct LogEntryEditView: View {
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 12) {
                     ForEach(amounts, id: \.hashValue) { amount in
-                        Button(amount.formatted(maxDigits: 1, includeSpace: true)) {
+                        Button(amount.formatted(maxDigits: 1)) {
                             // TODO fix bug with switching units
                             item.amount = amount
                         }
@@ -139,7 +139,7 @@ struct LogEntryEditView: View {
                 Menu {
                     ForEach(storeEntries, id: \.hashValue) { storeEntry in
                         let servingCost = storeEntry.costPerServing(food.servingSize)
-                        Button("\(storeEntry.store)\(storeEntry.isSale ? " (Sale)" : ""):\n\(storeEntry.amount.formatted(maxDigits: 0)) \(servingCost.formatted())") {
+                        Button("\(storeEntry.store)\(storeEntry.isSale ? " (Sale)" : ""):\n\(storeEntry.amount.formatted()) \(servingCost.formatted())") {
                             item.servingCost = servingCost
                         }
                     }
@@ -185,10 +185,8 @@ struct LogEntryEditView: View {
             VStack(alignment: .leading) {
                 Text(recipe.name)
                     .font(.headline)
-                HStack(spacing: 4) {
-                    Text((recipe.total * scale).amount.formatted(includeSpace: true))
-                    Text("(\((recipe.total * scale).value.formatted()))")
-                }.font(.subheadline)
+                Text((recipe.total * scale).formatted())
+                    .font(.subheadline)
                     .fontWeight(.semibold)
                 if let totalCost = recipe.cost {
                     Text((totalCost * scale).formatted())
@@ -249,10 +247,8 @@ struct ScaledFoodView: View {
                 }
                 Text(food.name)
                     .font(.headline)
-                HStack(spacing: 4) {
-                    Text(size.amount.formatted(includeSpace: true))
-                    Text("(\(size.value.formatted()))")
-                }.font(.subheadline)
+                Text(size.formatted())
+                    .font(.subheadline)
                     .fontWeight(.semibold)
                 if let servingCost {
                     Text((servingCost * numServings).formatted())

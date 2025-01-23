@@ -145,7 +145,7 @@ private struct RecipeEntryButton: View {
             Spacer()
             Gauge(value: entry.usedScale, in: 0...1) {
                 // TODO
-                Text(entry.total.value.formatted(maxDigits: 0))
+                Text(entry.total.value.formatted())
             }.gaugeStyle(.accessoryCircularCapacity)
         }
     }

@@ -225,6 +225,9 @@ extension Food {
             metaData.rating = value?.rating
         }
     }
+    var isRetired: Bool {
+        metaData.retireDate != nil
+    }
     
     var bestStoreEntry: StoreEntry? {
         get {
@@ -295,6 +298,10 @@ extension [FoodLogEntry] {
 // Recipes
 
 extension RecipeEntry {
+    var remainingScale: Double {
+        max(0, min(1, 1 - logEntries.map({ $0.amountScale }).reduce(removedScale, +)))
+    }
+    
     var hasRemaining: Bool {
         remainingScale >= 0
     }
@@ -310,6 +317,14 @@ extension RecipeEntry {
     
     var remaining: FoodSize {
         total * remainingScale
+    }
+    
+    var totalNumServings: Double {
+        total.amount.value.raw
+    }
+    
+    var servingSize: Amount {
+        .init(value: .raw(1), unitStr: total.amount.unitStr)
     }
 }
 
@@ -334,5 +349,23 @@ extension RecipeEntryIngredient {
     
     var size: FoodSize {
         food.servingSize * numServings
+    }
+}
+
+extension RecipeLogEntry {
+    var size: FoodSize {
+        recipe.total * amountScale
+    }
+    
+    var nutrients: Nutrients {
+        recipe.nutrients * amountScale
+    }
+    
+    var cost: Currency? {
+        if let totalCost = recipe.cost {
+            totalCost * amountScale
+        } else {
+            nil
+        }
     }
 }

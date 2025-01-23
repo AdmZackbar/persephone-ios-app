@@ -24,6 +24,7 @@ struct MockDataPreviewModifier: PreviewModifier {
     static func populateContainer(_ container: ModelContainer) {
         container.mainContext.insert(createTestFood())
         container.mainContext.insert(createTestRecipeEntry())
+        container.mainContext.insert(createTestFoodLogEntry())
 //        container.mainContext.insert(createRecipe())
     }
     
@@ -73,10 +74,9 @@ struct MockDataPreviewModifier: PreviewModifier {
     }
     
     static func createTestRecipeEntry() -> RecipeEntry {
-        .init(name: "Baked Pork Tenderloin",
+        let entry = RecipeEntry(name: "Baked Pork Tenderloin",
               notes: "In the oven for 20 min",
               total: .init(str: "2 tenderloins", val: 907),
-              remainingScale: 0.85,
               ingredients: [
                 .init(
                     food: .init(
@@ -85,6 +85,20 @@ struct MockDataPreviewModifier: PreviewModifier {
                         servingSize: .init(str: "4 oz", val: 112)),
                     amount: .init(value: .raw(1102), unit: Units.gram))
               ])
+        entry.logEntries = [
+            .init(amountScale: 0.2, meal: "Lunch")
+        ]
+        return entry
+    }
+    
+    static func createTestFoodLogEntry() -> FoodLogEntry {
+        .init(food: .init(
+            name: "Pork Tenderloin",
+            ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7]),
+            servingSize: .init(str: "4 oz", val: 112)),
+              amount: .init(value: .raw(203), unit: Units.gram),
+              meal: "Lunch",
+              servingCost: .usd(203))
     }
     
 //    static func createRecipe() -> Recipe {

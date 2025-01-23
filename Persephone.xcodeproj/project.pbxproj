@@ -43,6 +43,13 @@
 		E8E7024F2D33FBA000FB7013 /* MainUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E7024E2D33FBA000FB7013 /* MainUtilities.swift */; };
 		E8E702562D3408D200FB7013 /* NutrientPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E702552D3408CF00FB7013 /* NutrientPieChart.swift */; };
 		E8E702582D340C1200FB7013 /* MockDataPreviewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */; };
+		E8E9AE352D3F5C8100B2A193 /* RecipeLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE342D3F5C7E00B2A193 /* RecipeLogEntry.swift */; };
+		E8E9AE372D3FDD1B00B2A193 /* OptionalDatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE362D3FDD1500B2A193 /* OptionalDatePicker.swift */; };
+		E8E9AE392D4121C800B2A193 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE382D4121C400B2A193 /* LogEntry.swift */; };
+		E8E9AE3B2D41230400B2A193 /* RecipeLogEntryEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE3A2D4122FC00B2A193 /* RecipeLogEntryEditView.swift */; };
+		E8E9AE3D2D4123CA00B2A193 /* RecipeLogEntryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE3C2D4123C700B2A193 /* RecipeLogEntryItem.swift */; };
+		E8E9AE3F2D41299F00B2A193 /* SelectRecipeEntrySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE3E2D41299900B2A193 /* SelectRecipeEntrySheet.swift */; };
+		E8E9AE412D412F7C00B2A193 /* AddLogEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE402D412F6F00B2A193 /* AddLogEntryView.swift */; };
 		E8EB88062D3B15EC00861685 /* FoodDatabaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88052D3B15D900861685 /* FoodDatabaseView.swift */; };
 		E8EB88092D3B1E7B00861685 /* Food.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88082D3B1E6600861685 /* Food.swift */; };
 		E8EB880B2D3B3F6A00861685 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB880A2D3B3F5E00861685 /* Category.swift */; };
@@ -124,6 +131,13 @@
 		E8E7024E2D33FBA000FB7013 /* MainUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainUtilities.swift; sourceTree = "<group>"; };
 		E8E702552D3408CF00FB7013 /* NutrientPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutrientPieChart.swift; sourceTree = "<group>"; };
 		E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataPreviewModifier.swift; sourceTree = "<group>"; };
+		E8E9AE342D3F5C7E00B2A193 /* RecipeLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeLogEntry.swift; sourceTree = "<group>"; };
+		E8E9AE362D3FDD1500B2A193 /* OptionalDatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalDatePicker.swift; sourceTree = "<group>"; };
+		E8E9AE382D4121C400B2A193 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
+		E8E9AE3A2D4122FC00B2A193 /* RecipeLogEntryEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeLogEntryEditView.swift; sourceTree = "<group>"; };
+		E8E9AE3C2D4123C700B2A193 /* RecipeLogEntryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeLogEntryItem.swift; sourceTree = "<group>"; };
+		E8E9AE3E2D41299900B2A193 /* SelectRecipeEntrySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectRecipeEntrySheet.swift; sourceTree = "<group>"; };
+		E8E9AE402D412F6F00B2A193 /* AddLogEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLogEntryView.swift; sourceTree = "<group>"; };
 		E8EB88052D3B15D900861685 /* FoodDatabaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseView.swift; sourceTree = "<group>"; };
 		E8EB88082D3B1E6600861685 /* Food.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Food.swift; sourceTree = "<group>"; };
 		E8EB880A2D3B3F5E00861685 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
@@ -177,6 +191,7 @@
 				E8EB88232D3C265F00861685 /* ScaledAmountField.swift */,
 				E8EB881C2D3C0A2100861685 /* OptionalCurrencyField.swift */,
 				E8E7024A2D33F6CF00FB7013 /* CurrencyField.swift */,
+				E8E9AE362D3FDD1500B2A193 /* OptionalDatePicker.swift */,
 				E8743B9C2C51FB0E00E1B871 /* SheetCoordinator.swift */,
 				E80E2C502C41C23200D35BE7 /* ScannerView.swift */,
 			);
@@ -216,6 +231,7 @@
 				E8EB88082D3B1E6600861685 /* Food.swift */,
 				E8EB88112D3B66F000861685 /* FoodLogEntry.swift */,
 				E885CC742D3E90460041364D /* RecipeEntry.swift */,
+				E8E9AE342D3F5C7E00B2A193 /* RecipeLogEntry.swift */,
 			);
 			path = V1;
 			sourceTree = "<group>";
@@ -340,10 +356,15 @@
 			children = (
 				E8EB880F2D3B66D900861685 /* LogbookView.swift */,
 				E8EB88142D3B6F9100861685 /* LogCategoryView.swift */,
+				E8E9AE382D4121C400B2A193 /* LogEntry.swift */,
 				E8EB88162D3B708700861685 /* LogFoodItemEntryPreview.swift */,
+				E8E9AE402D412F6F00B2A193 /* AddLogEntryView.swift */,
 				E8EB881A2D3C059200861685 /* FoodLogEntryItem.swift */,
 				E8EB88182D3C054E00861685 /* FoodLogEntryEditView.swift */,
+				E8E9AE3C2D4123C700B2A193 /* RecipeLogEntryItem.swift */,
+				E8E9AE3A2D4122FC00B2A193 /* RecipeLogEntryEditView.swift */,
 				E8EB88212D3C1CF600861685 /* SelectFoodSheet.swift */,
+				E8E9AE3E2D41299900B2A193 /* SelectRecipeEntrySheet.swift */,
 			);
 			path = Logbook;
 			sourceTree = "<group>";
@@ -487,14 +508,18 @@
 				E8EB88102D3B66D900861685 /* LogbookView.swift in Sources */,
 				E8EB88172D3B708700861685 /* LogFoodItemEntryPreview.swift in Sources */,
 				E885CC782D3E9E810041364D /* RecipeEntryEditView.swift in Sources */,
+				E8E9AE392D4121C800B2A193 /* LogEntry.swift in Sources */,
 				E8828EE72C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift in Sources */,
 				E8E702562D3408D200FB7013 /* NutrientPieChart.swift in Sources */,
 				E8828EE32C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift in Sources */,
 				E8743BA52C5344D000E1B871 /* NutrientsView.swift in Sources */,
 				E8828EE52C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift in Sources */,
 				E8A5F5142D3EC7AD00377624 /* RecipeEntryIngredientSheet.swift in Sources */,
+				E8E9AE412D412F7C00B2A193 /* AddLogEntryView.swift in Sources */,
 				E885CC7E2D3EA8AE0041364D /* RecipeEntryItem.swift in Sources */,
 				E8EB88122D3B670C00861685 /* FoodLogEntry.swift in Sources */,
+				E8E9AE352D3F5C8100B2A193 /* RecipeLogEntry.swift in Sources */,
+				E8E9AE3F2D41299F00B2A193 /* SelectRecipeEntrySheet.swift in Sources */,
 				E8EB88092D3B1E7B00861685 /* Food.swift in Sources */,
 				E8EB88222D3C1CFC00861685 /* SelectFoodSheet.swift in Sources */,
 				E867E6682D343FDD001917C0 /* ModelUtilities.swift in Sources */,
@@ -509,6 +534,7 @@
 				E885CC752D3E904B0041364D /* RecipeEntry.swift in Sources */,
 				E8E7024D2D33F9CD00FB7013 /* NavigationStore.swift in Sources */,
 				E8EB88282D3D306C00861685 /* FoodItem.swift in Sources */,
+				E8E9AE3B2D41230400B2A193 /* RecipeLogEntryEditView.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
 				E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */,
 				E8EB882D2D3D55BF00861685 /* FoodPreview.swift in Sources */,
@@ -520,10 +546,12 @@
 				E8EB881F2D3C103800861685 /* AmountField.swift in Sources */,
 				E8EB88262D3D303500861685 /* FoodEditView.swift in Sources */,
 				E8EB881D2D3C0A2100861685 /* OptionalCurrencyField.swift in Sources */,
+				E8E9AE3D2D4123CA00B2A193 /* RecipeLogEntryItem.swift in Sources */,
 				E8E7024F2D33FBA000FB7013 /* MainUtilities.swift in Sources */,
 				E8D33C4F2D3AA2A700EE8555 /* Currency.swift in Sources */,
 				E8D33C4B2D3A8EDD00EE8555 /* Units.swift in Sources */,
 				E885CC7C2D3E9F230041364D /* CookbookView.swift in Sources */,
+				E8E9AE372D3FDD1B00B2A193 /* OptionalDatePicker.swift in Sources */,
 				E8828ED52C4F5871006C7CB3 /* Nutrients.swift in Sources */,
 				E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */,
 				E8EB880B2D3B3F6A00861685 /* Category.swift in Sources */,

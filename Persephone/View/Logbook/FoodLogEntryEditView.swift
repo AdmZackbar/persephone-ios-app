@@ -137,7 +137,7 @@ struct FoodLogEntryEditView: View {
             Button(item.isEdit ? "Save" : "Add") {
                 item.save(modelContext)
                 dismiss()
-            }
+            }.disabled(item.isInvalid)
         }
     }
     

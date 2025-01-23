@@ -63,9 +63,14 @@ final class NavigationStore: ObservableObject {
         case .entries:
             LogCategoryView()
         case .add(let meal):
-            FoodLogEntryEditView(item: .init(meal: meal ?? logConfig.selectedMeal ?? "Breakfast"))
+            AddLogEntryView(date: logConfig.date, meal: meal ?? "Breakfast")
         case .edit(let entry):
-            FoodLogEntryEditView(item: .init(entry: entry))
+            switch entry {
+            case .food(let food):
+                FoodLogEntryEditView(item: .init(entry: food))
+            case .recipe(let recipe):
+                RecipeLogEntryEditView(item: .init(entry: recipe))
+            }
         }
     }
     
@@ -96,6 +101,10 @@ struct LogConfig: Hashable, Equatable {
     
     func contains(_ date: Date) -> Bool {
         self.date.day == date.day
+    }
+    
+    func contains(meal: String) -> Bool {
+        selectedMeal == nil || selectedMeal == meal
     }
     
     mutating func prev() {

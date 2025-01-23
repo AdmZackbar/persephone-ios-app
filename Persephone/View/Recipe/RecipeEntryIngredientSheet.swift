@@ -121,7 +121,8 @@ struct RecipeEntryIngredientSheet: View {
 }
 
 private struct SelectFoodView: View {
-    @Query(sort: \Food.name) var foods: [Food]
+    @Query(filter: #Predicate { $0.metaData.retireDate == nil },
+           sort: \Food.name) var foods: [Food]
     
     let suggestedFoods: [Food]
     

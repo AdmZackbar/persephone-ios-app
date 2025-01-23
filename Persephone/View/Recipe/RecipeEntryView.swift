@@ -138,7 +138,6 @@ struct RecipeEntryIngredientListEntryView: View {
     let entry: RecipeEntry = .init(name: "Baked Pork Tenderloin",
                                    notes: "In the oven for 20 min",
                                    total: .init(str: "2 tenderloins", val: 907),
-                                   remainingScale: 0.85,
                                    ingredients: [
                                      .init(
                                          food: .init(

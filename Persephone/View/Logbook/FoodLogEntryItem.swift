@@ -14,6 +14,12 @@ struct FoodLogEntryItem {
         entry != nil
     }
     
+    var isInvalid: Bool {
+        food == nil ||
+        amount.value.raw <= 0 ||
+        meal == ""
+    }
+    
     var numServings: Double {
         // Amount / Serving Amount
         if let food {

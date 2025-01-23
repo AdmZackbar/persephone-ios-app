@@ -9,25 +9,45 @@ import SwiftData
 import SwiftUI
 
 struct CookbookView: View {
+    @Query(sort: \RecipeEntry.date, order: .reverse) private var recipeEntries: [RecipeEntry]
+    
     @StateObject private var navigationStore = NavigationStore()
     
     @State private var viewType: ViewType = .current
+    @State private var filter: String = ""
     
     var body: some View {
+        let recipeEntries = recipeEntries.filter({ filter.isEmpty || $0.name.localizedCaseInsensitiveContains(filter) })
+        let filteredEntries = {
+            switch viewType {
+            case .current:
+                return recipeEntries.filter({ $0.hasRemaining })
+            case .past:
+                return recipeEntries.filter({ !$0.hasRemaining })
+            }
+        }()
         NavigationStack(path: $navigationStore.path) {
             Form {
                 Section("Recipes") {
-                    switch viewType {
-                    case .current:
-                        CurrentRecipeEntryView()
-                    case .past:
-                        OldRecipeEntryView()
+                    if filteredEntries.isEmpty {
+                        let placeholder = {
+                            switch viewType {
+                            case .current:
+                                "Remaining"
+                            case .past:
+                                "Previous"
+                            }
+                        }()
+                        Text("No \(placeholder) Entries")
+                    } else {
+                        ForEach(filteredEntries, id: \.hashValue, content: RecipeEntryButton.init)
                     }
                 }.headerProminence(.increased)
             }.navigationTitle("Cookbook")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar(content: toolbarContent)
                 .handleDestinations(navigationStore)
+                .searchable(text: $filter)
         }.environmentObject(navigationStore)
     }
     
@@ -55,34 +75,6 @@ struct CookbookView: View {
     private enum ViewType: String, CaseIterable {
         case current
         case past
-    }
-}
-
-private struct CurrentRecipeEntryView: View {
-    @Query(filter: #Predicate { $0.remainingScale > 0 },
-           sort: \RecipeEntry.date,
-           order: .reverse) private var recipeEntries: [RecipeEntry]
-    
-    var body: some View {
-        if recipeEntries.isEmpty {
-            Text("No Remaining Entries")
-        } else {
-            ForEach(recipeEntries, id: \.hashValue, content: RecipeEntryButton.init)
-        }
-    }
-}
-
-private struct OldRecipeEntryView: View {
-    @Query(filter: #Predicate { $0.remainingScale <= 0 },
-           sort: \RecipeEntry.date,
-           order: .reverse) private var recipeEntries: [RecipeEntry]
-    
-    var body: some View {
-        if recipeEntries.isEmpty {
-            Text("No Old Entries")
-        } else {
-            ForEach(recipeEntries, id: \.hashValue, content: RecipeEntryButton.init)
-        }
     }
 }
 

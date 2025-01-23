@@ -24,14 +24,19 @@ struct FoodView: View {
                 }.padding(.top, 8)
             } header: {
                 let category = food.metaData.category
-                HStack {
-                    if !category.isEmpty {
-                        Label(category, systemImage: "tag.fill")
+                VStack(alignment: .leading, spacing: 8) {
+                    if let retireDate = food.metaData.retireDate {
+                        Text("Retired: \(retireDate.formatted(date: .long, time: .omitted))")
+                            .italic()
                     }
-                    Spacer()
-                    Text("\(food.rating?.rawValue ?? "No") Tier")
+                    HStack {
+                        if !category.isEmpty {
+                            Label(category, systemImage: "tag.fill")
+                        }
+                        Spacer()
+                        Text("\(food.rating?.rawValue ?? "No") Tier")
+                    }.fontWeight(.semibold)
                 }.font(.subheadline)
-                    .fontWeight(.semibold)
                     .padding([.leading, .trailing], -12)
             }.headerProminence(.increased)
             if let notes = food.notes {

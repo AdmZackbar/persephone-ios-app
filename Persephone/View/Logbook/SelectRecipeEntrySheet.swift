@@ -1,63 +1,59 @@
 //
-//  SelectFoodSheet.swift
+//  SelectRecipeEntrySheet.swift
 //  Persephone
 //
-//  Created by Zach Wassynger on 1/18/25.
+//  Created by Zach Wassynger on 1/22/25.
 //
 
 import SwiftData
 import SwiftUI
 
-struct SelectFoodSheet: View {
+struct SelectRecipeEntrySheet: View {
     @Environment(\.dismiss) var dismiss
-    @Query(filter: #Predicate { $0.metaData.retireDate == nil },
-           sort: \Food.name) var foods: [Food]
-    
-    let suggestedFoods: [Food]
+    // TODO
+    @Query(filter: #Predicate { $0.removedScale < 1 },
+           sort: \RecipeEntry.date, order: .reverse) var entries: [RecipeEntry]
     
     var isFiltered: Bool {
-        filter.count > 1
+        !filter.isEmpty
     }
     
-    @Binding private var selection: Food?
+    @Binding private var selection: RecipeEntry?
     @State private var searchPresented: Bool = false
     @State private var filter: String = ""
     
-    init(selection: Binding<Food?>, suggestedFoods: [Food] = []) {
+    init(selection: Binding<RecipeEntry?>) {
         self._selection = selection
-        self.suggestedFoods = suggestedFoods
     }
     
     var body: some View {
         NavigationStack {
             Form {
-                let f: [Food] = {
+                let e: [RecipeEntry] = {
                     if isFiltered {
-                        return foods.filter({ $0.contains(filter) })
+                        return entries.filter({ $0.name.localizedCaseInsensitiveContains(filter) })
                     }
-                    return suggestedFoods
+                    return entries
                 }()
-                if f.isEmpty {
+                if e.isEmpty {
                     let reason = {
-                        if foods.isEmpty {
-                            "No Foods in DB"
-                        } else if isFiltered {
-                            "No Foods Matching \(filter)"
+                        if entries.isEmpty {
+                            "No Recipe Entries in DB"
                         } else {
-                            "No Suggested Foods"
+                            "No Recipes Matching \(filter)"
                         }
                     }()
                     Text(reason)
                 } else {
                     if isFiltered || searchPresented {
-                        foodsView(f)
+                        recipeEntriesView(e)
                     } else {
-                        Section("Recent Foods") {
-                            foodsView(f)
+                        Section("Recipe Entries") {
+                            recipeEntriesView(e)
                         }
                     }
                 }
-            }.navigationTitle("Select Food")
+            }.navigationTitle("Select Recipe")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
@@ -76,20 +72,18 @@ struct SelectFoodSheet: View {
     }
     
     @ViewBuilder
-    private func foodsView(_ foods: [Food]) -> some View {
-        ForEach(foods, id: \.hashValue) { food in
+    private func recipeEntriesView(_ entries: [RecipeEntry]) -> some View {
+        ForEach(entries, id: \.hashValue) { entry in
             Button {
-                selection = food
+                selection = entry
                 dismiss()
             } label: {
                 HStack {
                     VStack(alignment: .leading) {
-                        if let brand = food.brand {
-                            Text(brand)
-                                .font(.caption)
-                                .italic()
-                        }
-                        Text(food.name)
+                        Text(entry.date.formatted(date: .abbreviated, time: .shortened))
+                            .font(.subheadline)
+                            .italic()
+                        Text(entry.name)
                             .fontWeight(.semibold)
                     }
                     Spacer()
@@ -100,7 +94,7 @@ struct SelectFoodSheet: View {
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {
-    @Previewable @State var selection: Food? = nil
+    @Previewable @State var selection: RecipeEntry? = nil
     @Previewable @State var showing: Bool = false
     Form {
         Button(selection?.name ?? "No Selection") {
@@ -110,6 +104,6 @@ struct SelectFoodSheet: View {
             selection = nil
         }
     }.sheet(isPresented: $showing) {
-        SelectFoodSheet(selection: $selection)
+        SelectRecipeEntrySheet(selection: $selection)
     }
 }

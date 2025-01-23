@@ -17,11 +17,11 @@ struct RecipeEntryItem {
     var name: String
     var notes: String
     var total: FoodSize
-    var remainingScale: Double
+    var removedScale: Double
     var ingredients: [RecipeEntryIngredient]
     
     var isInvalid: Bool {
-        name.isEmpty || total.str.isEmpty || total.amount.value.raw <= 0 || remainingScale < 0 || remainingScale > 1
+        name.isEmpty || total.str.isEmpty || total.amount.value.raw <= 0 || removedScale < 0 || removedScale > 1
     }
     
     init(entry: RecipeEntry? = nil) {
@@ -30,7 +30,7 @@ struct RecipeEntryItem {
         self.name = entry?.name ?? ""
         self.notes = entry?.notes ?? ""
         self.total = entry?.total ?? .init()
-        self.remainingScale = entry?.remainingScale ?? 1
+        self.removedScale = entry?.removedScale ?? 1
         self.ingredients = entry?.ingredients ?? []
     }
     
@@ -40,11 +40,11 @@ struct RecipeEntryItem {
             entry.name = name
             entry.notes = notes.isEmpty ? nil : notes
             entry.total = total
-            entry.remainingScale = remainingScale
+            entry.removedScale = removedScale
             entry.ingredients = ingredients
             return nil
         }
-        entry = .init(date: date, name: name, notes: notes.isEmpty ? nil : notes, total: total, remainingScale: remainingScale, ingredients: ingredients)
+        entry = .init(date: date, name: name, notes: notes.isEmpty ? nil : notes, total: total, removedScale: removedScale, ingredients: ingredients)
         return entry
     }
 }

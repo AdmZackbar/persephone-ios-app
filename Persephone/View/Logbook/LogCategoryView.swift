@@ -9,8 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct LogCategoryView: View {
-    @Query(sort: \FoodLogEntry.date) private var entries: [FoodLogEntry]
-    @Environment(\.modelContext) var modelContext
+    @Query(sort: \FoodLogEntry.date) private var foodEntries: [FoodLogEntry]
+    @Query(sort: \RecipeLogEntry.date) private var recipeEntries: [RecipeLogEntry]
+    
+    @Environment(\.modelContext) private var modelContext
     
     @EnvironmentObject
     private var navigationStore: NavigationStore
@@ -18,22 +20,26 @@ struct LogCategoryView: View {
 //    @State private var sheetType: SheetType? = nil
     
     var body: some View {
-        let items = entries.filter({ navigationStore.logConfig.contains($0.date) })
-            .filter({ navigationStore.logConfig.selectedMeal == nil || $0.meal == navigationStore.logConfig.selectedMeal })
+        let entries: [LogEntry] = foodEntries.filter({ navigationStore.logConfig.contains($0.date) })
+            .filter({ navigationStore.logConfig.contains(meal: $0.meal) })
+            .map({ .food($0) }) +
+        recipeEntries.filter({ navigationStore.logConfig.contains($0.date) })
+            .filter({ navigationStore.logConfig.contains(meal: $0.meal) })
+            .map({ .recipe($0) })
         VStack(spacing: 0) {
             dateHeader()
                 .padding([.top, .bottom], 8)
                 .padding([.leading, .trailing], 24)
             Form {
                 Section {
-                    ForEach(items, id: \.hashValue, content: itemView)
+                    ForEach(entries, id: \.hashValue, content: entryView)
                 } header: {
                     mealButton()
                 }.headerProminence(.increased)
                 HStack(alignment: .top) {
-                    LogbookPieChart(nutrients: items.totalNutrients, price: items.totalCost ?? .zero)
+                    LogbookPieChart(nutrients: entries.nutrients, price: entries.cost ?? .zero)
                         .frame(width: 160, height: 160)
-                    verticalMacroView(items.totalNutrients)
+                    verticalMacroView(entries.nutrients)
                 }
             }
             Spacer()
@@ -93,35 +99,16 @@ struct LogCategoryView: View {
     }
     
     @ViewBuilder
-    private func itemView(_ entry: FoodLogEntry) -> some View {
+    private func entryView(_ entry: LogEntry) -> some View {
         Button {
-            navigationStore.push(LogViewType.edit(entry))
+            // TODO show sheet
         } label: {
-            VStack(alignment: .leading, spacing: 2) {
-                if let brand = entry.food.brand {
-                    Text(brand)
-                        .font(.subheadline)
-                        .opacity(0.7)
-                }
-                Text(entry.food.name)
-                    .bold()
-                HStack {
-                    Text(entry.nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
-                    Spacer()
-                    Text(entry.amount.formatted(includeSpace: true))
-                }.font(.subheadline)
-                    .fontWeight(.semibold)
-                HStack {
-                    MacroSummaryView(entry.nutrients)
-                        .italic()
-                        .fontWeight(.semibold)
-                    Spacer()
-                    if let cost = entry.cost {
-                        Text(cost.formatted())
-                            .italic()
-                    }
-                }.font(.subheadline)
-            }.contentShape(Rectangle())
+            switch entry {
+            case .food(let food):
+                foodLogEntry(food)
+            case .recipe(let recipe):
+                recipeLogEntry(recipe)
+            }
         }.buttonStyle(.plain)
             .contextMenu {
                 Button {
@@ -140,9 +127,17 @@ struct LogCategoryView: View {
                     Label("Delete", systemImage: "trash")
                 }
             } preview: {
-                FoodLogEntryPreview(entry: entry)
-                    .padding()
-                    .frame(width: 300)
+                switch entry {
+                case .food(let food):
+                    FoodLogEntryPreview(entry: food)
+                        .padding()
+                        .frame(width: 300)
+                case .recipe(let recipe):
+                    // TODO
+                    RecipeEntryPreview(entry: recipe.recipe)
+                        .padding()
+                        .frame(width: 300)
+                }
             }
             .swipeActions(allowsFullSwipe: false) {
                 Button {
@@ -163,22 +158,92 @@ struct LogCategoryView: View {
             }
     }
     
-    private func edit(_ entry: FoodLogEntry) {
+    @ViewBuilder
+    private func foodLogEntry(_ entry: FoodLogEntry) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if let brand = entry.food.brand {
+                Text(brand)
+                    .font(.subheadline)
+                    .opacity(0.7)
+            }
+            Text(entry.food.name)
+                .bold()
+            HStack {
+                Text(entry.nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
+                Spacer()
+                Text(entry.amount.formatted(includeSpace: true))
+            }.font(.subheadline)
+                .fontWeight(.semibold)
+            HStack {
+                MacroSummaryView(entry.nutrients)
+                    .italic()
+                    .fontWeight(.semibold)
+                Spacer()
+                if let cost = entry.cost {
+                    Text(cost.formatted())
+                        .italic()
+                }
+            }.font(.subheadline)
+        }.contentShape(Rectangle())
+    }
+    
+    @ViewBuilder
+    private func recipeLogEntry(_ entry: RecipeLogEntry) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(entry.recipe.name)
+                .bold()
+            HStack {
+                Text(entry.nutrients.calories.formatted(maxDigits: 0, includeSpace: true))
+                Spacer()
+                Text(entry.size.formatted())
+            }.font(.subheadline)
+                .fontWeight(.semibold)
+            HStack {
+                MacroSummaryView(entry.nutrients)
+                    .italic()
+                    .fontWeight(.semibold)
+                Spacer()
+                if let cost = entry.cost {
+                    Text(cost.formatted())
+                        .italic()
+                }
+            }.font(.subheadline)
+        }.contentShape(Rectangle())
+    }
+    
+    private func edit(_ entry: LogEntry) {
         navigationStore.push(LogViewType.edit(entry))
     }
     
-    private func duplicate(_ entry: FoodLogEntry) {
-        let copy = FoodLogEntry(date: entry.date,
-                                food: entry.food,
-                                amount: entry.amount,
-                                meal: entry.meal,
-                                servingCost: entry.servingCost)
-        modelContext.insert(copy)
-        navigationStore.push(LogViewType.edit(copy))
+    private func duplicate(_ entry: LogEntry) {
+        switch entry {
+        case .food(let food):
+            let copy = FoodLogEntry(date: food.date,
+                                    food: food.food,
+                                    amount: food.amount,
+                                    meal: food.meal,
+                                    servingCost: food.servingCost)
+            modelContext.insert(copy)
+            navigationStore.push(LogViewType.edit(.food(copy)))
+        case .recipe(let recipe):
+            let copy = RecipeLogEntry(date: recipe.date,
+                                      recipe: recipe.recipe,
+                                      amountScale: recipe.amountScale,
+                                      meal: recipe.meal)
+            modelContext.insert(copy)
+            navigationStore.push(LogViewType.edit(.recipe(recipe)))
+            break
+        }
+        
     }
     
-    private func delete(_ entry: FoodLogEntry) {
-        modelContext.delete(entry)
+    private func delete(_ entry: LogEntry) {
+        switch entry {
+        case .food(let food):
+            modelContext.delete(food)
+        case .recipe(let recipe):
+            modelContext.delete(recipe)
+        }
     }
     
     @ViewBuilder
@@ -242,4 +307,12 @@ struct MacroSummaryView: View {
             Text("\(nutrients.get(.Sodium)?.formatted(maxDigits: 0) ?? "0mg")")
         }
     }
+}
+
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    @Previewable @StateObject var navigationStore = NavigationStore()
+    NavigationStack(path: $navigationStore.path) {
+        LogCategoryView()
+            .handleDestinations(navigationStore)
+    }.environmentObject(navigationStore)
 }

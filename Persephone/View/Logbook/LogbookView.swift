@@ -12,8 +12,10 @@ import UniformTypeIdentifiers
 struct LogbookView: View {
     @Environment(\.modelContext) var modelContext
     
-    @Query(sort: \FoodLogEntry.date) private var entries: [FoodLogEntry]
-    @Query(sort: \Food.name) private var foods: [Food]
+    @Query(sort: \FoodLogEntry.date) private var foodEntries: [FoodLogEntry]
+    @Query(sort: \RecipeLogEntry.date) private var recipeEntries: [RecipeLogEntry]
+    @Query(filter: #Predicate { $0.metaData.retireDate == nil },
+           sort: \Food.name) private var foods: [Food]
     
     static let Meals: [String] = [
         "Breakfast",
@@ -27,9 +29,12 @@ struct LogbookView: View {
     @State private var importing = false
     
     var body: some View {
-        let entries = entries.filter({ navigationStore.logConfig.contains($0.date) })
-        let entryMap: [String : [FoodLogEntry]] = {
-            var map: [String : [FoodLogEntry]] = [:]
+        let entries: [LogEntry] = foodEntries.filter({ navigationStore.logConfig.contains($0.date) })
+            .map({ .food($0) }) +
+        recipeEntries.filter({ navigationStore.logConfig.contains($0.date) })
+            .map({ .recipe($0) })
+        let entryMap: [String : [LogEntry]] = {
+            var map: [String : [LogEntry]] = [:]
             entries.forEach({ entry in
                 if Self.Meals.contains(where: { $0 == entry.meal }) {
                     map[entry.meal, default: []].append(entry)
@@ -45,7 +50,7 @@ struct LogbookView: View {
                     .padding()
                 Form {
                     Section("Summary") {
-                        nutrientView(nutrients: entries.totalNutrients, price: entries.totalCost ?? .zero)
+                        nutrientView(nutrients: entries.nutrients, price: entries.cost ?? .zero)
                     }
                     Section("Meals") {
                         ForEach(Self.Meals, id: \.hashValue) { meal in
@@ -98,7 +103,7 @@ struct LogbookView: View {
     }
     
     @ViewBuilder
-    private func mealButton(meal: String, entries: [FoodLogEntry]) -> some View {
+    private func mealButton(meal: String, entries: [LogEntry]) -> some View {
         Button {
             navigationStore.logConfig.selectedMeal = meal
             navigationStore.push(LogViewType.entries)
@@ -108,17 +113,22 @@ struct LogbookView: View {
                     Text(meal.capitalized)
                         .font(.title3)
                         .bold()
-                    Text((entries.totalCost ?? .zero).formatted())
+                    Text((entries.cost ?? .zero).formatted())
                         .italic()
                 }
                 Spacer()
-                horizontalMacroView(entries.totalNutrients)
+                horizontalMacroView(entries.nutrients)
             }.contentShape(Rectangle())
         }.buttonStyle(.plain)
             .contextMenu {
                 Button(role: .destructive) {
                     for entry in entries {
-                        modelContext.delete(entry)
+                        switch entry {
+                        case .food(let food):
+                            modelContext.delete(food)
+                        case .recipe(let recipe):
+                            modelContext.delete(recipe)
+                        }
                     }
                 } label: {
                     Label("Clear All", systemImage: "trash")
@@ -177,5 +187,9 @@ struct LogbookView: View {
 enum LogViewType: Hashable {
     case entries
     case add(meal: String? = nil)
-    case edit(_ entry: FoodLogEntry)
+    case edit(_ entry: LogEntry)
+}
+
+#Preview(traits: .modifier(MockDataPreviewModifier())) {
+    LogbookView()
 }

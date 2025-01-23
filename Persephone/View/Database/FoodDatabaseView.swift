@@ -15,6 +15,7 @@ struct FoodDatabaseView: View {
     
     @StateObject private var navigationStore = NavigationStore()
     
+    @State private var foodState: FoodState = .active
     @State private var filter: String = ""
     @State private var confirmDelete = false
     @State private var deleteItem: Food? = nil
@@ -22,7 +23,7 @@ struct FoodDatabaseView: View {
     var body: some View {
         NavigationStack(path: $navigationStore.path) {
             Form {
-                ForEach(foods.filter({ filter.isEmpty || $0.contains(filter) }), id: \.hashValue) { food in
+                ForEach(foods.filter(foodState.isFiltered).filter({ filter.isEmpty || $0.contains(filter) }), id: \.hashValue) { food in
                     Button {
                         navigationStore.push(FoodViewType.viewFood(food))
                     } label: {
@@ -92,11 +93,33 @@ struct FoodDatabaseView: View {
     
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
+        ToolbarItemGroup(placement: .principal) {
+            Picker("", selection: $foodState) {
+                ForEach(FoodState.allCases, id: \.hashValue) { type in
+                    Text(type.rawValue.capitalized).tag(type)
+                }
+            }.pickerStyle(.segmented)
+                .frame(width: 160)
+        }
         ToolbarItem(placement: .primaryAction) {
             Button {
                 navigationStore.push(FoodViewType.addFood)
             } label: {
                 Label("Add Food", systemImage: "plus").labelStyle(.iconOnly)
+            }
+        }
+    }
+    
+    private enum FoodState: String, CaseIterable {
+        case active
+        case retired
+        
+        func isFiltered(_ food: Food) -> Bool {
+            switch self {
+            case .active:
+                !food.isRetired
+            case .retired:
+                food.isRetired
             }
         }
     }

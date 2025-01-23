@@ -18,22 +18,23 @@ extension SchemaV1 {
         var name: String = ""
         var notes: String? = nil
         var total: FoodSize = FoodSize()
-        var remainingScale: Double = 1
+        var removedScale: Double = 0
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeEntryIngredient.recipe)
         var ingredients: [RecipeEntryIngredient]! = []
+        @Relationship(deleteRule: .cascade, inverse: \RecipeLogEntry.recipe)
+        var logEntries: [RecipeLogEntry]! = []
         
         init(date: Date = .now,
              name: String = "",
              notes: String? = nil,
              total: FoodSize = .init(),
-             remainingScale: Double = 1,
+             removedScale: Double = 0,
              ingredients: [RecipeEntryIngredient] = []) {
             self.date = date
             self.name = name
             self.notes = notes
             self.total = total
-            self.remainingScale = remainingScale
             self.ingredients = ingredients
         }
     }

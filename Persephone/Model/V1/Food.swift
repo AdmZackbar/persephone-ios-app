@@ -44,19 +44,22 @@ extension SchemaV1 {
             var category: String
             var notes: String
             var rating: Double?
+            var retireDate: Date?
             
             init(timestamp: Date = .now,
                  barcode: String? = nil,
                  brand: String = "",
                  category: String = "",
                  notes: String = "",
-                 rating: Double? = nil) {
+                 rating: Double? = nil,
+                 retireDate: Date? = nil) {
                 self.timestamp = timestamp
                 self.barcode = barcode
                 self.brand = brand
                 self.category = category
                 self.notes = notes
                 self.rating = rating
+                self.retireDate = retireDate
             }
         }
         

@@ -64,6 +64,7 @@ struct FoodEditView: View {
                     .autocorrectionDisabled()
             }
             RatingTierEditor(label: "Rating:", rating: $item.rating)
+            OptionalDatePicker(text: "Retired:", selection: $item.metaData.retireDate)
             TextField("Notes", text: $item.metaData.notes, axis: .vertical)
                 .lineLimit(3...12)
                 .textInputAutocapitalization(.sentences)

@@ -15,16 +15,16 @@ extension SchemaV1 {
     final class RecipeLogEntry {
         var date: Date = Date()
         var recipe: RecipeEntry! = nil
-        var amountScale: Double = 1
+        var amount: Amount = Amount(value: .zero)
         var meal: String = ""
         
         init(date: Date = .now,
              recipe: RecipeEntry? = nil,
-             amountScale: Double = 1,
+             amount: Amount = .init(value: .zero),
              meal: String = "") {
             self.date = date
             self.recipe = recipe
-            self.amountScale = amountScale
+            self.amount = amount
             self.meal = meal
         }
     }

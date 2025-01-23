@@ -18,7 +18,7 @@ extension SchemaV1 {
         var name: String = ""
         var notes: String? = nil
         var total: FoodSize = FoodSize()
-        var removedScale: Double = 0
+        var retired: Bool = false
         
         @Relationship(deleteRule: .cascade, inverse: \RecipeEntryIngredient.recipe)
         var ingredients: [RecipeEntryIngredient]! = []
@@ -29,12 +29,13 @@ extension SchemaV1 {
              name: String = "",
              notes: String? = nil,
              total: FoodSize = .init(),
-             removedScale: Double = 0,
+             retired: Bool = false,
              ingredients: [RecipeEntryIngredient] = []) {
             self.date = date
             self.name = name
             self.notes = notes
             self.total = total
+            self.retired = retired
             self.ingredients = ingredients
         }
     }

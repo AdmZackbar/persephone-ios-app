@@ -11,7 +11,7 @@ import SwiftUI
 struct SelectRecipeEntrySheet: View {
     @Environment(\.dismiss) var dismiss
     // TODO
-    @Query(filter: #Predicate { $0.removedScale < 1 },
+    @Query(filter: #Predicate { !$0.retired },
            sort: \RecipeEntry.date, order: .reverse) var entries: [RecipeEntry]
     
     var isFiltered: Bool {

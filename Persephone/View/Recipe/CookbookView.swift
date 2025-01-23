@@ -21,9 +21,9 @@ struct CookbookView: View {
         let filteredEntries = {
             switch viewType {
             case .current:
-                return recipeEntries.filter({ $0.hasRemaining })
+                return recipeEntries.filter({ !$0.retired })
             case .past:
-                return recipeEntries.filter({ !$0.hasRemaining })
+                return recipeEntries.filter({ $0.retired })
             }
         }()
         NavigationStack(path: $navigationStore.path) {
@@ -143,8 +143,9 @@ private struct RecipeEntryButton: View {
                     .font(.subheadline)
             }
             Spacer()
-            Gauge(value: entry.remainingScale, in: 0...1) {
-                Text(entry.remaining.value.formatted(maxDigits: 0))
+            Gauge(value: entry.usedScale, in: 0...1) {
+                // TODO
+                Text(entry.total.value.formatted(maxDigits: 0))
             }.gaugeStyle(.accessoryCircularCapacity)
         }
     }

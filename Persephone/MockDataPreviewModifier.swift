@@ -86,7 +86,7 @@ struct MockDataPreviewModifier: PreviewModifier {
                     amount: .init(value: .raw(1102), unit: Units.gram))
               ])
         entry.logEntries = [
-            .init(amountScale: 0.2, meal: "Lunch")
+            .init(amount: .init(value: .raw(140), unit: Units.gram), meal: "Lunch")
         ]
         return entry
     }

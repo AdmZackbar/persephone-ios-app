@@ -63,14 +63,14 @@ final class NavigationStore: ObservableObject {
         case .entries:
             LogCategoryView()
         case .add(let meal):
-            AddLogEntryView(date: logConfig.date, meal: meal ?? "Breakfast")
+            let date: Date = {
+                let current = Date()
+                let time = current.timeIntervalSince(Date.from(year: current.year, month: current.month, day: current.day))
+                return logConfig.date.addingTimeInterval(time)
+            }()
+            LogEntryEditView(item: .init(date: date, meal: meal ?? "Breakfast"))
         case .edit(let entry):
-            switch entry {
-            case .food(let food):
-                FoodLogEntryEditView(item: .init(entry: food))
-            case .recipe(let recipe):
-                RecipeLogEntryEditView(item: .init(entry: recipe))
-            }
+            LogEntryEditView(item: .init(entry: entry))
         }
     }
     

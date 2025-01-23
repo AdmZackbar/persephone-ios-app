@@ -228,7 +228,7 @@ struct LogCategoryView: View {
         case .recipe(let recipe):
             let copy = RecipeLogEntry(date: recipe.date,
                                       recipe: recipe.recipe,
-                                      amountScale: recipe.amountScale,
+                                      amount: recipe.amount,
                                       meal: recipe.meal)
             modelContext.insert(copy)
             navigationStore.push(LogViewType.edit(.recipe(recipe)))

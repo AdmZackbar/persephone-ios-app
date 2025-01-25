@@ -299,15 +299,20 @@ extension [FoodLogEntry] {
 
 extension RecipeEntry {
     var usedScale: Double {
-        if retired {
-            return 1
-        }
         let totalUsed = logEntries.map({ $0.amount.value.raw }).reduce(0, +)
         return max(0, min(1, totalUsed / total.value.value.raw))
     }
     
+    var remainingScale: Double {
+        1 - usedScale
+    }
+    
     var hasRemaining: Bool {
-        usedScale < 1
+        remainingScale > 0
+    }
+    
+    var remaining: FoodSize {
+        total * remainingScale
     }
     
     var nutrients: Nutrients {

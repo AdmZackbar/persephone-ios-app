@@ -101,7 +101,7 @@ struct LogCategoryView: View {
         Button {
             sheetType = .amount(entry)
         } label: {
-            logEntryView(entry)
+            LogEntryListEntryView(entry)
                 .contentShape(Rectangle())
         }.buttonStyle(.plain)
             .contextMenu {
@@ -150,35 +150,6 @@ struct LogCategoryView: View {
                     Label("Edit", systemImage: "pencil").tint(.gray)
                 }
             }
-    }
-    
-    @ViewBuilder
-    private func logEntryView(_ entry: LogEntry) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            if let brand = entry.brand {
-                Text(brand)
-                    .font(.subheadline)
-                    .opacity(0.7)
-            }
-            Text(entry.name)
-                .bold()
-            HStack {
-                Text(entry.nutrients.calories.formatted())
-                Spacer()
-                Text(entry.amount.formatted(maxDigits: 1))
-            }.font(.subheadline)
-                .fontWeight(.semibold)
-            HStack {
-                MacroSummaryView(entry.nutrients)
-                    .italic()
-                    .fontWeight(.semibold)
-                Spacer()
-                if let cost = entry.cost {
-                    Text(cost.formatted())
-                        .italic()
-                }
-            }.font(.subheadline)
-        }
     }
     
     private func edit(_ entry: LogEntry) {
@@ -264,6 +235,42 @@ private enum SheetType: Identifiable {
     }
     
     case amount(_ entry: LogEntry)
+}
+
+struct LogEntryListEntryView: View {
+    let entry: LogEntry
+    
+    init(_ entry: LogEntry) {
+        self.entry = entry
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if let brand = entry.brand {
+                Text(brand)
+                    .font(.subheadline)
+                    .opacity(0.7)
+            }
+            Text(entry.name)
+                .bold()
+            HStack {
+                Text(entry.nutrients.calories.formatted())
+                Spacer()
+                Text(entry.amount.formatted(maxDigits: 1))
+            }.font(.subheadline)
+                .fontWeight(.semibold)
+            HStack {
+                MacroSummaryView(entry.nutrients)
+                    .italic()
+                    .fontWeight(.semibold)
+                Spacer()
+                if let cost = entry.cost {
+                    Text(cost.formatted())
+                        .italic()
+                }
+            }.font(.subheadline)
+        }
+    }
 }
 
 struct MacroSummaryView: View {

@@ -30,9 +30,8 @@ struct RecipeEntryPreview: View {
                             .italic()
                     }
                 }
-                // TODO
-                Gauge(value: entry.usedScale, in: 0...1) {
-                    Text(entry.total.value.formatted(maxDigits: 0))
+                Gauge(value: entry.remainingScale, in: 0...1) {
+                    Text(entry.remaining.value.formatted(maxDigits: 0))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                 }.gaugeStyle(.accessoryCircularCapacity)

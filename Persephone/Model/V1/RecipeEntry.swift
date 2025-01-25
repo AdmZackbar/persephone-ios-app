@@ -30,13 +30,15 @@ extension SchemaV1 {
              notes: String? = nil,
              total: FoodSize = .init(),
              retired: Bool = false,
-             ingredients: [RecipeEntryIngredient] = []) {
+             ingredients: [RecipeEntryIngredient] = [],
+             logEntries: [RecipeLogEntry] = []) {
             self.date = date
             self.name = name
             self.notes = notes
             self.total = total
             self.retired = retired
             self.ingredients = ingredients
+            self.logEntries = logEntries
         }
     }
     

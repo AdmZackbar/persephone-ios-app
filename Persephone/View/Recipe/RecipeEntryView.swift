@@ -34,9 +34,8 @@ struct RecipeEntryView: View {
                             .fontWeight(.semibold)
                     }
                     Spacer()
-                    // TODO
-                    Gauge(value: entry.usedScale, in: 0...1) {
-                        Text(entry.total.value.formatted())
+                    Gauge(value: entry.remainingScale, in: 0...1) {
+                        Text(entry.remaining.value.formatted())
                             .font(.subheadline)
                             .fontWeight(.semibold)
                     }.gaugeStyle(.accessoryCircularCapacity)
@@ -52,6 +51,13 @@ struct RecipeEntryView: View {
             }
             Section("Per Serving") {
                 NutrientsView(nutrients: servingNutrients)
+            }
+            if let logEntries = entry.logEntries, !logEntries.isEmpty {
+                Section("Log Entries") {
+                    ForEach(logEntries, id: \.hashValue) { entry in
+                        LogEntryListEntryView(.recipe(entry))
+                    }
+                }
             }
         }.navigationTitle(entry.name)
             .navigationBarTitleDisplayMode(.inline)
@@ -136,20 +142,24 @@ struct RecipeEntryIngredientListEntryView: View {
 
 #Preview {
     @Previewable @StateObject var navigationStore = NavigationStore()
-    let entry: RecipeEntry = .init(name: "Baked Pork Tenderloin",
-                                   notes: "In the oven for 20 min",
-                                   total: .init(str: "2 tenderloins", val: 907),
-                                   ingredients: [
-                                     .init(
-                                         food: .init(
-                                             name: "Pork Tenderloin",
-                                             metaData: .init(brand: "Publix", category: "Beef"),
-                                             ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7]),
-                                             servingSize: .init(str: "4 oz", val: 112)),
-                                         amount: .init(value: .raw(1102), unit: Units.gram),
-                                         servingCost: .usd(134),
-                                         notes: "Tenderized and trimmed")
-                                   ])
+    let entry: RecipeEntry = .init(
+        name: "Baked Pork Tenderloin",
+        notes: "In the oven for 20 min",
+        total: .init(str: "2 tenderloins", val: 907),
+        ingredients: [
+            .init(
+                food: .init(
+                    name: "Pork Tenderloin",
+                    metaData: .init(brand: "Publix", category: "Beef"),
+                    ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7]),
+                    servingSize: .init(str: "4 oz", val: 112)),
+                amount: .init(value: .raw(1102), unit: Units.gram),
+                servingCost: .usd(134),
+                notes: "Tenderized and trimmed")
+        ],
+        logEntries: [
+            .init(amount: .init(value: .raw(68), unit: Units.gram), meal: "Breakfast")
+        ])
     NavigationStack(path: $navigationStore.path) {
         RecipeEntryView(entry: entry)
             .handleDestinations(navigationStore)

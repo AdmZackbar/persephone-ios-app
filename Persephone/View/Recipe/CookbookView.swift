@@ -101,6 +101,7 @@ private struct RecipeEntryButton: View {
             }
             .contextMenu {
                 editButton()
+                retireButton()
                 deleteButton()
             } preview: {
                 RecipeEntryPreview(entry: entry)
@@ -114,6 +115,12 @@ private struct RecipeEntryButton: View {
             navigationStore.push(CookbookViewType.editEntry(entry))
         } label: {
             Label("Edit", systemImage: "pencil.circle")
+        }
+    }
+    
+    private func retireButton() -> some View {
+        Button(entry.retired ? "Un-retire" : "Retire") {
+            entry.retired.toggle()
         }
     }
     
@@ -143,9 +150,8 @@ private struct RecipeEntryButton: View {
                     .font(.subheadline)
             }
             Spacer()
-            Gauge(value: entry.usedScale, in: 0...1) {
-                // TODO
-                Text(entry.total.value.formatted())
+            Gauge(value: entry.remainingScale, in: 0...1) {
+                Text(entry.remaining.value.formatted())
             }.gaugeStyle(.accessoryCircularCapacity)
         }
     }

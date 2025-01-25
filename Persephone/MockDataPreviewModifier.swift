@@ -74,20 +74,21 @@ struct MockDataPreviewModifier: PreviewModifier {
     }
     
     static func createTestRecipeEntry() -> RecipeEntry {
-        let entry = RecipeEntry(name: "Baked Pork Tenderloin",
-              notes: "In the oven for 20 min",
-              total: .init(str: "2 tenderloins", val: 907),
-              ingredients: [
+        let entry = RecipeEntry(
+            name: "Baked Pork Tenderloin",
+            notes: "In the oven for 20 min",
+            total: .init(str: "2 tenderloins", val: 907),
+            ingredients: [
                 .init(
                     food: .init(
                         name: "Pork Tenderloin",
                         ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7]),
                         servingSize: .init(str: "4 oz", val: 112)),
                     amount: .init(value: .raw(1102), unit: Units.gram))
-              ])
-        entry.logEntries = [
-            .init(amount: .init(value: .raw(140), unit: Units.gram), meal: "Lunch")
-        ]
+            ],
+            logEntries: [
+                .init(amount: .init(value: .raw(140), unit: Units.gram), meal: "Lunch")
+            ])
         return entry
     }
     

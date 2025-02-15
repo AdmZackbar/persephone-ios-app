@@ -97,7 +97,7 @@ struct LogConfig: Hashable, Equatable {
     var selectedMeal: String? = nil
     
     func contains(_ date: Date) -> Bool {
-        self.date.day == date.day
+        self.date.day == date.day && self.date.month == date.month && self.date.year == date.year
     }
     
     func contains(meal: String) -> Bool {

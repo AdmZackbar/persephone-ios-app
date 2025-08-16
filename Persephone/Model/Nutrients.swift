@@ -12,7 +12,11 @@ typealias Nutrients = [Nutrient : Double]
 
 extension Nutrients {
     var calories: Amount {
-        return .init(value: .raw(self[.Energy, default: 0]), unit: Units.calorie)
+        .init(value: .raw(self[.Energy, default: 0]), unit: Units.calorie)
+    }
+    
+    var netCarbs: Amount {
+        .init(value: .raw(self[.TotalCarbs, default: 0] - self[.DietaryFiber, default: 0]), unit: Units.gram)
     }
     
     func get(_ nutrient: Nutrient) -> Amount? {

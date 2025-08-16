@@ -39,6 +39,7 @@ struct LogCategoryView: View {
                         .frame(width: 160, height: 160)
                     verticalMacroView(entries.nutrients)
                 }
+                NutrientsView(nutrients: entries.nutrients)
             }
             Spacer()
         }.navigationTitle("Logbook")
@@ -199,6 +200,7 @@ struct LogCategoryView: View {
                 .font(.title3)
                 .foregroundStyle(Colors.protein)
             Text("Sodium: \(nutrients.get(.Sodium)?.formatted(includeSpace: false) ?? "0mg")")
+            Text("Net Carbs: \(nutrients.netCarbs.formatted(includeSpace: false))")
         }.bold()
     }
     
@@ -292,6 +294,10 @@ struct MacroSummaryView: View {
                 .foregroundStyle(Colors.protein)
             Text("·")
             Text("\(nutrients.get(.Sodium)?.formatted(includeSpace: false) ?? "0mg")")
+            Text("·")
+            Text("\(nutrients.netCarbs.formatted(includeSpace: false))")
+                .foregroundStyle(Colors.carbs)
+                .opacity(0.6)
         }
     }
 }

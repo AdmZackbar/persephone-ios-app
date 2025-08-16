@@ -61,6 +61,9 @@ struct LogbookView: View {
                             navigationStore.push(LogViewType.entries)
                         }
                     }
+                    Section("Nutrition") {
+                        NutrientsView(nutrients: entries.nutrients)
+                    }
                 }.headerProminence(.increased)
             }.navigationTitle("Logbook")
                 .navigationBarTitleDisplayMode(.inline)
@@ -180,6 +183,7 @@ struct LogbookView: View {
                 .font(.title3)
                 .foregroundStyle(Colors.protein)
             Text("Sodium: \(nutrients.get(.Sodium)?.formatted(includeSpace: false) ?? "0mg")")
+            Text("Net Carbs: \(nutrients.netCarbs.formatted(includeSpace: false))")
         }.bold()
     }
 }

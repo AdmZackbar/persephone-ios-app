@@ -95,7 +95,7 @@ struct MockDataPreviewModifier: PreviewModifier {
     static func createTestFoodLogEntry() -> FoodLogEntry {
         .init(food: .init(
             name: "Pork Tenderloin",
-            ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7]),
+            ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7, .TotalCarbs: 3, .DietaryFiber: 1]),
             servingSize: .init(str: "4 oz", val: 112)),
               amount: .init(value: .raw(203), unit: Units.gram),
               meal: "Lunch",

@@ -25,6 +25,7 @@ struct MockDataPreviewModifier: PreviewModifier {
         container.mainContext.insert(createTestFood())
         container.mainContext.insert(createTestRecipeEntry())
         container.mainContext.insert(createTestFoodLogEntry())
+//        insertTestMeals(container)
 //        container.mainContext.insert(createRecipe())
     }
     
@@ -101,6 +102,32 @@ struct MockDataPreviewModifier: PreviewModifier {
               meal: "Lunch",
               servingCost: .usd(203))
     }
+    
+//    static func insertTestMeals(_ container: ModelContainer) {
+//        let foods: [Food] = [
+//            .init(name: "Artisan Roll", metaData: .init(brand: "Kirkland", category: "Bread"), servingSize: .init(str: "1 loaf", val: 100)),
+//            .init(name: "Sharp Cheddar", metaData: .init(brand: "Adams Reserve", category: "Cheese"), servingSize: .init(str: "1 slice", val: 21)),
+//            .init(name: "Sliced Ham", metaData: .init(brand: "Kirkland", category: "Ham"), servingSize: .init(str: "2 slices", val: 56)),
+//            .init(name: "CFA Sauce", metaData: .init(brand: "Chick-Fil-A", category: "Sauce"), servingSize: .init(str: "1 oz", val: 32)),
+//            .init(name: "Jasmine Rice", metaData: .init(brand: "Botan", category: "Rice"), servingSize: .init(str: "45 g", val: 45)),
+//            .init(name: "Pork Tenderloin", metaData: .init(brand: "Swift", category: "Pork"), servingSize: .init(str: "4 oz", val: 112)),
+//            .init(name: "Green Beans", metaData: .init(brand: "Kirkland", category: "Vegetables"), servingSize: .init(str: "85 g", val: 85)),
+//        ]
+//        let meals: [Meal] = [
+//            .init(name: "Zach's Sandwich"),
+//            .init(name: "Slop Bowl"),
+//        ]
+//        let mealItems: [MealItem] = [
+//            .init(meal: meals[0], food: foods[0]),
+//            .init(meal: meals[0], food: foods[1]),
+//            .init(meal: meals[0], food: foods[2], defaultAmount: .init(value: .raw(2))),
+//            .init(meal: meals[0], food: foods[3], defaultAmount: .init(value: .raw(5), unitStr: "g")),
+//            .init(meal: meals[1], food: foods[4]),
+//            .init(meal: meals[1], food: foods[5]),
+//            .init(meal: meals[1], food: foods[6]),
+//        ]
+//        mealItems.forEach(container.mainContext.insert)
+//    }
     
 //    static func createRecipe() -> Recipe {
 //        .init(

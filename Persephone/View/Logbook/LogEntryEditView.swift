@@ -41,6 +41,8 @@ struct LogEntryEditView: View {
                 foodSection()
             case .recipe:
                 recipeSection()
+            case .meal:
+                mealSection()
             }
         }.navigationTitle(item.isEdit ? "Edit Entry" : "Add Entry")
             .navigationBarTitleDisplayMode(.inline)
@@ -65,6 +67,8 @@ struct LogEntryEditView: View {
                     SelectFoodSheet(selection: $item.food, suggestedFoods: recentEntries.map({ $0.food }).uniqued().prefix(24).map({ $0! }))
                 case .recipe:
                     SelectRecipeEntrySheet(selection: $item.recipe)
+                case .meal:
+                    SelectMealSheet(selection: $item.mealEntry)
                 }
             }
             .toolbar {
@@ -120,8 +124,12 @@ struct LogEntryEditView: View {
                 LazyHStack(spacing: 12) {
                     ForEach(amounts, id: \.hashValue) { amount in
                         Button(amount.formatted(maxDigits: 1)) {
-                            // TODO fix bug with switching units
-                            item.amount = amount
+                            Task {
+                                item.amount.unitStr = amount.unitStr
+                                // TODO horrible hack to fix switch bug
+                                try await Task.sleep(nanoseconds: 50_000_000)
+                                item.amount.value = amount.value
+                            }
                         }
                     }
                 }
@@ -205,15 +213,47 @@ struct LogEntryEditView: View {
     }
     
     @ViewBuilder
+    private func mealSection() -> some View {
+        Section("Meal") {
+            if let meal = item.mealEntry {
+                Text(meal.name)
+            }
+            // TODO
+//            if let meal = item.mealEntry {
+//                let units: [Amount.Unit] = {
+//                    let servingUnit = Amount.Unit(name: "Serving", abbreviation: recipe.total.amount.unit?.abbreviation ?? "serving", modifier: recipe.total.val / recipe.total.amount.value.raw)
+//                    if recipe.total.isMass {
+//                        return [servingUnit, Units.gram, Units.ounce, Units.pound]
+//                    } else {
+//                        return [servingUnit, Units.milliliter, Units.fluidounce]
+//                    }
+//                }()
+//                ScaledAmountField(amount: $item.amount, units: units)
+//                otherAmountView(recipe)
+//                recipeView(recipe)
+//            }
+            Button {
+                sheetType = .meal
+            } label: {
+                Label(item.food != nil ? "Change Meal" : "Select Meal", systemImage: "fork.knife")
+            }
+        }
+    }
+    
+    @ViewBuilder
     private func otherAmountView(_ recipe: RecipeEntry) -> some View {
         let amounts = (recipe.logEntries ?? []).sorted(by: { $0.date > $1.date }).map({ $0.amount }).uniqued()
         if !amounts.isEmpty {
             ScrollView(.horizontal) {
-                LazyHStack(spacing: 12) {
+                HStack(spacing: 12) {
                     ForEach(amounts, id: \.hashValue) { amount in
                         Button(amount.formatted(maxDigits: 1, includeSpace: true)) {
-                            // TODO fix bug with switching units
-                            item.amount = amount
+                            Task {
+                                item.amount.unitStr = amount.unitStr
+                                // TODO horrible hack to fix switch bug
+                                try await Task.sleep(nanoseconds: 50_000_000)
+                                item.amount.value = amount.value
+                            }
                         }
                     }
                 }
@@ -229,6 +269,7 @@ private enum SheetType: String, Identifiable {
     
     case food
     case recipe
+    case meal
 }
 
 struct ScaledFoodView: View {

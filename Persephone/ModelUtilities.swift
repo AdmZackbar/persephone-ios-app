@@ -381,3 +381,41 @@ extension RecipeLogEntry {
         }
     }
 }
+
+// Meals
+
+extension Meal {
+    var nutrients: Nutrients {
+        items.map({ $0.nutrients }).reduce([:], +)
+    }
+    
+    var cost: Currency? {
+        let total = items.filter({ $0.cost != nil }).map({ $0.cost! })
+        return total.isEmpty ? nil : total.reduce(.zero, +)
+    }
+}
+
+extension MealItem {
+    var numServings: Double {
+        if let modifier = defaultAmount.unit?.modifier {
+            return (defaultAmount.value.raw * modifier) / food.servingSize.val
+        }
+        return defaultAmount.value.raw / food.servingSize.amount.value.raw
+    }
+    
+    var nutrients: Nutrients {
+        food.ingredients.nutrients * numServings
+    }
+    
+    var cost: Currency? {
+        if let servingCost {
+            servingCost * numServings
+        } else {
+            nil
+        }
+    }
+    
+    var size: FoodSize {
+        food.servingSize * numServings
+    }
+}

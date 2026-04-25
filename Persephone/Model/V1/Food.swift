@@ -24,6 +24,8 @@ extension SchemaV1 {
         var logEntries: [FoodLogEntry]! = []
         @Relationship(deleteRule: .cascade, inverse: \RecipeEntryIngredient.food)
         var recipeEntries: [RecipeEntryIngredient]! = []
+        @Relationship(deleteRule: .cascade, inverse: \MealItem.food)
+        var mealItems: [MealItem]! = []
         
         init(name: String = "",
              metaData: MetaData = .init(),

@@ -67,6 +67,14 @@ final class NavigationStore: ObservableObject {
                                          meal: meal ?? logConfig.selectedMeal ?? "Breakfast"))
         case .edit(let entry):
             LogEntryEditView(item: .init(entry: entry))
+        case .meals:
+            MealsView()
+        case .meal(let meal):
+            MealView(meal: meal)
+        case .addMeal:
+            MealEditView()
+        case .editMeal(let meal):
+            MealEditView(meal: .init(meal: meal))
         }
     }
     

@@ -342,6 +342,8 @@ struct LogEntryAmountSheet: View {
                         } else {
                             return [servingUnit, Units.milliliter, Units.fluidounce]
                         }
+                    case .meal:
+                        return []
                     }
                 }()
                 ScaledAmountField(amount: $item.amount, units: units)
@@ -352,6 +354,8 @@ struct LogEntryAmountSheet: View {
                 case .recipe:
                     otherAmountView(item.recipe!)
                     recipeView(item.recipe!)
+                case .meal:
+                    EmptyView()
                 }
             }.navigationTitle("Edit Amount")
                 .navigationBarTitleDisplayMode(.inline)

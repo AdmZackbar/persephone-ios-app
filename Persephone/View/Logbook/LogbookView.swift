@@ -23,6 +23,12 @@ struct LogbookView: View {
         "Dinner",
         "Snacks"
     ]
+    static let MealIcon: [String : String] = [
+        "Breakfast": "sun.horizon",
+        "Lunch": "sun.max",
+        "Dinner": "moon",
+        "Snacks": "carrot"
+    ]
     
     @StateObject private var navigationStore = NavigationStore()
     
@@ -72,9 +78,21 @@ struct LogbookView: View {
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
                             ForEach(Self.Meals, id: \.hashValue) { meal in
-                                Button(meal) {
+                                Button {
                                     navigationStore.push(LogViewType.add(meal: meal))
+                                } label: {
+                                    if let icon = Self.MealIcon[meal] {
+                                        Label(meal, systemImage: icon)
+                                    } else {
+                                        Text(meal)
+                                    }
                                 }
+                            }
+                            Divider()
+                            Button {
+                                navigationStore.push(LogViewType.meals)
+                            } label: {
+                                Label("Meals", systemImage: "fork.knife")
                             }
                         } label: {
                             Label("Add", systemImage: "plus")
@@ -192,6 +210,10 @@ enum LogViewType: Hashable {
     case entries
     case add(meal: String? = nil)
     case edit(_ entry: LogEntry)
+    case meals
+    case meal(_ meal: Meal)
+    case addMeal
+    case editMeal(_ meal: Meal)
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {

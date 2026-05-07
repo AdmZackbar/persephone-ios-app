@@ -48,7 +48,7 @@ struct LogWeekView: View {
                     dayView(startDate.addDays(dayIndex))
                 }
             }.frame(maxWidth: .infinity)
-        }.padding([.leading, .trailing], 4)
+        }.padding([.leading, .trailing], 12)
             .gesture(
                 DragGesture()
                     .onChanged { gesture in
@@ -82,6 +82,7 @@ struct LogWeekView: View {
                     .font(.footnote)
                     .fontWeight(.bold)
             }.contentShape(Rectangle())
+                .scaleEffect(d.day == date.day ? 1.1 : 1.0)
         }.buttonStyle(.plain)
     }
     
@@ -139,7 +140,7 @@ private struct LogDayView: View {
                         showNutrientSheet.toggle()
                     }
                     .padding()
-                    .presentationDetents([.height(520)])
+                    .presentationDetents([.height(500)])
             }
     }
     

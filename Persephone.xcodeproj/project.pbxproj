@@ -10,6 +10,7 @@
 		E80E2B4E2FABC2B5006FAC4A /* LogWeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2B4D2FABC2B5006FAC4A /* LogWeekView.swift */; };
 		E80E2B512FABD124006FAC4A /* MiniNutrientPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2B502FABD124006FAC4A /* MiniNutrientPieChart.swift */; };
 		E80E2B542FAC41CB006FAC4A /* LogEntryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2B532FAC41CB006FAC4A /* LogEntryListView.swift */; };
+		E80E2B562FACE86B006FAC4A /* SetAmountSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2B552FACE86B006FAC4A /* SetAmountSheet.swift */; };
 		E80E2C462C400B0800D35BE7 /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C452C400B0800D35BE7 /* Schema.swift */; };
 		E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C502C41C23200D35BE7 /* ScannerView.swift */; };
 		E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82CFBD92C3F078D0055C6B2 /* MainView.swift */; };
@@ -96,6 +97,7 @@
 		E80E2B4D2FABC2B5006FAC4A /* LogWeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWeekView.swift; sourceTree = "<group>"; };
 		E80E2B502FABD124006FAC4A /* MiniNutrientPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniNutrientPieChart.swift; sourceTree = "<group>"; };
 		E80E2B532FAC41CB006FAC4A /* LogEntryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryListView.swift; sourceTree = "<group>"; };
+		E80E2B552FACE86B006FAC4A /* SetAmountSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetAmountSheet.swift; sourceTree = "<group>"; };
 		E80E2C452C400B0800D35BE7 /* Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
 		E80E2C4F2C41C00600D35BE7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E80E2C502C41C23200D35BE7 /* ScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerView.swift; sourceTree = "<group>"; };
@@ -382,6 +384,7 @@
 				E8EB88212D3C1CF600861685 /* SelectFoodSheet.swift */,
 				E8E9AE3E2D41299900B2A193 /* SelectRecipeEntrySheet.swift */,
 				E8C61F302F9C50BD000EA054 /* SelectMealSheet.swift */,
+				E80E2B552FACE86B006FAC4A /* SetAmountSheet.swift */,
 			);
 			path = Logbook;
 			sourceTree = "<group>";
@@ -574,6 +577,7 @@
 				E8D33C4B2D3A8EDD00EE8555 /* Units.swift in Sources */,
 				E885CC7C2D3E9F230041364D /* CookbookView.swift in Sources */,
 				E8E9AE372D3FDD1B00B2A193 /* OptionalDatePicker.swift in Sources */,
+				E80E2B562FACE86B006FAC4A /* SetAmountSheet.swift in Sources */,
 				E8828ED52C4F5871006C7CB3 /* Nutrients.swift in Sources */,
 				E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */,
 				E8EB880B2D3B3F6A00861685 /* Category.swift in Sources */,

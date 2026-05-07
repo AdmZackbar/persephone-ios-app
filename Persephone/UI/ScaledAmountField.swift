@@ -18,27 +18,30 @@ struct ScaledAmountField: View {
     }
     
     var body: some View {
-        Picker(selection: Binding<String>(get: {
-            amount.unit?.abbreviation ?? ""
-        }, set: { unit in
-            amount.unitStr = unit
-        })) {
-            ForEach(units, id: \.hashValue) { unit in
-                Text(unit.abbreviation).tag(unit.abbreviation)
-            }
-        } label: {
+        HStack {
             TextField("", text: Binding(get: {
-                amount.value.formatted(maxDigits: 7)
+                amount.value.formatted(maxDigits: 3)
             }, set: { text in
                 if let value: Amount.Value = .parse(text) {
                     amount.value = value
                 }
-            }))
-        }.onChange(of: amount.unitStr ?? "") { oldValue, newValue in
-            if let x = getUnit(oldValue)?.modifier, let y = getUnit(newValue)?.modifier {
-                let scale = x / y
-                amount.value = amount.value * scale
-            }
+            })).font(.title)
+                .fontWeight(.bold)
+                .keyboardType(.numbersAndPunctuation)
+            Picker("Unit", selection: Binding<String>(get: {
+                amount.unit?.abbreviation ?? ""
+            }, set: { unit in
+                amount.unitStr = unit
+            })) {
+                ForEach(units, id: \.hashValue) { unit in
+                    Text(unit.abbreviation).tag(unit.abbreviation)
+                }
+            }.onChange(of: amount.unitStr ?? "") { oldValue, newValue in
+                if let x = getUnit(oldValue)?.modifier, let y = getUnit(newValue)?.modifier {
+                    let scale = x / y
+                    amount.value = amount.value * scale
+                }
+            }.pickerStyle(.segmented)
         }
     }
     
@@ -51,7 +54,7 @@ struct ScaledAmountField: View {
     @Previewable @State var amount: Amount = .init(value: .raw(30.2), unit: Units.gram)
     Form {
         Text(amount.formatted(maxDigits: 7))
-        ScaledAmountField(amount: $amount, units: [.init(name: "serving", abbreviation: "serving", modifier: 84.0), Units.gram, Units.ounce])
+        ScaledAmountField(amount: $amount, units: [.init(name: "serving", abbreviation: "serving", modifier: 84.0), Units.gram])
         Button("Clear") {
             amount = .init(value: .zero, unit: .none)
         }

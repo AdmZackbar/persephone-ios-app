@@ -101,6 +101,7 @@ private struct LogDayView: View {
     
     @Binding var date: Date
     @State private var showNutrientSheet = false
+    @State private var editItem: PersistentIdentifier? = nil
     
     var body: some View {
         let nutrients = entryMap.values.map({ $0.nutrients }).reduce([:], +)
@@ -141,6 +142,23 @@ private struct LogDayView: View {
                     }
                     .padding()
                     .presentationDetents([.height(500)])
+                    // Don't use liquid glass as main background
+                    .presentationBackground(.regularMaterial)
+            }
+            .sheet(isPresented: .isPresent($editItem)) {
+                if let entry = entryMap.values.flatMap({ $0 }).first(where: { e in
+                    switch e {
+                    case .food(let f):
+                        return f.id == editItem
+                    case .recipe(let r):
+                        return r.id == editItem
+                    }
+                }) {
+                    SetAmountSheet(item: .init(entry: entry))
+                }
+                else {
+                    Text("Error getting item")
+                }
             }
     }
     
@@ -179,24 +197,23 @@ private struct LogDayView: View {
         Section {
             ForEach(entryMap[name]!, id: \.hashValue) { entry in
                 Button {
-                    navigationStore.push(LogViewType.edit(entry))
+                    switch entry {
+                    case .food(let food):
+                        editItem = food.id
+                    case .recipe(let recipe):
+                        editItem = recipe.id
+                    }
                 } label: {
                     LogEntryListView(entry: entry)
                         .contentShape(Rectangle())
                 }.buttonStyle(.plain)
+                    .contextMenu {
+                        editButton(entry)
+                        deleteButton(entry)
+                    }
                     .swipeActions {
-                        Button(role: .destructive) {
-                            withAnimation {
-                                switch entry {
-                                case .food(let food):
-                                    modelContext.delete(food)
-                                case .recipe(let recipe):
-                                    modelContext.delete(recipe)
-                                }
-                            }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
+                        deleteButton(entry)
+                        editButton(entry)
                     }
             }
         } header: {
@@ -207,6 +224,29 @@ private struct LogDayView: View {
                 Spacer()
                 Text(entryMap[name]!.map({ $0.nutrients }).reduce([:], +).calories.formatted())
             }
+        }
+    }
+    
+    private func editButton(_ entry: LogEntry) -> some View {
+        Button {
+            navigationStore.push(LogViewType.edit(entry))
+        } label: {
+            Label("Edit", systemImage: "pencil")
+        }
+    }
+    
+    private func deleteButton(_ entry: LogEntry) -> some View {
+        Button(role: .destructive) {
+            withAnimation {
+                switch entry {
+                case .food(let food):
+                    modelContext.delete(food)
+                case .recipe(let recipe):
+                    modelContext.delete(recipe)
+                }
+            }
+        } label: {
+            Label("Delete", systemImage: "trash")
         }
     }
 }
@@ -222,6 +262,20 @@ enum LogViewType: Hashable {
 
 enum MealType: String, Hashable, CaseIterable {
     case Breakfast, Brunch, Lunch, Dinner, Snacks
+}
+
+extension Binding {
+    /// Creates a Bool Binding representing “non-nil” from an Optional Binding.
+    static func isPresent<T: Sendable>(_ binding: Binding<T?>) -> Binding<Bool> {
+        Binding<Bool>(
+            get: { binding.wrappedValue != nil },
+            set: { isPresented in
+                if !isPresented {
+                    binding.wrappedValue = nil
+                }
+            }
+        )
+    }
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {

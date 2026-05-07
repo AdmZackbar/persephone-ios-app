@@ -111,7 +111,7 @@ private struct LogDayView: View {
                     .fontWeight(.bold)
                 Spacer()
                 Button {
-                    navigationStore.push(LogViewType.add(date))
+                    navigationStore.push(LogViewType.add(date.atCurrentTime()))
                 } label: {
                     Image(systemName: "plus")
                         .frame(width: 30, height: 30)

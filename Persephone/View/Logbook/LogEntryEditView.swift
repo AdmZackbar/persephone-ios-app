@@ -17,8 +17,6 @@ struct LogEntryEditView: View {
     @State private var item: LogEntryItem
     @State private var sheetType: SheetType?
     
-    let meals: [String] = ["Breakfast", "Brunch", "Lunch", "Dinner", "Snacks"]
-    
     init(item: LogEntryItem = .init()) {
         self.item = item
         var descriptor = FetchDescriptor<FoodLogEntry>(
@@ -34,8 +32,8 @@ struct LogEntryEditView: View {
         Form {
             DatePicker("Date:", selection: $item.date)
             Picker("Meal:", selection: $item.meal) {
-                ForEach(meals, id: \.hashValue) { meal in
-                    Text(meal).tag(meal)
+                ForEach(MealType.allCases, id: \.rawValue) { meal in
+                    Text(meal.rawValue).tag(meal.rawValue)
                 }
             }
             switch item.type {

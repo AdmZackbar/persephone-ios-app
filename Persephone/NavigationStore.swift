@@ -10,7 +10,6 @@ import SwiftUI
 @MainActor
 final class NavigationStore: ObservableObject {
     @Published var path = NavigationPath()
-    @Published var logConfig = LogConfig()
     
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
@@ -60,9 +59,8 @@ final class NavigationStore: ObservableObject {
     @ViewBuilder
     func getLogView(_ type: LogViewType) -> some View {
         switch type {
-        case .add(let meal):
-            LogEntryEditView(item: .init(date: logConfig.date.atCurrentTime(),
-                                         meal: meal ?? logConfig.selectedMeal ?? "Breakfast"))
+        case .add(let date):
+            LogEntryEditView(item: .init(date: date, meal: "Snacks"))
         case .edit(let entry):
             LogEntryEditView(item: .init(entry: entry))
         case .meals:
@@ -94,27 +92,5 @@ extension View {
         self.navigationDestination(for: FoodViewType.self, destination: navigationStore.getFoodView)
             .navigationDestination(for: LogViewType.self, destination: navigationStore.getLogView)
             .navigationDestination(for: CookbookViewType.self, destination: navigationStore.getCookbookView)
-    }
-}
-
-struct LogConfig: Hashable, Equatable {
-    var date: Date = Date()
-    
-    var selectedMeal: String? = nil
-    
-    func contains(_ date: Date) -> Bool {
-        self.date.day == date.day && self.date.month == date.month && self.date.year == date.year
-    }
-    
-    func contains(meal: String) -> Bool {
-        selectedMeal == nil || selectedMeal == meal
-    }
-    
-    mutating func prev() {
-        date = .from(year: date.year, month: date.month, day: date.day - 1)
-    }
-    
-    mutating func next() {
-        date = .from(year: date.year, month: date.month, day: date.day + 1)
     }
 }

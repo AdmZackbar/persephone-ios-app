@@ -110,7 +110,7 @@ private struct LogDayView: View {
                     .fontWeight(.bold)
                 Spacer()
                 Button {
-                    navigationStore.push(LogViewType.add())
+                    navigationStore.push(LogViewType.add(date))
                 } label: {
                     Image(systemName: "plus")
                         .frame(width: 30, height: 30)
@@ -125,8 +125,8 @@ private struct LogDayView: View {
                     .onTapGesture {
                         showNutrientSheet.toggle()
                     }
-                ForEach(entryMap.keys.sorted(), id: \.self) { meal in
-                    mealView(meal)
+                ForEach(MealType.allCases.filter({ entryMap[$0.rawValue] != nil }), id: \.rawValue) { mealType in
+                    mealView(mealType.rawValue)
                 }
             }.scrollContentBackground(.hidden)
                 // Remove hidden margin above form
@@ -211,12 +211,16 @@ private struct LogDayView: View {
 }
 
 enum LogViewType: Hashable {
-    case add(meal: String? = nil)
+    case add(_ date: Date)
     case edit(_ entry: LogEntry)
     case meals
     case meal(_ meal: Meal)
     case addMeal
     case editMeal(_ meal: Meal)
+}
+
+enum MealType: String, Hashable, CaseIterable {
+    case Breakfast, Brunch, Lunch, Dinner, Snacks
 }
 
 #Preview(traits: .modifier(MockDataPreviewModifier())) {

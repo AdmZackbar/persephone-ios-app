@@ -12,3 +12,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Database: new view to view/edit foods in a DB
 - Cookbook: new view to view/edit recipes
 - Scanner: can scan barcodes and populate information from FoodData Central
+- Logbook: allows users to log food/recipes each day

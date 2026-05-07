@@ -29,19 +29,13 @@ extension Int {
 
 extension Date {
     var year: Int {
-        get {
-            Calendar.current.component(.year, from: self)
-        }
+        Calendar.current.component(.year, from: self)
     }
     var month: Int {
-        get {
-            Calendar.current.component(.month, from: self)
-        }
+        Calendar.current.component(.month, from: self)
     }
     var day: Int {
-        get {
-            Calendar.current.component(.day, from: self)
-        }
+        Calendar.current.component(.day, from: self)
     }
     
     static func from(year: Int, month: Int, day: Int) -> Date {
@@ -59,6 +53,20 @@ extension Date {
         components.minute = current.minute
         components.second = current.second
         return Calendar.current.date(from: components)!
+    }
+    
+    func lastSaturday(_ calendar: Calendar = .current) -> Date {
+        let components = DateComponents(weekday: 7)
+        return calendar.nextDate(
+            after: self,
+            matching: components,
+            matchingPolicy: .nextTime,
+            direction: .backward
+        ) ?? self
+    }
+    
+    func addDays(_ days: Int) -> Date {
+        Calendar.current.date(byAdding: .day, value: days, to: self) ?? self
     }
 }
 

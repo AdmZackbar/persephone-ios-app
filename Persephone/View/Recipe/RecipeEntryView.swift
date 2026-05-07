@@ -55,7 +55,7 @@ struct RecipeEntryView: View {
             if let logEntries = entry.logEntries, !logEntries.isEmpty {
                 Section("Log Entries") {
                     ForEach(logEntries, id: \.hashValue) { entry in
-                        LogEntryListEntryView(.recipe(entry))
+                        LogEntryListView(entry: .recipe(entry))
                     }
                 }
             }
@@ -107,30 +107,31 @@ struct RecipeEntryIngredientListEntryView: View {
     let ingredient: RecipeEntryIngredient
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
-                if let brand = ingredient.food.brand {
-                    Text(brand)
-                        .opacity(0.7)
+                VStack(alignment: .leading) {
+                    Text(ingredient.food.name)
+                        .font(.headline)
+                    if let brand = ingredient.food.brand {
+                        Text(brand)
+                            .opacity(0.7)
+                    }
                 }
                 Spacer()
-                if let cost = ingredient.cost {
-                    Text(cost.formatted())
-                        .italic()
+                VStack(alignment: .trailing) {
+                    Text(ingredient.amount.formatted(maxDigits: 1))
+                        .font(.headline)
+                    if let cost = ingredient.cost {
+                        Text(cost.formatted())
+                            .font(.subheadline)
+                            .italic()
+                    }
                 }
-            }.font(.subheadline)
-            HStack {
-                Text(ingredient.food.name)
-                    .font(.headline)
-                Spacer()
-                Text(ingredient.amount.formatted(maxDigits: 1))
+                MiniNutrientPieChart(text: ingredient.nutrients.calories.value.formatted(), nutrients: ingredient.nutrients)
+                    .frame(width: 60, height: 60)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
             }
-            HStack {
-                MacroSummaryView(ingredient.nutrients)
-                Spacer()
-                Text(ingredient.nutrients.calories.formatted())
-            }.font(.subheadline)
-                .fontWeight(.semibold)
             if let notes = ingredient.notes {
                 Text(notes)
                     .font(.subheadline)

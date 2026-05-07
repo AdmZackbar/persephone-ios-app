@@ -28,7 +28,7 @@ struct MainView: View {
                 .tabItem {
                     Label("Inventory", systemImage: "list.clipboard")
                 }
-            LogbookView()
+            LogWeekView()
                 .tabItem {
                     Label("Logbook", systemImage: "calendar")
                 }

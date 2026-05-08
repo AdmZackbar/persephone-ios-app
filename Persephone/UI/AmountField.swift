@@ -38,10 +38,10 @@ struct AmountField: View {
 }
 
 #Preview {
-    @Previewable @State var amount: Amount = .init(value: .raw(30.2), unit: Units.gram)
+    @Previewable @State var amount: Amount = .init(value: .raw(30.2), unit: .gram)
     Form {
         Text(amount.formatted(maxDigits: 7))
-        AmountField(amount: $amount, units: [Units.gram, Units.milliliter])
+        AmountField(amount: $amount, units: [.gram, .milliliter])
         Button("Clear") {
             amount = .init(value: .zero, unit: .none)
         }

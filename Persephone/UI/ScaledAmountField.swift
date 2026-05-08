@@ -51,10 +51,10 @@ struct ScaledAmountField: View {
 }
 
 #Preview {
-    @Previewable @State var amount: Amount = .init(value: .raw(30.2), unit: Units.gram)
+    @Previewable @State var amount: Amount = .init(value: .raw(30.2), unit: .gram)
     Form {
         Text(amount.formatted(maxDigits: 7))
-        ScaledAmountField(amount: $amount, units: [.init(name: "serving", abbreviation: "serving", modifier: 84.0), Units.gram])
+        ScaledAmountField(amount: $amount, units: [.init(name: "serving", abbreviation: "serving", modifier: 84.0), .gram])
         Button("Clear") {
             amount = .init(value: .zero, unit: .none)
         }

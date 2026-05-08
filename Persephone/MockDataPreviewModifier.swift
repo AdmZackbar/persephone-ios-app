@@ -85,10 +85,10 @@ struct MockDataPreviewModifier: PreviewModifier {
                         name: "Pork Tenderloin",
                         ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7]),
                         servingSize: .init(str: "4 oz", val: 112)),
-                    amount: .init(value: .raw(1102), unit: Units.gram))
+                    amount: .init(value: .raw(1102), unit: .gram))
             ],
             logEntries: [
-                .init(amount: .init(value: .raw(140), unit: Units.gram), meal: "Lunch")
+                .init(amount: .init(value: .raw(140), unit: .gram), meal: "Lunch")
             ])
         return entry
     }
@@ -99,7 +99,7 @@ struct MockDataPreviewModifier: PreviewModifier {
             metaData: .init(brand: "Publix"),
             ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7, .TotalCarbs: 3, .DietaryFiber: 1]),
             servingSize: .init(str: "4 oz", val: 112)),
-              amount: .init(value: .raw(203), unit: Units.gram),
+              amount: .init(value: .raw(203), unit: .gram),
               meal: "Lunch",
               servingCost: .usd(203),)
     }

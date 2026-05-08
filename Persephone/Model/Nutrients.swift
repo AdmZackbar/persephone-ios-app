@@ -12,11 +12,11 @@ typealias Nutrients = [Nutrient : Double]
 
 extension Nutrients {
     var calories: Amount {
-        .init(value: .raw(self[.Energy, default: 0]), unit: Units.calorie)
+        .init(value: .raw(self[.Energy, default: 0]), unit: .calorie)
     }
     
     var netCarbs: Amount {
-        .init(value: .raw(self[.TotalCarbs, default: 0] - self[.DietaryFiber, default: 0]), unit: Units.gram)
+        .init(value: .raw(self[.TotalCarbs, default: 0] - self[.DietaryFiber, default: 0]), unit: .gram)
     }
     
     func get(_ nutrient: Nutrient) -> Amount? {
@@ -90,13 +90,13 @@ enum Nutrient: Codable, Equatable, Hashable {
     func getCommonUnit() -> Amount.Unit {
         switch self {
         case .Energy:
-            return Units.calorie
+            return .calorie
         case .Sodium, .Cholesterol, .Calcium, .Iron, .Potassium:
-            return Units.milligram
+            return .milligram
         case .VitaminD:
-            return Units.microgram
+            return .microgram
         default:
-            return Units.gram
+            return .gram
         }
     }
 }

@@ -33,19 +33,19 @@ struct SetAmountSheet: View {
         if let food = item.food {
             let servingUnit = Amount.Unit(name: "Serving", abbreviation: food.servingSize.amount.unit?.abbreviation ?? "serving", modifier: food.servingSize.val / food.servingSize.amount.value.raw)
             if food.servingSize.isMass {
-                return [servingUnit, Units.gram]
+                return [servingUnit, .gram]
             } else {
-                return [servingUnit, Units.milliliter]
+                return [servingUnit, .milliliter]
             }
         } else if let recipe = item.recipe {
             let servingUnit = Amount.Unit(name: "Serving", abbreviation: recipe.total.amount.unit?.abbreviation ?? "serving", modifier: recipe.total.val / recipe.total.amount.value.raw)
             if recipe.total.isMass {
-                return [servingUnit, Units.gram]
+                return [servingUnit, .gram]
             } else {
-                return [servingUnit, Units.milliliter]
+                return [servingUnit, .milliliter]
             }
         } else {
-            return [Units.gram]
+            return [.gram]
         }
     }
     

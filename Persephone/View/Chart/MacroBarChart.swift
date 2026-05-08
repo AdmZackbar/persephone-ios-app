@@ -41,7 +41,7 @@ struct MacroBarChart: View {
         case .none:
             return nil
         case .gram:
-            return Amount.init(value: .raw(data.grams), unit: Units.gram)
+            return Amount.init(value: .raw(data.grams), unit: .gram)
                 .formatted(maxDigits: 0, includeSpace: false)
         case .percent:
             return (data.calories / self.data.totalCalories)

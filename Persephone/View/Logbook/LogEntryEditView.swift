@@ -96,9 +96,9 @@ struct LogEntryEditView: View {
                 let units: [Amount.Unit] = {
                     let servingUnit = Amount.Unit(name: "Serving", abbreviation: food.servingSize.amount.unit?.abbreviation ?? "serving", modifier: food.servingSize.val / food.servingSize.amount.value.raw)
                     if food.servingSize.isMass {
-                        return [servingUnit, Units.gram]
+                        return [servingUnit, .gram]
                     } else {
-                        return [servingUnit, Units.milliliter]
+                        return [servingUnit, .milliliter]
                     }
                 }()
                 ScaledAmountField(amount: $item.amount, units: units)
@@ -169,9 +169,9 @@ struct LogEntryEditView: View {
                 let units: [Amount.Unit] = {
                     let servingUnit = Amount.Unit(name: "Serving", abbreviation: recipe.total.amount.unit?.abbreviation ?? "serving", modifier: recipe.total.val / recipe.total.amount.value.raw)
                     if recipe.total.isMass {
-                        return [servingUnit, Units.gram, Units.ounce, Units.pound]
+                        return [servingUnit, .gram, .ounce, .pound]
                     } else {
-                        return [servingUnit, Units.milliliter, Units.fluidounce]
+                        return [servingUnit, .milliliter, .fluidounce]
                     }
                 }()
                 ScaledAmountField(amount: $item.amount, units: units)

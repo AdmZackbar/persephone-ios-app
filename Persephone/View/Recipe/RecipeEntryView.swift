@@ -154,12 +154,12 @@ struct RecipeEntryIngredientListEntryView: View {
                     metaData: .init(brand: "Publix", category: "Beef"),
                     ingredients: .init(nutrients: [.Energy: 170, .Protein: 22, .TotalFat: 7]),
                     servingSize: .init(str: "4 oz", val: 112)),
-                amount: .init(value: .raw(1102), unit: Units.gram),
+                amount: .init(value: .raw(1102), unit: .gram),
                 servingCost: .usd(134),
                 notes: "Tenderized and trimmed")
         ],
         logEntries: [
-            .init(amount: .init(value: .raw(68), unit: Units.gram), meal: "Breakfast")
+            .init(amount: .init(value: .raw(68), unit: .gram), meal: "Breakfast")
         ])
     NavigationStack(path: $navigationStore.path) {
         RecipeEntryView(entry: entry)

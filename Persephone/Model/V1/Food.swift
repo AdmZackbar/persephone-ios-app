@@ -107,7 +107,7 @@ extension SchemaV1 {
             }
         }
         var value: Amount {
-            .init(value: .raw(val), unit: isMass ? Units.gram : Units.milliliter)
+            .init(value: .raw(val), unit: isMass ? .gram : .milliliter)
         }
         
         init(str: String = "",

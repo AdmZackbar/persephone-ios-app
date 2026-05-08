@@ -20,11 +20,11 @@ struct StoreEntryEditSheet: View {
         self._foodItem = foodItem
         self.item = item
         if foodItem.wrappedValue.servingSize.isMass {
-            self.unit = Units.gram
-            self.units = [Units.gram, Units.pound, Units.ounce]
+            self.unit = .gram
+            self.units = [.gram, .pound, .ounce]
         } else {
-            self.unit = Units.milliliter
-            self.units = [Units.milliliter, Units.liter, Units.fluidounce]
+            self.unit = .milliliter
+            self.units = [.milliliter, .liter, .fluidounce]
         }
     }
     

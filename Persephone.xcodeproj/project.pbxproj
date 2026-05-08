@@ -65,7 +65,6 @@
 		E8E9AE452D41F1C500B2A193 /* LogEntryEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE442D41F1BF00B2A193 /* LogEntryEditView.swift */; };
 		E8EB88062D3B15EC00861685 /* FoodDatabaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88052D3B15D900861685 /* FoodDatabaseView.swift */; };
 		E8EB88092D3B1E7B00861685 /* Food.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88082D3B1E6600861685 /* Food.swift */; };
-		E8EB880B2D3B3F6A00861685 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB880A2D3B3F5E00861685 /* Category.swift */; };
 		E8EB880D2D3B479B00861685 /* FoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB880C2D3B479500861685 /* FoodView.swift */; };
 		E8EB88122D3B670C00861685 /* FoodLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88112D3B66F000861685 /* FoodLogEntry.swift */; };
 		E8EB88172D3B708700861685 /* LogFoodItemEntryPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88162D3B708700861685 /* LogFoodItemEntryPreview.swift */; };
@@ -163,7 +162,6 @@
 		E8E9AE442D41F1BF00B2A193 /* LogEntryEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryEditView.swift; sourceTree = "<group>"; };
 		E8EB88052D3B15D900861685 /* FoodDatabaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseView.swift; sourceTree = "<group>"; };
 		E8EB88082D3B1E6600861685 /* Food.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Food.swift; sourceTree = "<group>"; };
-		E8EB880A2D3B3F5E00861685 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		E8EB880C2D3B479500861685 /* FoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodView.swift; sourceTree = "<group>"; };
 		E8EB88112D3B66F000861685 /* FoodLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodLogEntry.swift; sourceTree = "<group>"; };
 		E8EB88162D3B708700861685 /* LogFoodItemEntryPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFoodItemEntryPreview.swift; sourceTree = "<group>"; };
@@ -246,7 +244,6 @@
 		E847B1E82C58315B0084CD13 /* V1 */ = {
 			isa = PBXGroup;
 			children = (
-				E8EB880A2D3B3F5E00861685 /* Category.swift */,
 				E8EB88082D3B1E6600861685 /* Food.swift */,
 				E8EB88112D3B66F000861685 /* FoodLogEntry.swift */,
 				E8CFEC582E521139002B6268 /* Meal.swift */,
@@ -592,7 +589,6 @@
 				E80E2B562FACE86B006FAC4A /* SetAmountSheet.swift in Sources */,
 				E8828ED52C4F5871006C7CB3 /* Nutrients.swift in Sources */,
 				E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */,
-				E8EB880B2D3B3F6A00861685 /* Category.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

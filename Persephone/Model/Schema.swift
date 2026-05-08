@@ -15,7 +15,6 @@ enum SchemaV1: VersionedSchema {
     }
 
     static var models: [any PersistentModel.Type] {
-        [Category.self,
-         Food.self]
+        [Food.self]
     }
 }

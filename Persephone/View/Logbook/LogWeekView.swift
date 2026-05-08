@@ -105,6 +105,7 @@ private struct LogDayView: View {
     let entryMap: [String : [LogEntry]]
     
     @Binding var date: Date
+    @State private var editDate: Bool = false
     @State private var showNutrientSheet = false
     @State private var editItem: PersistentIdentifier? = nil
     
@@ -112,9 +113,16 @@ private struct LogDayView: View {
         let nutrients = entryMap.values.map({ $0.nutrients }).reduce([:], +)
         VStack {
             HStack {
-                Text(date.formatted(date: .long, time: .omitted))
-                    .font(.title)
-                    .fontWeight(.bold)
+                Button {
+                    editDate.toggle()
+                } label: {
+                    HStack {
+                        Text(date.formatted(date: .long, time: .omitted))
+                            .font(.title)
+                            .fontWeight(.bold)
+                        Image(systemName: "chevron.down")
+                    }.contentShape(Rectangle())
+                }.buttonStyle(.plain)
                 Spacer()
                 Button {
                     navigationStore.push(LogViewType.add(date.atCurrentTime()))
@@ -139,13 +147,20 @@ private struct LogDayView: View {
                 // Remove hidden margin above form
                 .contentMargins(.top, 0, for: .scrollContent)
         }.background(Color(uiColor: UIColor.systemGroupedBackground))
+            .sheet(isPresented: $editDate) {
+                DatePicker("", selection: $date, displayedComponents: .date)
+                    .datePickerStyle(.graphical)
+                    .presentationDetents([.height(380)])
+                    .padding([.leading, .trailing], 16)
+            }
             .sheet(isPresented: $showNutrientSheet) {
                 NutrientsView(nutrients: nutrients)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         showNutrientSheet.toggle()
                     }
-                    .padding()
+                    .padding(.top, 16)
+                    .padding([.leading, .trailing], 32)
                     .presentationDetents([.height(500)])
                     // Don't use liquid glass as main background
                     .presentationBackground(.regularMaterial)

@@ -79,32 +79,32 @@ struct SetAmountSheet: View {
     
     @ViewBuilder
     private func foodSummaryView(_ food: Food) -> some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(food.name)
-                    .fontWeight(.semibold)
-                HStack {
+        let nutrients = food.ingredients.nutrients * item.numServings
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading) {
                     if let brand = food.brand {
                         Text(brand)
+                            .font(.subheadline)
+                            .italic()
                     }
-                }.font(.caption).italic()
-            }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 4) {
-                Text(item.amount.formatted())
-                    .font(.title3)
-                    .fontWeight(.bold)
-                if let cost = item.servingCost {
-                    Text((cost * item.numServings).formatted())
-                        .font(.caption)
-                        .italic()
+                    Text(food.name)
+                        .fontWeight(.bold)
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    if let cost = item.servingCost {
+                        Text((cost * item.numServings).formatted())
+                            .font(.subheadline)
+                            .italic()
+                    }
+                    Text(nutrients.calories.formatted())
+                        .fontWeight(.bold)
                 }
             }
-            let nutrients = food.ingredients.nutrients * item.numServings
-            MiniNutrientPieChart(text: nutrients.calories.value.formatted(), nutrients: nutrients)
-                .frame(width: 56, height: 56)
-                .font(.caption)
-                .fontWeight(.bold)
+            MacroBarChart(nutrients: nutrients, textFormat: .gram, textLayout: .center)
+                .frame(height: 14)
+                .font(.caption2)
         }.foregroundStyle(.primary)
     }
     

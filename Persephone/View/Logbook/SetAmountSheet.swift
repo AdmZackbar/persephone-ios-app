@@ -185,13 +185,18 @@ struct SetAmountSheet: View {
             }
         }
         ToolbarItem(placement: .topBarLeading) {
-            Picker(selection: $item.meal) {
-                ForEach(MealType.allCases) { mealType in
-                    Text(mealType.rawValue).tag(mealType.rawValue)
+            // Picker sucks in the toolbar, use menu instead
+            Menu {
+                ForEach(MealType.allCases.reversed()) { mealType in
+                    Button {
+                        item.meal = mealType.rawValue
+                    } label: {
+                        Label(mealType.rawValue, systemImage: mealType.getIconName())
+                    }.disabled(item.meal == mealType.rawValue)
                 }
             } label: {
-                EmptyView()
-            }.tint(.primary)
+                Text(item.meal)
+            }
         }
         ToolbarItem(placement: .topBarTrailing) {
             Button {

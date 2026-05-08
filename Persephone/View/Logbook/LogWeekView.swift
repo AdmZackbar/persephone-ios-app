@@ -249,19 +249,10 @@ private struct LogDayView: View {
             let nutrients = entries.map({ $0.nutrients }).reduce([:], +)
             VStack(spacing: 8) {
                 HStack(alignment: .bottom) {
-                    Menu {
-                        Button {
-                            navigationStore.push(LogViewType.add(date: date.atCurrentTime(), mealType: mealType.rawValue))
-                        } label: {
-                            Label("Add Entry...", systemImage: "plus")
-                        }
-                        // TODO change meal type to another...
-                    } label: {
-                        Label(mealType.rawValue, systemImage: mealType.getIconName())
-                            .labelReservedIconWidth(12)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                    }
+                    Label(mealType.rawValue, systemImage: mealType.getIconName())
+                        .labelReservedIconWidth(12)
+                        .font(.title2)
+                        .fontWeight(.bold)
                     Spacer()
                     Button {
                         // TODO

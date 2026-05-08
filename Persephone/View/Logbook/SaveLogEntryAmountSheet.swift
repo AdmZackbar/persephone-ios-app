@@ -1,5 +1,5 @@
 //
-//  SetAmountSheet.swift
+//  SaveLogEntryAmountSheet.swift
 //  Persephone
 //
 //  Created by Zach Wassynger on 5/7/26.
@@ -8,14 +8,27 @@
 import SwiftData
 import SwiftUI
 
-struct SetAmountSheet: View {
+/// An editor for a LogEntryItem. Should be used in a sheet.
+struct SaveLogEntryAmountSheet: View {
+    /// Used to dismiss the sheet
     @Environment(\.dismiss) private var dismiss
+    /// Used to save the item to the DB
     @Environment(\.modelContext) private var modelContext
     
+    /// Contains recent log entries relating to the food of the item
     @Query private var recentFoodEntries: [FoodLogEntry]
     
+    /// Contains the current state of the item
     @State var item: LogEntryItem
     
+    /**
+     Creates a new sheet that has its initial value set to the given item.
+     The given item is not directly updated, but is instead updated through a model context
+     if the user decides to save.
+     
+     - Parameter item: the initial item to base edits on
+     - Returns: the created view for the item
+     */
     init(item: LogEntryItem) {
         self.item = item
         if let foodId = item.food?.id {
@@ -29,6 +42,7 @@ struct SetAmountSheet: View {
         }
     }
     
+    /// Builds the list of appropriate units to display as options
     private func computeUnits() -> [Amount.Unit] {
         if let food = item.food {
             let servingUnit = Amount.Unit(name: "Serving", abbreviation: food.servingSize.amount.unit?.abbreviation ?? "serving", modifier: food.servingSize.val / food.servingSize.amount.value.raw)
@@ -77,6 +91,7 @@ struct SetAmountSheet: View {
         }
     }
     
+    /// Displays a small multiline summary view for the given food
     @ViewBuilder
     private func foodSummaryView(_ food: Food) -> some View {
         let nutrients = food.ingredients.nutrients * item.numServings
@@ -108,13 +123,37 @@ struct SetAmountSheet: View {
         }.foregroundStyle(.primary)
     }
     
+    /// Displays a small multiline summary view for the given recipe
+    @ViewBuilder
     private func recipeSummaryView(_ recipe: RecipeEntry) -> some View {
-        // TODO
-        VStack {
-            Text("TODO")
-        }
+        let nutrients = recipe.nutrients * item.numServings
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading) {
+                    Text(recipe.date.formatted(date: .abbreviated, time: .shortened))
+                        .font(.subheadline)
+                        .italic()
+                    Text(recipe.name)
+                        .fontWeight(.bold)
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    if let cost = item.servingCost {
+                        Text((cost * item.numServings).formatted())
+                            .font(.subheadline)
+                            .italic()
+                    }
+                    Text(nutrients.calories.formatted())
+                        .fontWeight(.bold)
+                }
+            }
+            MacroBarChart(nutrients: nutrients, textFormat: .gram, textLayout: .center)
+                .frame(height: 14)
+                .font(.caption2)
+        }.foregroundStyle(.primary)
     }
     
+    /// Scrolling list of options that contain recent 'amounts' in other log entries
     private func recentEntriesView() -> some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
@@ -138,6 +177,7 @@ struct SetAmountSheet: View {
             .padding([.leading, .trailing], -14)
     }
     
+    /// Section with a currency editor and potential buttons to set the price from previous entries
     @ViewBuilder
     private func priceView(_ food: Food) -> some View {
         Section {
@@ -146,7 +186,7 @@ struct SetAmountSheet: View {
                     if let unwrappedValue = Binding($item.servingCost) {
                         CurrencyField(value: unwrappedValue)
                     } else {
-                        Text(item.servingCost?.formatted() ?? "$0.00")
+                        Text((item.servingCost ?? .zero).formatted())
                     }
                     Spacer()
                     Text("$ per \(food.servingSize.formatted())")
@@ -177,6 +217,7 @@ struct SetAmountSheet: View {
         }
     }
     
+    /// Contains all the tool bar items for the main view
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .principal) {
@@ -217,6 +258,6 @@ struct SetAmountSheet: View {
     VStack {
         
     }.sheet(isPresented: .constant(true)) {
-        SetAmountSheet(item: .init(meal: "Snacks"))
+        SaveLogEntryAmountSheet(item: .init(meal: "Snacks"))
     }
 }

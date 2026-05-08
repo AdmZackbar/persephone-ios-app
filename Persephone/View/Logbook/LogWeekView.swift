@@ -181,7 +181,7 @@ private struct LogDayView: View {
                         return r.id == editItem
                     }
                 }) {
-                    SetAmountSheet(item: .init(entry: entry))
+                    SaveLogEntryAmountSheet(item: .init(entry: entry))
                 }
                 else {
                     Text("Error getting item")

@@ -11,10 +11,14 @@ import SwiftUI
 struct MacroBarChart: View {
     let data: [MacroData]
     let textFormat: TextFormat
+    let textLayout: TextLayout
     
-    init(nutrients: Nutrients = [:], textFormat: TextFormat = .none) {
+    init(nutrients: Nutrients = [:],
+         textFormat: TextFormat = .none,
+         textLayout: TextLayout = .bottom) {
         self.data = nutrients.toMacroData()
         self.textFormat = textFormat
+        self.textLayout = textLayout
     }
     
     var body: some View {
@@ -23,12 +27,12 @@ struct MacroBarChart: View {
                 x: .value("Size", d.calories)
             ).cornerRadius(8)
                 .foregroundStyle(d.macro?.color ?? .gray)
-                .annotation(position: .bottom, alignment: .center, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                .annotation(position: textLayout.position, alignment: .center, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
                     if let text = format(d) {
                         Text(text)
                             .fontWeight(.bold)
-                            .foregroundStyle(d.macro?.color ?? .gray)
-                            .padding(.top, -6)
+                            .foregroundStyle(textLayout.getColor(d))
+                            .padding(textLayout.paddingSide, -6)
                     }
                 }
         }.chartXAxis(.hidden)
@@ -52,6 +56,44 @@ struct MacroBarChart: View {
     enum TextFormat {
         case none, gram, percent
     }
+    
+    enum TextLayout {
+        case top, center, bottom
+        
+        var position: AnnotationPosition {
+            switch self {
+            case .top:
+                return .top
+            case .center:
+                return .overlay
+            case .bottom:
+                return .bottom
+            }
+        }
+        
+        var paddingSide: Edge.Set {
+            // Flip side (we want text to get closer to the bar)
+            switch self {
+            case .top:
+                return .bottom
+            case .center:
+                return []
+            case .bottom:
+                return .top
+            }
+        }
+        
+        func getColor(_ data: MacroData) -> Color {
+            switch self {
+            case .top, .bottom:
+                // Above or below bar, use same color as bar
+                return data.macro?.color ?? .primary
+            case .center:
+                // Can't use the same color as the bar, default to background
+                return .background
+            }
+        }
+    }
 }
 
 #Preview {
@@ -63,9 +105,17 @@ struct MacroBarChart: View {
             .Protein: 30,
         ]
         MacroBarChart().frame(height: 10)
-        MacroBarChart(nutrients: nutrients, textFormat: .gram).frame(height: 20)
+        MacroBarChart(nutrients: nutrients, textFormat: .gram)
+            .frame(height: 20)
             .font(.caption)
-        MacroBarChart(nutrients: nutrients, textFormat: .percent).frame(height: 20)
+        MacroBarChart(nutrients: nutrients, textFormat: .percent)
+            .frame(height: 20)
+            .font(.caption)
+        MacroBarChart(nutrients: nutrients, textFormat: .percent, textLayout: .top)
+            .frame(height: 20)
+            .font(.caption)
+        MacroBarChart(nutrients: nutrients, textFormat: .percent, textLayout: .center)
+            .frame(height: 20)
             .font(.caption)
         MacroBarChart(nutrients: nutrients).frame(height: 10)
             

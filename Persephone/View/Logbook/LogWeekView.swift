@@ -215,11 +215,10 @@ private struct LogDayView: View {
                     Text(nutrients.get(.Sodium)?.formatted() ?? "0 mg")
                 }.fontWeight(.semibold)
             }
-            MacroBarChart(nutrients: nutrients, textFormat: .percent)
-                .font(.caption)
-                .frame(height: 8)
+            MacroBarChart(nutrients: nutrients, textFormat: .percent, textLayout: .center)
+                .font(.caption2)
+                .frame(height: 12)
                 .padding(.top, 4)
-                .padding(.bottom, 8)
         }
     }
     
@@ -255,6 +254,7 @@ private struct LogDayView: View {
                         } label: {
                             Label("Add Entry...", systemImage: "plus")
                         }
+                        // TODO change meal type to another...
                     } label: {
                         Label(mealType.rawValue, systemImage: mealType.getIconName())
                             .labelReservedIconWidth(12)

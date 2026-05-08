@@ -124,8 +124,14 @@ private struct LogDayView: View {
                     }.contentShape(Rectangle())
                 }.buttonStyle(.plain)
                 Spacer()
-                Button {
-                    navigationStore.push(LogViewType.add(date.atCurrentTime()))
+                Menu {
+                    ForEach(MealType.allCases) { mealType in
+                        Button {
+                            navigationStore.push(LogViewType.add(date: date.atCurrentTime(), mealType: mealType.rawValue))
+                        } label: {
+                            Label(mealType.rawValue, systemImage: mealType.getIconName())
+                        }
+                    }
                 } label: {
                     Image(systemName: "plus")
                         .frame(width: 30, height: 30)
@@ -140,8 +146,8 @@ private struct LogDayView: View {
                     .onTapGesture {
                         showNutrientSheet.toggle()
                     }
-                ForEach(MealType.allCases.filter({ entryMap[$0.rawValue] != nil }), id: \.rawValue) { mealType in
-                    mealView(mealType.rawValue)
+                ForEach(MealType.allCases.filter({ entryMap[$0.rawValue] != nil })) { mealType in
+                    mealView(mealType, entryMap[mealType.rawValue]!)
                 }
             }.scrollContentBackground(.hidden)
                 // Remove hidden margin above form
@@ -215,9 +221,9 @@ private struct LogDayView: View {
         }
     }
     
-    private func mealView(_ name: String) -> some View {
+    private func mealView(_ mealType: MealType, _ entries: [LogEntry]) -> some View {
         Section {
-            ForEach(entryMap[name]!, id: \.hashValue) { entry in
+            ForEach(entries, id: \.hashValue) { entry in
                 Button {
                     switch entry {
                     case .food(let food):
@@ -237,11 +243,12 @@ private struct LogDayView: View {
                     }
             }
         } header: {
-            let cost = entryMap[name]!.map({ $0.cost ?? .zero }).reduce(.zero, +)
-            let nutrients = entryMap[name]!.map({ $0.nutrients }).reduce([:], +)
+            let cost = entries.map({ $0.cost ?? .zero }).reduce(.zero, +)
+            let nutrients = entries.map({ $0.nutrients }).reduce([:], +)
             VStack(spacing: 8) {
                 HStack {
-                    Text(name)
+                    Label(mealType.rawValue, systemImage: mealType.getIconName())
+                        .labelReservedIconWidth(12)
                         .font(.title2)
                         .fontWeight(.bold)
                     Spacer()
@@ -283,7 +290,7 @@ private struct LogDayView: View {
 }
 
 enum LogViewType: Hashable {
-    case add(_ date: Date)
+    case add(date: Date, mealType: String)
     case edit(_ entry: LogEntry)
     case meals
     case meal(_ meal: Meal)
@@ -291,8 +298,29 @@ enum LogViewType: Hashable {
     case editMeal(_ meal: Meal)
 }
 
-enum MealType: String, Hashable, CaseIterable {
-    case Breakfast, Brunch, Lunch, Dinner, Snacks
+enum MealType: String, Identifiable, Hashable, CaseIterable {
+    var id: String {
+        rawValue
+    }
+    
+    case Breakfast, Brunch, Lunch, Dinner, Snacks, Workout
+    
+    func getIconName() -> String {
+        switch self {
+        case .Breakfast:
+            return "sunrise"
+        case .Brunch:
+            return "sun.min"
+        case .Lunch:
+            return "sun.max"
+        case .Dinner:
+            return "sunset"
+        case .Snacks:
+            return "carrot"
+        case .Workout:
+            return "scalemass"
+        }
+    }
 }
 
 extension Binding {

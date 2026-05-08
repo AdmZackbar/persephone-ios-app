@@ -186,7 +186,7 @@ struct SetAmountSheet: View {
         }
         ToolbarItem(placement: .topBarLeading) {
             Picker(selection: $item.meal) {
-                ForEach(MealType.allCases, id: \.rawValue) { mealType in
+                ForEach(MealType.allCases) { mealType in
                     Text(mealType.rawValue).tag(mealType.rawValue)
                 }
             } label: {

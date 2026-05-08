@@ -225,7 +225,7 @@ struct AddLogEntryView: View {
     private func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .principal) {
             Menu {
-                ForEach(MealType.allCases, id: \.rawValue) { t in
+                ForEach(MealType.allCases) { t in
                     Button(t.rawValue) {
                         mealType = t.rawValue
                     }.disabled(mealType == t.rawValue)

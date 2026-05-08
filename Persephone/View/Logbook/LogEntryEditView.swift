@@ -32,7 +32,7 @@ struct LogEntryEditView: View {
         Form {
             DatePicker("Date:", selection: $item.date)
             Picker("Meal:", selection: $item.meal) {
-                ForEach(MealType.allCases, id: \.rawValue) { meal in
+                ForEach(MealType.allCases) { meal in
                     Text(meal.rawValue).tag(meal.rawValue)
                 }
             }

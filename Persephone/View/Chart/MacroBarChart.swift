@@ -9,23 +9,22 @@ import Charts
 import SwiftUI
 
 struct MacroBarChart: View {
-    let nutrients: Nutrients
+    let data: [MacroData]
     let textFormat: TextFormat
     
     init(nutrients: Nutrients = [:], textFormat: TextFormat = .none) {
-        self.nutrients = nutrients
+        self.data = nutrients.toMacroData()
         self.textFormat = textFormat
     }
     
     var body: some View {
-        let data = createData()
         Chart(data) { d in
             BarMark(
-                x: .value("Size", d.energy)
+                x: .value("Size", d.calories)
             ).cornerRadius(8)
                 .foregroundStyle(d.macro?.color ?? .gray)
                 .annotation(position: .bottom, alignment: .center, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
-                    if let text = d.format(textFormat, totalEnergy: data.map({ $0.energy }).reduce(0, +)) {
+                    if let text = format(d) {
                         Text(text)
                             .fontWeight(.bold)
                             .foregroundStyle(d.macro?.color ?? .gray)
@@ -37,91 +36,21 @@ struct MacroBarChart: View {
             .chartLegend(.hidden)
     }
     
-    private func createData() -> [Data] {
-        let data = Macro.allCases.map({ Data(macro: $0, nutrients: nutrients) })
-        if data.allSatisfy({ $0.value <= 0.0 }) {
-            // Return 'none' value
-            return [.init()]
+    private func format(_ data: MacroData) -> String? {
+        switch textFormat {
+        case .none:
+            return nil
+        case .gram:
+            return Amount.init(value: .raw(data.grams), unit: Units.gram)
+                .formatted(maxDigits: 0, includeSpace: false)
+        case .percent:
+            return (data.calories / self.data.totalCalories)
+                .formatted(.percent.precision(.fractionLength(0)))
         }
-        return data
     }
     
     enum TextFormat {
         case none, gram, percent
-    }
-    
-    private struct Data: Identifiable {
-        var id: String {
-            if let macro {
-                macro.rawValue
-            } else {
-                "None"
-            }
-        }
-        
-        let macro: Macro?
-        let value: Double
-        var energy: Double {
-            if let macro {
-                value * macro.modifier
-            } else {
-                1.0
-            }
-        }
-        
-        init() {
-            self.macro = nil
-            self.value = 1.0
-        }
-        
-        init(macro: Macro, nutrients: Nutrients) {
-            self.macro = macro
-            self.value = nutrients[macro.nutrient, default: 0.0]
-        }
-        
-        func format(_ textFormat: TextFormat, totalEnergy: Double) -> String? {
-            switch textFormat {
-            case .none:
-                return nil
-            case .gram:
-                return Amount.init(value: .raw(value), unit: Units.gram).formatted(maxDigits: 0, includeSpace: false)
-            case .percent:
-                return (energy / totalEnergy).formatted(.percent.precision(.fractionLength(0)))
-            }
-        }
-    }
-    
-    private enum Macro: String, CaseIterable {
-        case carbs, fat, protein
-        
-        var nutrient: Nutrient {
-            switch self {
-            case .carbs:
-                return .TotalCarbs
-            case .fat:
-                return .TotalFat
-            case .protein:
-                return .Protein
-            }
-        }
-        var modifier: Double {
-            switch self {
-            case .carbs, .protein:
-                return 4
-            case .fat:
-                return 9
-            }
-        }
-        var color: Color {
-            switch self {
-            case .carbs:
-                return .carbs
-            case .fat:
-                return .fat
-            case .protein:
-                return .protein
-            }
-        }
     }
 }
 

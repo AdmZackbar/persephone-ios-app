@@ -9,26 +9,24 @@ import Charts
 import SwiftUI
 
 struct NutrientPieChart: View {
-    let nutrients: Nutrients
+    let data: [MacroData]
+    
+    init(nutrients: Nutrients = [:]) {
+        self.data = nutrients.toMacroData()
+    }
     
     var body: some View {
         ZStack {
-            Chart(createData(), id: \.name) { name, amount in
+            Chart(data) { d in
                 SectorMark(
-                    angle: .value("Amount", amount),
+                    angle: .value("Amount", d.calories),
                     innerRadius: .ratio(0.7),
                     outerRadius: .inset(8),
                     angularInset: 2
                 ).cornerRadius(4)
-                    .foregroundStyle(by: .value("Macro type", name))
+                    .foregroundStyle(d.macro?.color ?? .gray)
             }.chartLegend(.hidden)
                 .padding(4)
-                .chartForegroundStyleScale([
-                    "Carbs": Colors.carbs,
-                    "Fat": Colors.fat,
-                    "Protein": Colors.protein,
-                    "None": Color.gray
-                ])
                 .chartBackground { chartProxy in
                     GeometryReader { geometry in
                         if let anchor = chartProxy.plotFrame {
@@ -39,24 +37,24 @@ struct NutrientPieChart: View {
                 }
             VStack(alignment: .leading) {
                 HStack {
-                    let protein = getNutrientString(.Protein)
+                    let protein = getNutrientString(.protein)
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Protein")
                         Text(protein)
-                    }.foregroundStyle(Colors.protein)
+                    }.foregroundStyle(.protein)
                     Spacer()
-                    let carbs = getNutrientString(.TotalCarbs)
+                    let carbs = getNutrientString(.carbs)
                     VStack(alignment: .trailing, spacing: 0) {
                         Text("Carbs")
                         Text(carbs)
-                    }.foregroundStyle(Colors.carbs)
+                    }.foregroundStyle(.carbs)
                 }
                 Spacer()
-                let fat = getNutrientString(.TotalFat)
+                let fat = getNutrientString(.fat)
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Fat")
                     Text(fat)
-                }.foregroundStyle(Colors.fat)
+                }.foregroundStyle(.fat)
             }.font(.caption)
                 .fontWeight(.heavy)
         }
@@ -65,30 +63,15 @@ struct NutrientPieChart: View {
     @ViewBuilder
     private func chartOverlay(_ frame: CGRect) -> some View {
         VStack(spacing: 2) {
-            Text(nutrients.calories.value.formatted())
+            Text(data.totalCalories.formatted(.number.precision(.fractionLength(0))))
                 .font(.title3).fontWeight(.heavy)
             Text("Cal")
                 .font(.caption).bold()
         }.position(x: frame.midX, y: frame.midY)
     }
     
-    private func createData() -> [(name: String, amount: Double)] {
-        let data = [
-            (name: "Carbs", amount: nutrients[.TotalCarbs, default: 0] * 4),
-            (name: "Fat", amount: nutrients[.TotalFat, default: 0] * 9),
-            (name: "Protein", amount: nutrients[.Protein, default: 0] * 4)
-        ]
-        if data.allSatisfy({ (name: String, amount: Double) in amount <= 0 }) {
-            return [(name: "None", amount: 1)]
-        }
-        return data
-    }
-    
-    private func getNutrientString(_ nutrient: Nutrient) -> String {
-        if let amount = nutrients.get(nutrient) {
-            return amount.formatted(includeSpace: false)
-        }
-        return "0g"
+    private func getNutrientString(_ macro: Macro) -> String {
+        return "\(data.first(where: { $0.macro == macro })?.grams.formatted(.number.precision(.fractionLength(0))) ?? "0")g"
     }
 }
 

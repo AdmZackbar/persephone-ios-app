@@ -36,6 +36,7 @@
 		E885CC802D3EAC5D0041364D /* RecipeEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E885CC7F2D3EAC590041364D /* RecipeEntryView.swift */; };
 		E89A87032FAD20C8002CDEBB /* AddLogEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87022FAD20C8002CDEBB /* AddLogEntryView.swift */; };
 		E89A87072FAD9323002CDEBB /* MacroBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87062FAD9323002CDEBB /* MacroBarChart.swift */; };
+		E89A870D2FAE2672002CDEBB /* MacroData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A870C2FAE2672002CDEBB /* MacroData.swift */; };
 		E89D08C72C7CFFDF005AE1EF /* FoodDatabaseDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */; };
 		E8A5F5142D3EC7AD00377624 /* RecipeEntryIngredientSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */; };
 		E8A5F5162D3EDD6C00377624 /* RecipeEntryPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */; };
@@ -133,6 +134,7 @@
 		E885CC7F2D3EAC590041364D /* RecipeEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryView.swift; sourceTree = "<group>"; };
 		E89A87022FAD20C8002CDEBB /* AddLogEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLogEntryView.swift; sourceTree = "<group>"; };
 		E89A87062FAD9323002CDEBB /* MacroBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBarChart.swift; sourceTree = "<group>"; };
+		E89A870C2FAE2672002CDEBB /* MacroData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroData.swift; sourceTree = "<group>"; };
 		E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseDocument.swift; sourceTree = "<group>"; };
 		E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryIngredientSheet.swift; sourceTree = "<group>"; };
 		E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryPreview.swift; sourceTree = "<group>"; };
@@ -349,6 +351,7 @@
 		E8E702522D34089A00FB7013 /* Chart */ = {
 			isa = PBXGroup;
 			children = (
+				E89A870C2FAE2672002CDEBB /* MacroData.swift */,
 				E867E6652D343AF8001917C0 /* LogbookPieChart.swift */,
 				E8E702552D3408CF00FB7013 /* NutrientPieChart.swift */,
 				E80E2B502FABD124006FAC4A /* MiniNutrientPieChart.swift */,
@@ -576,6 +579,7 @@
 				E8A5F5162D3EDD6C00377624 /* RecipeEntryPreview.swift in Sources */,
 				E8743BA32C52DC6300E1B871 /* NutrientsEditSheet.swift in Sources */,
 				E8E702582D340C1200FB7013 /* MockDataPreviewModifier.swift in Sources */,
+				E89A870D2FAE2672002CDEBB /* MacroData.swift in Sources */,
 				E8EB881F2D3C103800861685 /* AmountField.swift in Sources */,
 				E8EB88262D3D303500861685 /* FoodEditView.swift in Sources */,
 				E8EB881D2D3C0A2100861685 /* OptionalCurrencyField.swift in Sources */,

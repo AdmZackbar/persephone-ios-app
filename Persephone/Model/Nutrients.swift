@@ -100,3 +100,36 @@ enum Nutrient: Codable, Equatable, Hashable {
         }
     }
 }
+
+/// Macronurtient: Carbs, Fat, Protein
+/// Essentially a subset of the nutrient enum.
+enum Macro: String, CaseIterable {
+    case carbs, fat, protein
+    
+    /// The capitalized name
+    var name: String {
+        rawValue.capitalized
+    }
+    
+    /// The representative nutrient
+    var nutrient: Nutrient {
+        switch self {
+        case .carbs:
+            return .TotalCarbs
+        case .fat:
+            return .TotalFat
+        case .protein:
+            return .Protein
+        }
+    }
+    
+    /// Calories per gram of macronutrient
+    var modifier: Double {
+        switch self {
+        case .carbs, .protein:
+            return 4
+        case .fat:
+            return 9
+        }
+    }
+}

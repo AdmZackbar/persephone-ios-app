@@ -37,6 +37,7 @@
 		E89A87032FAD20C8002CDEBB /* AddLogEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87022FAD20C8002CDEBB /* AddLogEntryView.swift */; };
 		E89A87072FAD9323002CDEBB /* MacroBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87062FAD9323002CDEBB /* MacroBarChart.swift */; };
 		E89A870D2FAE2672002CDEBB /* MacroData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A870C2FAE2672002CDEBB /* MacroData.swift */; };
+		E89A870F2FAE86CD002CDEBB /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E89A870E2FAE86CD002CDEBB /* AppIcon.icon */; };
 		E89D08C72C7CFFDF005AE1EF /* FoodDatabaseDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */; };
 		E8A5F5142D3EC7AD00377624 /* RecipeEntryIngredientSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */; };
 		E8A5F5162D3EDD6C00377624 /* RecipeEntryPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */; };
@@ -134,6 +135,7 @@
 		E89A87022FAD20C8002CDEBB /* AddLogEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLogEntryView.swift; sourceTree = "<group>"; };
 		E89A87062FAD9323002CDEBB /* MacroBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBarChart.swift; sourceTree = "<group>"; };
 		E89A870C2FAE2672002CDEBB /* MacroData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroData.swift; sourceTree = "<group>"; };
+		E89A870E2FAE86CD002CDEBB /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseDocument.swift; sourceTree = "<group>"; };
 		E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryIngredientSheet.swift; sourceTree = "<group>"; };
 		E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryPreview.swift; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 				E80E2C3E2C3F6C6700D35BE7 /* UI */,
 				E8828EDF2C50F703006C7CB3 /* Util */,
 				E860ACE72C3EFBE8007E65DE /* Assets.xcassets */,
+				E89A870E2FAE86CD002CDEBB /* AppIcon.icon */,
 				E80E2C4F2C41C00600D35BE7 /* Info.plist */,
 				E860ACE92C3EFBE8007E65DE /* Preview Content */,
 			);
@@ -499,6 +502,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E89A870F2FAE86CD002CDEBB /* AppIcon.icon in Resources */,
 				E860ACEB2C3EFBE8007E65DE /* Preview Assets.xcassets in Resources */,
 				E860ACE82C3EFBE8007E65DE /* Assets.xcassets in Resources */,
 			);

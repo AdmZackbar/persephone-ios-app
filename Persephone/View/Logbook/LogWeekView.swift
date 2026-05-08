@@ -182,11 +182,11 @@ private struct LogDayView: View {
                 Divider().hidden()
                 GridRow {
                     Text(nutrients.get(.TotalCarbs)?.formatted() ?? "0 g")
-                        .foregroundStyle(Colors.carbs)
+                        .foregroundStyle(.carbs)
                     Text(nutrients.get(.TotalFat)?.formatted() ?? "0 g")
-                        .foregroundStyle(Colors.fat)
+                        .foregroundStyle(.fat)
                     Text(nutrients.get(.Protein)?.formatted() ?? "0 g")
-                        .foregroundStyle(Colors.protein)
+                        .foregroundStyle(.protein)
                     Text(nutrients.get(.Sodium)?.formatted() ?? "0 mg")
                 }.fontWeight(.semibold)
             }
@@ -208,12 +208,10 @@ private struct LogDayView: View {
                         .contentShape(Rectangle())
                 }.buttonStyle(.plain)
                     .contextMenu {
-                        editButton(entry)
                         deleteButton(entry)
                     }
                     .swipeActions {
                         deleteButton(entry)
-                        editButton(entry)
                     }
             }
         } header: {
@@ -223,15 +221,7 @@ private struct LogDayView: View {
                     .fontWeight(.bold)
                 Spacer()
                 Text(entryMap[name]!.map({ $0.nutrients }).reduce([:], +).calories.formatted())
-            }
-        }
-    }
-    
-    private func editButton(_ entry: LogEntry) -> some View {
-        Button {
-            navigationStore.push(LogViewType.edit(entry))
-        } label: {
-            Label("Edit", systemImage: "pencil")
+            }.foregroundStyle(.primary)
         }
     }
     

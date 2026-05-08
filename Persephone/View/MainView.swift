@@ -16,9 +16,9 @@ struct MainView: View {
     
     var body: some View {
         TabView {
-            FoodDatabaseView()
+            LogWeekView()
                 .tabItem {
-                    Label("Database", systemImage: "tablecells")
+                    Label("Logbook", systemImage: "calendar")
                 }
             CookbookView()
                 .tabItem {
@@ -28,9 +28,9 @@ struct MainView: View {
                 .tabItem {
                     Label("Inventory", systemImage: "list.clipboard")
                 }
-            LogWeekView()
+            FoodDatabaseView()
                 .tabItem {
-                    Label("Logbook", systemImage: "calendar")
+                    Label("Database", systemImage: "tablecells")
                 }
         }
     }

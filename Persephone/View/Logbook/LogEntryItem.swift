@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-struct LogEntryItem {
+struct LogEntryItem: Hashable {
     private var entry: LogEntry?
     var isEdit: Bool {
         entry != nil

@@ -60,7 +60,7 @@ final class NavigationStore: ObservableObject {
     func getLogView(_ type: LogViewType) -> some View {
         switch type {
         case .add(let date):
-            LogEntryEditView(item: .init(date: date, meal: "Snacks"))
+            AddLogEntryView(date: date, mealType: "Snacks")
         case .edit(let entry):
             LogEntryEditView(item: .init(entry: entry))
         case .meals:

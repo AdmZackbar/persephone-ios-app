@@ -52,15 +52,14 @@ struct SetAmountSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                if let food = item.food {
-                    foodSummaryView(food)
-                } else if let recipe = item.recipe {
-                    recipeSummaryView(recipe)
-                }
                 Section {
                     ScaledAmountField(amount: $item.amount, units: computeUnits())
                 } header: {
-                    EmptyView()
+                    if let food = item.food {
+                        foodSummaryView(food)
+                    } else if let recipe = item.recipe {
+                        recipeSummaryView(recipe)
+                    }
                 } footer: {
                     if !recentFoodEntries.isEmpty {
                         recentEntriesView()
@@ -70,29 +69,9 @@ struct SetAmountSheet: View {
                     priceView(food)
                 }
             }.listSectionSpacing(.compact)
-            // Remove hidden margin above/below sections
-            .contentMargins([.top, .bottom], 0, for: .scrollContent)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Label("Cancel", systemImage: "chevron.left")
-                    }.disabled(item.isInvalid)
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        item.save(modelContext)
-                        dismiss()
-                    } label: {
-                        if item.isEdit {
-                            Label("Save", systemImage: "checkmark")
-                        } else {
-                            Label("Add", systemImage: "plus")
-                        }
-                    }.disabled(item.isInvalid)
-                }
-            }.presentationDetents([.height(440)])
+                .toolbar(content: toolbarContent)
+                .toolbarTitleDisplayMode(.inline)
+                .presentationDetents([.height(420)])
                 // Don't use liquid glass as main background
                 .presentationBackground(.regularMaterial)
         }
@@ -100,35 +79,33 @@ struct SetAmountSheet: View {
     
     @ViewBuilder
     private func foodSummaryView(_ food: Food) -> some View {
-        Section {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(food.name)
-                        .fontWeight(.semibold)
-                    HStack {
-                        if let brand = food.brand {
-                            Text(brand)
-                        }
-                    }.font(.caption).italic()
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(item.amount.formatted())
-                        .font(.title3)
-                        .fontWeight(.bold)
-                    if let cost = item.servingCost {
-                        Text((cost * item.numServings).formatted())
-                            .font(.caption)
-                            .italic()
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(food.name)
+                    .fontWeight(.semibold)
+                HStack {
+                    if let brand = food.brand {
+                        Text(brand)
                     }
-                }
-                let nutrients = food.ingredients.nutrients * item.numServings
-                MiniNutrientPieChart(text: nutrients.calories.value.formatted(), nutrients: nutrients)
-                    .frame(width: 56, height: 56)
-                    .font(.caption)
-                    .fontWeight(.bold)
+                }.font(.caption).italic()
             }
-        }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(item.amount.formatted())
+                    .font(.title3)
+                    .fontWeight(.bold)
+                if let cost = item.servingCost {
+                    Text((cost * item.numServings).formatted())
+                        .font(.caption)
+                        .italic()
+                }
+            }
+            let nutrients = food.ingredients.nutrients * item.numServings
+            MiniNutrientPieChart(text: nutrients.calories.value.formatted(), nutrients: nutrients)
+                .frame(width: 56, height: 56)
+                .font(.caption)
+                .fontWeight(.bold)
+        }.foregroundStyle(.primary)
     }
     
     private func recipeSummaryView(_ recipe: RecipeEntry) -> some View {
@@ -197,6 +174,34 @@ struct SetAmountSheet: View {
                 }.scrollIndicators(.hidden)
                     .scrollClipDisabled()
             }
+        }
+    }
+    
+    @ToolbarContentBuilder
+    private func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            DatePicker(selection: $item.date, displayedComponents: [.hourAndMinute]) {
+                EmptyView()
+            }
+        }
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
+                dismiss()
+            } label: {
+                Label("Cancel", systemImage: "chevron.left")
+            }.disabled(item.isInvalid)
+        }
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                item.save(modelContext)
+                dismiss()
+            } label: {
+                if item.isEdit {
+                    Label("Save", systemImage: "checkmark")
+                } else {
+                    Label("Add", systemImage: "plus")
+                }
+            }.disabled(item.isInvalid)
         }
     }
 }

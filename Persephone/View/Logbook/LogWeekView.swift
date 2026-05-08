@@ -135,6 +135,7 @@ private struct LogDayView: View {
                 } label: {
                     Image(systemName: "plus")
                         .frame(width: 30, height: 30)
+                        .bold()
                 }.buttonStyle(.glassProminent)
                     .clipShape(Circle())
                     .glassEffect(in: Circle())

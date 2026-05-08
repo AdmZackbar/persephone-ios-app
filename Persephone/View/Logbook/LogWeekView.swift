@@ -215,9 +215,11 @@ private struct LogDayView: View {
                     Text(nutrients.get(.Sodium)?.formatted() ?? "0 mg")
                 }.fontWeight(.semibold)
             }
-            MacroBarChart(nutrients: nutrients)
+            MacroBarChart(nutrients: nutrients, textFormat: .percent)
+                .font(.caption)
                 .frame(height: 8)
                 .padding(.top, 4)
+                .padding(.bottom, 8)
         }
     }
     
@@ -246,29 +248,39 @@ private struct LogDayView: View {
             let cost = entries.map({ $0.cost ?? .zero }).reduce(.zero, +)
             let nutrients = entries.map({ $0.nutrients }).reduce([:], +)
             VStack(spacing: 8) {
-                HStack {
-                    Label(mealType.rawValue, systemImage: mealType.getIconName())
-                        .labelReservedIconWidth(12)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                HStack(alignment: .bottom) {
+                    Menu {
+                        Button {
+                            navigationStore.push(LogViewType.add(date: date.atCurrentTime(), mealType: mealType.rawValue))
+                        } label: {
+                            Label("Add Entry...", systemImage: "plus")
+                        }
+                    } label: {
+                        Label(mealType.rawValue, systemImage: mealType.getIconName())
+                            .labelReservedIconWidth(12)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                    }
                     Spacer()
                     Button {
                         // TODO
                     } label: {
                         Text(nutrients.calories.formatted())
+                            .font(.subheadline)
                             .fontWeight(.semibold)
                     }.buttonStyle(.glass)
                     Button {
                         // TODO
                     } label: {
                         Text(cost.formatted())
+                            .font(.subheadline)
                             .fontWeight(.semibold)
                     }.buttonStyle(.glass)
                 }
-                MacroBarChart(nutrients: nutrients, showText: true)
+                MacroBarChart(nutrients: nutrients, textFormat: .gram)
                     .font(.caption2)
                     .frame(height: 8)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 10)
             }.foregroundStyle(.primary)
         }
     }

@@ -184,14 +184,16 @@ struct SetAmountSheet: View {
                 EmptyView()
             }
         }
-        ToolbarItem(placement: .cancellationAction) {
-            Button {
-                dismiss()
+        ToolbarItem(placement: .topBarLeading) {
+            Picker(selection: $item.meal) {
+                ForEach(MealType.allCases, id: \.rawValue) { mealType in
+                    Text(mealType.rawValue).tag(mealType.rawValue)
+                }
             } label: {
-                Label("Cancel", systemImage: "chevron.left")
-            }.disabled(item.isInvalid)
+                EmptyView()
+            }.tint(.primary)
         }
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .topBarTrailing) {
             Button {
                 item.save(modelContext)
                 dismiss()
@@ -210,6 +212,6 @@ struct SetAmountSheet: View {
     VStack {
         
     }.sheet(isPresented: .constant(true)) {
-        SetAmountSheet(item: .init())
+        SetAmountSheet(item: .init(meal: "Snacks"))
     }
 }

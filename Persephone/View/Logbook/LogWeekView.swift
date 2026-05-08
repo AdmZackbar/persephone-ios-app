@@ -121,7 +121,7 @@ private struct LogDayView: View {
                 } label: {
                     Image(systemName: "plus")
                         .frame(width: 30, height: 30)
-                }.buttonStyle(.glass)
+                }.buttonStyle(.glassProminent)
                     .clipShape(Circle())
                     .glassEffect(in: Circle())
             }.padding(.leading, 24)
@@ -175,7 +175,6 @@ private struct LogDayView: View {
             Text(entryMap.values.map({ $0.cost ?? .zero }).reduce(.zero, +).formatted())
                 .fontWeight(.bold)
             Spacer()
-            // TODO improve this layout and styling
             Grid(alignment: .leadingFirstTextBaseline, verticalSpacing: 2) {
                 GridRow {
                     Text("Carbs")
@@ -195,6 +194,9 @@ private struct LogDayView: View {
                     Text(nutrients.get(.Sodium)?.formatted() ?? "0 mg")
                 }.fontWeight(.semibold)
             }
+            MacroBarChart(nutrients: nutrients)
+                .frame(height: 8)
+                .padding(.top, 4)
         }
     }
     
@@ -220,12 +222,31 @@ private struct LogDayView: View {
                     }
             }
         } header: {
-            HStack {
-                Text(name)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                Spacer()
-                Text(entryMap[name]!.map({ $0.nutrients }).reduce([:], +).calories.formatted())
+            let cost = entryMap[name]!.map({ $0.cost ?? .zero }).reduce(.zero, +)
+            let nutrients = entryMap[name]!.map({ $0.nutrients }).reduce([:], +)
+            VStack(spacing: 8) {
+                HStack {
+                    Text(name)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Spacer()
+                    Button {
+                        // TODO
+                    } label: {
+                        Text(nutrients.calories.formatted())
+                            .fontWeight(.semibold)
+                    }.buttonStyle(.glass)
+                    Button {
+                        // TODO
+                    } label: {
+                        Text(cost.formatted())
+                            .fontWeight(.semibold)
+                    }.buttonStyle(.glass)
+                }
+                MacroBarChart(nutrients: nutrients, showText: true)
+                    .font(.caption2)
+                    .frame(height: 8)
+                    .padding(.bottom, 16)
             }.foregroundStyle(.primary)
         }
     }

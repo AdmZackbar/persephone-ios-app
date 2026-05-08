@@ -14,8 +14,13 @@ struct LogWeekView: View {
     @Query(sort: \FoodLogEntry.date) private var foodEntries: [FoodLogEntry]
     @Query(sort: \RecipeLogEntry.date) private var recipeEntries: [RecipeLogEntry]
     
-    @State var date: Date = .now
-    @State private var weekOffset: CGSize = .zero
+    @State var date: Date
+    @State private var weekOffset: CGSize
+    
+    init(date: Date = .now) {
+        self.date = date
+        self.weekOffset = .zero
+    }
     
     var body: some View {
         NavigationStack(path: $navigationStore.path) {

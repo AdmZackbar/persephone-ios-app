@@ -20,6 +20,8 @@ extension SchemaV1 {
         var servingSize: FoodSize = FoodSize()
         var storeEntries: [StoreEntry] = []
         
+        @Relationship(deleteRule: .cascade, inverse: \FoodInstance.food)
+        var instances: [FoodInstance]! = []
         @Relationship(deleteRule: .cascade, inverse: \FoodLogEntry.food)
         var logEntries: [FoodLogEntry]! = []
         @Relationship(deleteRule: .cascade, inverse: \RecipeEntryIngredient.food)

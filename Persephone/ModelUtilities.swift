@@ -253,6 +253,12 @@ extension Food.StoreEntry {
     }
 }
 
+extension FoodInstance {
+    var remaining: FoodSize {
+        total * remainder
+    }
+}
+
 // Log Entry
 
 extension FoodLogEntry {

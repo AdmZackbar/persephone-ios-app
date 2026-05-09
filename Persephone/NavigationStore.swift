@@ -85,6 +85,14 @@ final class NavigationStore: ObservableObject {
             RecipeEntryEditView(item: .init(entry: entry))
         }
     }
+    
+    @ViewBuilder
+    func getInventoryView(_ type: InventoryViewType) -> some View {
+        switch type {
+        case .addFood:
+            AddFoodInstanceView()
+        }
+    }
 }
 
 extension View {
@@ -92,5 +100,6 @@ extension View {
         self.navigationDestination(for: FoodViewType.self, destination: navigationStore.getFoodView)
             .navigationDestination(for: LogViewType.self, destination: navigationStore.getLogView)
             .navigationDestination(for: CookbookViewType.self, destination: navigationStore.getCookbookView)
+            .navigationDestination(for: InventoryViewType.self, destination: navigationStore.getInventoryView)
     }
 }

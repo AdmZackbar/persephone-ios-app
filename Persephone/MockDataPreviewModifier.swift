@@ -22,9 +22,12 @@ struct MockDataPreviewModifier: PreviewModifier {
     }
     
     static func populateContainer(_ container: ModelContainer) {
-        container.mainContext.insert(createTestFood())
+        let food = createTestFood()
+        container.mainContext.insert(food)
         container.mainContext.insert(createTestRecipeEntry())
         container.mainContext.insert(createTestFoodLogEntry())
+        let instance: FoodInstance = .init(food: food, acquireDate: .now.addDays(-1), source: "Costco", cost: .usd(1399), total: .init(str: "1 bag", val: 350), remainder: 0.5)
+        container.mainContext.insert(instance)
 //        insertTestMeals(container)
 //        container.mainContext.insert(createRecipe())
     }
@@ -57,20 +60,6 @@ struct MockDataPreviewModifier: PreviewModifier {
                 .init(store: "Store 2", cost: .usd(1099), amount: .init(str: "2 containers", val: 3200)),
                 .init(store: "Store 3", cost: .usd(1000), amount: .init(str: "1 lb", val: 500))
             ])
-//        item.logEntries.append(.init(item: item, amount: .Raw(1.5), category: "Breakfast", unitPrice: .Cents(240)))
-//        item.instances = [
-//            FoodInstance(
-//                foodItem: item,
-//                origin: .Store(store: "Costco", price: .Cents(530)),
-//                amount: .Single(
-//                    total: Quantity(value: .Raw(530), unit: .Gram),
-//                    remaining: Quantity(value: .Raw(420), unit: .Gram)),
-//                dates: FoodInstance.Dates(
-//                    acqDate: Date(),
-//                    expDate: Date().addingTimeInterval(100000),
-//                    freezeDate: Date().addingTimeInterval(3600)
-//                ))
-//        ]
         return item
     }
     

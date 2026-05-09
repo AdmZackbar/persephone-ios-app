@@ -38,6 +38,8 @@
 		E89A87072FAD9323002CDEBB /* MacroBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87062FAD9323002CDEBB /* MacroBarChart.swift */; };
 		E89A870D2FAE2672002CDEBB /* MacroData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A870C2FAE2672002CDEBB /* MacroData.swift */; };
 		E89A870F2FAE86CD002CDEBB /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E89A870E2FAE86CD002CDEBB /* AppIcon.icon */; };
+		E89A87132FAEA187002CDEBB /* FoodInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87122FAEA187002CDEBB /* FoodInstance.swift */; };
+		E89A87162FAEA44E002CDEBB /* InventoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87152FAEA44E002CDEBB /* InventoryView.swift */; };
 		E89D08C72C7CFFDF005AE1EF /* FoodDatabaseDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */; };
 		E8A5F5142D3EC7AD00377624 /* RecipeEntryIngredientSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */; };
 		E8A5F5162D3EDD6C00377624 /* RecipeEntryPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */; };
@@ -58,6 +60,7 @@
 		E8E7024F2D33FBA000FB7013 /* MainUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E7024E2D33FBA000FB7013 /* MainUtilities.swift */; };
 		E8E702562D3408D200FB7013 /* NutrientPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E702552D3408CF00FB7013 /* NutrientPieChart.swift */; };
 		E8E702582D340C1200FB7013 /* MockDataPreviewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */; };
+		E8E883232FAEAD4200E07B28 /* AddFoodInstanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E883222FAEAD4200E07B28 /* AddFoodInstanceView.swift */; };
 		E8E9AE352D3F5C8100B2A193 /* RecipeLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE342D3F5C7E00B2A193 /* RecipeLogEntry.swift */; };
 		E8E9AE372D3FDD1B00B2A193 /* OptionalDatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE362D3FDD1500B2A193 /* OptionalDatePicker.swift */; };
 		E8E9AE392D4121C800B2A193 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE382D4121C400B2A193 /* LogEntry.swift */; };
@@ -136,6 +139,8 @@
 		E89A87062FAD9323002CDEBB /* MacroBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBarChart.swift; sourceTree = "<group>"; };
 		E89A870C2FAE2672002CDEBB /* MacroData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroData.swift; sourceTree = "<group>"; };
 		E89A870E2FAE86CD002CDEBB /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		E89A87122FAEA187002CDEBB /* FoodInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodInstance.swift; sourceTree = "<group>"; };
+		E89A87152FAEA44E002CDEBB /* InventoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryView.swift; sourceTree = "<group>"; };
 		E89D08C62C7CFFDF005AE1EF /* FoodDatabaseDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodDatabaseDocument.swift; sourceTree = "<group>"; };
 		E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryIngredientSheet.swift; sourceTree = "<group>"; };
 		E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryPreview.swift; sourceTree = "<group>"; };
@@ -156,6 +161,7 @@
 		E8E7024E2D33FBA000FB7013 /* MainUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainUtilities.swift; sourceTree = "<group>"; };
 		E8E702552D3408CF00FB7013 /* NutrientPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutrientPieChart.swift; sourceTree = "<group>"; };
 		E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataPreviewModifier.swift; sourceTree = "<group>"; };
+		E8E883222FAEAD4200E07B28 /* AddFoodInstanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFoodInstanceView.swift; sourceTree = "<group>"; };
 		E8E9AE342D3F5C7E00B2A193 /* RecipeLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeLogEntry.swift; sourceTree = "<group>"; };
 		E8E9AE362D3FDD1500B2A193 /* OptionalDatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionalDatePicker.swift; sourceTree = "<group>"; };
 		E8E9AE382D4121C400B2A193 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
@@ -239,6 +245,7 @@
 				E8EB88042D3B15C000861685 /* Database */,
 				E885CC762D3E9E5B0041364D /* Recipe */,
 				E8EB880E2D3B661D00861685 /* Logbook */,
+				E89A87142FAEA3BC002CDEBB /* Inventory */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -247,6 +254,7 @@
 			isa = PBXGroup;
 			children = (
 				E8EB88082D3B1E6600861685 /* Food.swift */,
+				E89A87122FAEA187002CDEBB /* FoodInstance.swift */,
 				E8EB88112D3B66F000861685 /* FoodLogEntry.swift */,
 				E8CFEC582E521139002B6268 /* Meal.swift */,
 				E885CC742D3E90460041364D /* RecipeEntry.swift */,
@@ -346,6 +354,15 @@
 				E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */,
 			);
 			path = Recipe;
+			sourceTree = "<group>";
+		};
+		E89A87142FAEA3BC002CDEBB /* Inventory */ = {
+			isa = PBXGroup;
+			children = (
+				E89A87152FAEA44E002CDEBB /* InventoryView.swift */,
+				E8E883222FAEAD4200E07B28 /* AddFoodInstanceView.swift */,
+			);
+			path = Inventory;
 			sourceTree = "<group>";
 		};
 		E8E702522D34089A00FB7013 /* Chart */ = {
@@ -531,9 +548,11 @@
 			files = (
 				E8E9AE432D41EC4B00B2A193 /* LogEntryItem.swift in Sources */,
 				E82CFBDA2C3F078D0055C6B2 /* MainView.swift in Sources */,
+				E8E883232FAEAD4200E07B28 /* AddFoodInstanceView.swift in Sources */,
 				E8C61F252F9C2257000EA054 /* MealsView.swift in Sources */,
 				E8C61F272F9C29C8000EA054 /* MealView.swift in Sources */,
 				E8C61F2B2F9C408F000EA054 /* MealEditView.swift in Sources */,
+				E89A87132FAEA187002CDEBB /* FoodInstance.swift in Sources */,
 				E8E7024B2D33F6CF00FB7013 /* CurrencyField.swift in Sources */,
 				E885CC802D3EAC5D0041364D /* RecipeEntryView.swift in Sources */,
 				E8CFEC592E521140002B6268 /* Meal.swift in Sources */,
@@ -573,6 +592,7 @@
 				E885CC752D3E904B0041364D /* RecipeEntry.swift in Sources */,
 				E8E7024D2D33F9CD00FB7013 /* NavigationStore.swift in Sources */,
 				E8EB88282D3D306C00861685 /* FoodItem.swift in Sources */,
+				E89A87162FAEA44E002CDEBB /* InventoryView.swift in Sources */,
 				E860ACE22C3EFBE5007E65DE /* PersephoneApp.swift in Sources */,
 				E80E2C512C41C23200D35BE7 /* ScannerView.swift in Sources */,
 				E8EB882D2D3D55BF00861685 /* FoodPreview.swift in Sources */,

@@ -257,6 +257,17 @@ extension FoodInstance {
     var remaining: FoodSize {
         total * remainder
     }
+    
+    var numServings: Double {
+        if let modifier = total.value.unit?.modifier {
+            return (total.val * modifier) / food.servingSize.val
+        }
+        return total.val / food.servingSize.amount.value.raw
+    }
+    
+    var costPerServing: Currency {
+        cost / numServings
+    }
 }
 
 // Log Entry

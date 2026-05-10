@@ -16,6 +16,7 @@ struct AddLogEntryView: View {
     @Query private var recipes: [RecipeEntry]
     @Query private var meals: [Meal]
     @Query private var recentFoodEntries: [FoodLogEntry]
+    @Query private var instances: [FoodInstance]
     
     @State var date: Date
     @State var mealType: String
@@ -45,6 +46,7 @@ struct AddLogEntryView: View {
             descriptor.fetchLimit = 30
             return descriptor
         }())
+        self._instances = Query(sort: \.acquireDate)
     }
     
     var body: some View {
@@ -158,31 +160,63 @@ struct AddLogEntryView: View {
             }
         }
         ForEach(foodList.prefix(30)) { food in
-            Button {
-                var entry: LogEntryItem = .init()
-                entry.food = food
-                entry.meal = mealType
-                entry.date = date
-                entry.servingCost = food.storeEntries.first(where: { $0.isAvailable })?.costPerServing(food.servingSize) ?? .zero
-                entry.amount = recentFoodEntries.first(where: { $0.food == food })?.amount ?? food.servingSize.amount
-                selection.append(entry)
-                editItem = food.id
-            } label: {
-                // TODO
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(food.name)
-                            .bold()
-                        if let brand = food.brand {
-                            Text(brand)
-                                .font(.subheadline)
-                                .italic()
+            let foodInstances = instances.filter({ $0.food == food })
+            if foodInstances.isEmpty {
+                addBasicFoodButton(food)
+            } else {
+                Menu {
+                    ForEach(foodInstances, id: \.id) { instance in
+                        Button {
+                            addFood(food, instance: instance)
+                        } label: {
+                            Text("\(instance.source): \(instance.remaining.formatted())")
                         }
                     }
-                    Spacer()
-                }.contentShape(Rectangle())
-            }.buttonStyle(.plain)
+                    Button {
+                        addFood(food)
+                    } label: {
+                        Text("New Entry")
+                    }
+                } label: {
+                    foodListView(food)
+                }.buttonStyle(.plain)
+            }
         }
+    }
+    
+    private func addBasicFoodButton(_ food: Food) -> some View {
+        Button {
+            addFood(food)
+        } label: {
+            foodListView(food)
+        }.buttonStyle(.plain)
+    }
+    
+    private func addFood(_ food: Food, instance: FoodInstance? = nil) {
+        var entry: LogEntryItem = .init()
+        entry.food = food
+        entry.meal = mealType
+        entry.date = date
+        entry.servingCost = instance?.costPerServing ?? food.storeEntries.first(where: { $0.isAvailable })?.costPerServing(food.servingSize) ?? .zero
+        entry.amount = recentFoodEntries.first(where: { $0.food == food })?.amount ?? food.servingSize.amount
+        entry.instance = instance
+        selection.append(entry)
+        editItem = food.id
+    }
+    
+    private func foodListView(_ food: Food) -> some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(food.name)
+                    .bold()
+                if let brand = food.brand {
+                    Text(brand)
+                        .font(.subheadline)
+                        .italic()
+                }
+            }
+            Spacer()
+        }.contentShape(Rectangle())
     }
     
     private func isFiltered(_ food: Food) -> Bool {
@@ -278,6 +312,7 @@ struct AddLogEntryView: View {
         
         @Query private var recentFoodEntries: [FoodLogEntry]
         
+        
         @Binding var item: LogEntryItem
         
         init(item: Binding<LogEntryItem>) {
@@ -331,8 +366,14 @@ struct AddLogEntryView: View {
                             recentEntriesView()
                         }
                     }
-                    if let food = item.food {
-                        priceView(food)
+                    if let instance = item.instance {
+                        Section("Inventory") {
+                            instanceView(instance)
+                        }
+                    } else if let food = item.food {
+                        Section {
+                            priceView(food)
+                        }
                     }
                 }.listSectionSpacing(.compact)
                     .toolbar(.hidden)
@@ -403,42 +444,59 @@ struct AddLogEntryView: View {
                 .padding([.leading, .trailing], -14)
         }
         
+        private func instanceView(_ instance: FoodInstance) -> some View {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(instance.remaining.formatted())
+                        .bold()
+                    Text(instance.source)
+                        .font(.subheadline)
+                        .italic()
+                    Text(instance.acquireDate.formatted(date: .abbreviated, time: .shortened))
+                        .font(.subheadline)
+                        .fontWeight(.light)
+                }
+                Spacer()
+                VStack(alignment: .trailing) {
+                    Text(instance.cost.formatted())
+                }
+            }
+        }
+        
         @ViewBuilder
         private func priceView(_ food: Food) -> some View {
-            Section {
-                VStack {
-                    HStack {
-                        if let unwrappedValue = Binding($item.servingCost) {
-                            CurrencyField(value: unwrappedValue)
-                        } else {
-                            Text(item.servingCost?.formatted() ?? "$0.00")
-                        }
-                        Spacer()
-                        Text("$ per \(food.servingSize.formatted())")
+            VStack {
+                HStack {
+                    if let unwrappedValue = Binding($item.servingCost) {
+                        CurrencyField(value: unwrappedValue)
+                    } else {
+                        Text(item.servingCost?.formatted() ?? "$0.00")
                     }
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(food.storeEntries.filter({ $0.isAvailable }), id: \.hashValue) { storeEntry in
-                                Button {
-                                    item.servingCost = storeEntry.costPerServing(food.servingSize)
-                                } label: {
-                                    VStack(alignment: .leading) {
-                                        HStack {
-                                            Text(storeEntry.store)
-                                                .italic()
-                                            Text(storeEntry.cost.formatted())
-                                                .font(.subheadline)
-                                                .bold()
-                                        }
-                                        Text(storeEntry.amount.formatted())
-                                            .font(.caption)
-                                    }
-                                }.buttonStyle(.glass)
-                            }
-                        }
-                    }.scrollIndicators(.hidden)
-                        .scrollClipDisabled()
+                    Spacer()
+                    Text("$ per \(food.servingSize.formatted())")
                 }
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(food.storeEntries.filter({ $0.isAvailable }), id: \.hashValue) { storeEntry in
+                            Button {
+                                item.servingCost = storeEntry.costPerServing(food.servingSize)
+                            } label: {
+                                VStack(alignment: .leading) {
+                                    HStack {
+                                        Text(storeEntry.store)
+                                            .italic()
+                                        Text(storeEntry.cost.formatted())
+                                            .font(.subheadline)
+                                            .bold()
+                                    }
+                                    Text(storeEntry.amount.formatted())
+                                        .font(.caption)
+                                }
+                            }.buttonStyle(.glass)
+                        }
+                    }
+                }.scrollIndicators(.hidden)
+                    .scrollClipDisabled()
             }
         }
     }

@@ -37,6 +37,7 @@ struct LogEntryItem: Hashable {
     // Food
     var food: Food?
     var servingCost: Currency?
+    var instance: FoodInstance?
     // Recipe
     var recipe: RecipeEntry?
     // Meal
@@ -102,6 +103,7 @@ struct LogEntryItem: Hashable {
             self.amount = food.amount
             self.meal = food.meal
             self.servingCost = food.servingCost
+            self.instance = nil
             self.recipe = nil
         case .recipe(let recipe):
             self.type = .recipe
@@ -111,6 +113,7 @@ struct LogEntryItem: Hashable {
             self.meal = recipe.meal
             self.food = nil
             self.servingCost = nil
+            self.instance = nil
         }
     }
     
@@ -123,6 +126,7 @@ struct LogEntryItem: Hashable {
         self.recipe = nil
         self.meal = meal
         self.servingCost = nil
+        self.instance = nil
         self.amount = .init(value: .zero)
     }
     
@@ -131,7 +135,7 @@ struct LogEntryItem: Hashable {
         case .food(let foodEntry):
             switch type {
             case .food:
-                editFood(foodEntry)
+                editFood(modelContext, foodEntry)
             case .recipe:
                 modelContext.delete(foodEntry)
                 createRecipe(modelContext)
@@ -165,14 +169,29 @@ struct LogEntryItem: Hashable {
     func createFood(_ modelContext: ModelContext) {
         let foodEntry = FoodLogEntry(date: date, food: food, amount: amount, meal: meal, servingCost: servingCost)
         modelContext.insert(foodEntry)
+        tryUpdateFoodInstance(modelContext, foodEntry)
     }
     
-    func editFood(_ foodEntry: FoodLogEntry) {
+    func editFood(_ modelContext: ModelContext, _ foodEntry: FoodLogEntry) {
         foodEntry.date = date
         foodEntry.food = food
         foodEntry.amount = amount
         foodEntry.meal = meal
         foodEntry.servingCost = servingCost
+        tryUpdateFoodInstance(modelContext, foodEntry)
+    }
+    
+    private func tryUpdateFoodInstance(_ modelContext: ModelContext, _ foodEntry: FoodLogEntry) {
+        if let instance {
+            let newRemaining = instance.remaining.val - foodEntry.size.val
+            if newRemaining <= 0 {
+                // If nothing is left, delete the instance
+                modelContext.delete(instance)
+            } else {
+                // Otherwise, update with the new amount
+                instance.remainder = newRemaining / instance.total.val
+            }
+        }
     }
     
     func createRecipe(_ modelContext: ModelContext) {

@@ -9,9 +9,11 @@ import Charts
 import SwiftUI
 
 struct NutrientPieChart: View {
+    let nutrients: Nutrients
     let data: [MacroData]
     
     init(nutrients: Nutrients = [:]) {
+        self.nutrients = nutrients
         self.data = nutrients.toMacroData()
     }
     
@@ -63,7 +65,7 @@ struct NutrientPieChart: View {
     @ViewBuilder
     private func chartOverlay(_ frame: CGRect) -> some View {
         VStack(spacing: 2) {
-            Text(data.totalCalories.formatted(.number.precision(.fractionLength(0))))
+            Text(nutrients.calories.value.formatted())
                 .font(.title3).fontWeight(.heavy)
             Text("Cal")
                 .font(.caption).bold()

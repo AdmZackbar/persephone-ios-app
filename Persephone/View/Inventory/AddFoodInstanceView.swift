@@ -195,7 +195,7 @@ struct AddFoodInstanceView: View {
                 navigationStore.pop()
             } label: {
                 Label("Save", systemImage: "checkmark")
-            }.disabled(selection.isEmpty)
+            }.disabled(selection.isEmpty || !selection.allSatisfy({ !$0.invalid }))
         }
     }
     
@@ -349,6 +349,23 @@ struct AddFoodInstanceView: View {
             }
         }
     }
+    
+    struct FoodInstanceItem: Hashable {
+        let food: Food
+        var date: Date
+        var source: String
+        var amount: FoodSize
+        var cost: Currency
+        var remainder: Double
+        
+        var invalid: Bool {
+            amount.str.isEmpty || amount.val <= 0 || source.isEmpty || remainder <= 0 || remainder > 1
+        }
+        
+        func save(_ modelContext: ModelContext) {
+            modelContext.insert(FoodInstance(food: food, acquireDate: date, source: source, cost: cost, total: amount, remainder: remainder))
+        }
+    }
 }
 
 enum Stores: String, Identifiable, CaseIterable {
@@ -359,19 +376,6 @@ enum Stores: String, Identifiable, CaseIterable {
     }
     var name: String {
         rawValue.capitalized
-    }
-}
-
-struct FoodInstanceItem: Hashable {
-    let food: Food
-    var date: Date
-    var source: String
-    var amount: FoodSize
-    var cost: Currency
-    var remainder: Double
-    
-    func save(_ modelContext: ModelContext) {
-        modelContext.insert(FoodInstance(food: food, acquireDate: date, source: source, cost: cost, total: amount, remainder: remainder))
     }
 }
 

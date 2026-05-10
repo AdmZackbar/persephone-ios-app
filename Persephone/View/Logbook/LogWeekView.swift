@@ -295,11 +295,6 @@ private struct LogDayView: View {
 
 enum LogViewType: Hashable {
     case add(date: Date, mealType: String)
-    case edit(_ entry: LogEntry)
-    case meals
-    case meal(_ meal: Meal)
-    case addMeal
-    case editMeal(_ meal: Meal)
 }
 
 enum MealType: String, Identifiable, Hashable, CaseIterable {

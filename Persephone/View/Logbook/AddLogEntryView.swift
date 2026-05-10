@@ -14,7 +14,6 @@ struct AddLogEntryView: View {
     
     @Query private var foods: [Food]
     @Query private var recipes: [RecipeEntry]
-    @Query private var meals: [Meal]
     @Query private var recentFoodEntries: [FoodLogEntry]
     @Query private var instances: [FoodInstance]
     
@@ -38,7 +37,6 @@ struct AddLogEntryView: View {
         self._recipes = Query(filter: #Predicate<RecipeEntry> { recipe in
             !recipe.retired
         }, sort: \.name)
-        self._meals = Query(sort: \.name)
         self._recentFoodEntries = Query({
             var descriptor = FetchDescriptor<FoodLogEntry>(
                 sortBy: [SortDescriptor(\.date, order: .reverse)]
@@ -86,8 +84,6 @@ struct AddLogEntryView: View {
                     foodListView()
                 case .Recipe:
                     recipeListView()
-                case .Meal:
-                    mealListView()
                 }
             } header: {
                 HStack {
@@ -245,16 +241,6 @@ struct AddLogEntryView: View {
         }
     }
     
-    private func mealListView() -> some View {
-        ForEach(meals) { meal in
-            Button {
-                // TODO
-            } label: {
-                Text(meal.name)
-            }.buttonStyle(.plain)
-        }
-    }
-    
     @ToolbarContentBuilder
     private func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .principal) {
@@ -303,7 +289,7 @@ struct AddLogEntryView: View {
             rawValue
         }
         
-        case Food, Recipe, Meal
+        case Food, Recipe
     }
     
     struct SaveAmountSheet: View {

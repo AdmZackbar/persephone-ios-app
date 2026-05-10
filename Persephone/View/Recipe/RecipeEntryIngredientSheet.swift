@@ -120,6 +120,39 @@ struct RecipeEntryIngredientSheet: View {
     }
 }
 
+struct ScaledFoodView: View {
+    let food: Food
+    let size: FoodSize
+    let servingCost: Currency?
+    let numServings: Double
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                if let brand = food.brand {
+                    Text(brand)
+                        .font(.subheadline)
+                        .opacity(0.7)
+                }
+                Text(food.name)
+                    .font(.headline)
+                Text(size.formatted())
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                if let servingCost {
+                    Text((servingCost * numServings).formatted())
+                        .font(.subheadline)
+                        .italic()
+                }
+                Spacer()
+            }.padding(.top, 8)
+            Spacer()
+            NutrientPieChart(nutrients: food.ingredients.nutrients * numServings)
+                .frame(width: 120, height: 120)
+        }
+    }
+}
+
 private struct SelectFoodView: View {
     @Query(filter: #Predicate { $0.metaData.retireDate == nil },
            sort: \Food.name) var foods: [Food]

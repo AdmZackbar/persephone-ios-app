@@ -61,16 +61,6 @@ final class NavigationStore: ObservableObject {
         switch type {
         case .add(let date, let mealType):
             AddLogEntryView(date: date, mealType: mealType)
-        case .edit(let entry):
-            LogEntryEditView(item: .init(entry: entry))
-        case .meals:
-            MealsView()
-        case .meal(let meal):
-            MealView(meal: meal)
-        case .addMeal:
-            MealEditView()
-        case .editMeal(let meal):
-            MealEditView(meal: .init(meal: meal))
         }
     }
     

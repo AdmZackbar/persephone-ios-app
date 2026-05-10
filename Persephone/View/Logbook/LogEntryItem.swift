@@ -24,8 +24,6 @@ struct LogEntryItem: Hashable {
             recipe == nil ||
             amount.value.raw <= 0 ||
             meal == ""
-        case .meal:
-            mealEntry == nil
         }
     }
     
@@ -40,8 +38,6 @@ struct LogEntryItem: Hashable {
     var instance: FoodInstance?
     // Recipe
     var recipe: RecipeEntry?
-    // Meal
-    var mealEntry: Meal?
     
     var numServings: Double {
         switch type {
@@ -60,8 +56,6 @@ struct LogEntryItem: Hashable {
                 }
                 return amount.value.raw
             }
-        case .meal:
-            return 1
         }
         return amount.value.raw
     }
@@ -75,8 +69,6 @@ struct LogEntryItem: Hashable {
             if let recipe {
                 return recipe.total * (numServings / recipe.totalNumServings)
             }
-        case .meal:
-            return nil
         }
         return nil
     }
@@ -139,9 +131,6 @@ struct LogEntryItem: Hashable {
             case .recipe:
                 modelContext.delete(foodEntry)
                 createRecipe(modelContext)
-            case .meal:
-                modelContext.delete(foodEntry)
-                createMealEntries(modelContext)
             }
         case .recipe(let recipeEntry):
             switch type {
@@ -150,9 +139,6 @@ struct LogEntryItem: Hashable {
             case .food:
                 modelContext.delete(recipeEntry)
                 createFood(modelContext)
-            case .meal:
-                modelContext.delete(recipeEntry)
-                createMealEntries(modelContext)
             }
         case nil:
             switch type {
@@ -160,8 +146,6 @@ struct LogEntryItem: Hashable {
                 createFood(modelContext)
             case .recipe:
                 createRecipe(modelContext)
-            case .meal:
-                createMealEntries(modelContext)
             }
         }
     }
@@ -206,18 +190,8 @@ struct LogEntryItem: Hashable {
         recipeEntry.meal = meal
     }
     
-    func createMealEntries(_ modelContext: ModelContext) {
-        mealEntry?.items.forEach({ createMealEntry(modelContext, mealItem: $0) })
-    }
-    
-    func createMealEntry(_ modelContext: ModelContext, mealItem: MealItem) {
-        let foodEntry = FoodLogEntry(date: date, food: mealItem.food, amount: mealItem.defaultAmount, meal: meal, servingCost: mealItem.servingCost)
-        modelContext.insert(foodEntry)
-    }
-    
     enum LogEntryType: String, CaseIterable {
         case food
         case recipe
-        case meal
     }
 }

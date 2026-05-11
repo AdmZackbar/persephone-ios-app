@@ -103,6 +103,7 @@ struct InventoryView: View {
             NavigationStack {
                 Form {
                     Section {
+                        DatePicker("Date:", selection: $item.date)
                         HStack {
                             Text("Amount:")
                             TextField("required", text: $item.total.str)
@@ -137,8 +138,8 @@ struct InventoryView: View {
                             }
                             Spacer()
                             VStack(alignment: .trailing) {
-                                Text((item.total * item.remainder).formatted())
-                                Text(item.cost.formatted())
+                                Text(item.remaining.value.formatted())
+                                Text(item.remaining.amount.formatted(maxDigits: 1))
                             }
                         }.foregroundStyle(.primary)
                             .padding(.top, 12)
@@ -151,36 +152,59 @@ struct InventoryView: View {
                     .navigationBarBackButtonHidden()
                     .toolbar(content: toolbarContent)
                     .listSectionSpacing(.compact)
-            }.presentationDetents([.height(480)])
+            }.presentationDetents([.height(580)])
                 // Don't use liquid glass as main background
                 .presentationBackground(.regularMaterial)
         }
         
         @ViewBuilder
         private func remainderView() -> some View {
+            let value: Binding<Double> = {
+                switch remainderType {
+                case .amount:
+                    return Binding<Double>(get: {
+                        item.total.amount.value.raw * item.remainder
+                    }, set: { newValue in
+                        item.remainder = newValue / item.total.amount.value.raw
+                    })
+                case .value:
+                    return Binding<Double>(get: {
+                        item.total.val * item.remainder
+                    }, set: { newValue in
+                        if item.total.val <= 0 {
+                            item.remainder = 0
+                        } else {
+                            item.remainder = newValue / item.total.val
+                        }
+                    })
+                }
+            }()
             Section {
                 if item.total.amount.value.raw <= 1 {
-                    Slider(value: $item.remainder, in: 0...1, step: 0.01)
+                    VStack {
+                        HStack {
+                            TextField("Amount", value: value, format: .number.precision(.fractionLength(remainderType == .amount ? 3 : 0)))
+                            switch remainderType {
+                            case .amount:
+                                if let unit = item.total.amount.unitStr {
+                                    Text(unit)
+                                }
+                            case .value:
+                                if let unit = item.total.value.unitStr {
+                                    Text(unit)
+                                }
+                            }
+                        }
+                        Slider(value: $item.remainder, in: 0...1, step: 0.01)
+                    }
                 } else {
                     switch remainderType {
                     case .amount:
-                        Stepper(value: Binding<Double>(get: {
-                            item.total.amount.value.raw * item.remainder
-                        }, set: { newValue in
-                            item.remainder = newValue / item.total.amount.value.raw
-                        }), in: 1...item.total.amount.value.raw) {
+                        Stepper(value: value, in: 1...item.total.amount.value.raw) {
                             Text((item.total.amount * item.remainder).formatted())
                         }
                     case .value:
-                        Stepper(value: Binding<Double>(get: {
-                            item.total.val * item.remainder
-                        }, set: { newValue in
-                            if item.total.val <= 0 {
-                                item.remainder = 0
-                            } else {
-                                item.remainder = newValue / item.total.val
-                            }
-                        }), in: 1...item.total.val) {
+                        Stepper(value: value, in: 1...item.total.val) {
                             Text((item.total.value * item.remainder).formatted())
                         }
                     }
@@ -189,13 +213,11 @@ struct InventoryView: View {
                 HStack {
                     Text("Remaining")
                     Spacer()
-                    if item.total.amount.value.raw > 1 {
-                        Picker("", selection: $remainderType) {
-                            Text("Amount").tag(RemainderType.amount)
-                            Text(item.total.isMass ? "Mass" : "Volume").tag(RemainderType.value)
-                        }.pickerStyle(.segmented)
-                            .frame(width: 200)
-                    }
+                    Picker("", selection: $remainderType) {
+                        Text("Amount").tag(RemainderType.amount)
+                        Text(item.total.isMass ? "Mass" : "Volume").tag(RemainderType.value)
+                    }.pickerStyle(.segmented)
+                        .frame(width: 200)
                 }
             }
         }
@@ -289,6 +311,9 @@ struct InventoryView: View {
         var cost: Currency
         var remainder: Double
         
+        var remaining: FoodSize {
+            total * remainder
+        }
         var invalid: Bool {
             source.isEmpty || remainder > 1
         }

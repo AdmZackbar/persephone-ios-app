@@ -14,7 +14,6 @@ struct AddLogEntryView: View {
     
     @Query private var foods: [Food]
     @Query private var recipes: [RecipeEntry]
-    @Query private var recentFoodEntries: [FoodLogEntry]
     @Query private var instances: [FoodInstance]
     
     @State var date: Date
@@ -37,16 +36,6 @@ struct AddLogEntryView: View {
         self._recipes = Query(filter: #Predicate<RecipeEntry> { recipe in
             !recipe.retired
         }, sort: \.name)
-        self._recentFoodEntries = Query({
-            var descriptor = FetchDescriptor<FoodLogEntry>(
-                predicate: #Predicate<FoodLogEntry> { entry in
-                    entry.meal == mealType
-                },
-                sortBy: [SortDescriptor(\.date, order: .reverse)]
-            )
-            descriptor.fetchLimit = 30
-            return descriptor
-        }())
         self._instances = Query(sort: \.acquireDate)
     }
     
@@ -84,7 +73,7 @@ struct AddLogEntryView: View {
             Section {
                 switch entryType {
                 case .Food:
-                    foodListView()
+                    FoodListView(mealType: mealType, foods: foods, instances: instances, searchText: $searchText, date: $date, selection: $selection, editItem: $editItem)
                 case .Recipe:
                     recipeListView()
                 }
@@ -143,95 +132,6 @@ struct AddLogEntryView: View {
                 .font(.caption)
                 .fontWeight(.bold)
         }
-    }
-    
-    @ViewBuilder
-    private func foodListView() -> some View {
-        var foodList: [Food] {
-            if searchText.isEmpty {
-                if recentFoodEntries.isEmpty {
-                    return foods
-                } else {
-                    return recentFoodEntries.map({ $0.food }).uniqued()
-                }
-            } else {
-                return (recentFoodEntries.map({ $0.food }) + foods).uniqued().filter(isFiltered)
-            }
-        }
-        ForEach(foodList.prefix(30)) { food in
-            let foodInstances = instances.filter({ $0.food == food })
-            if foodInstances.isEmpty {
-                addBasicFoodButton(food)
-            } else {
-                Menu {
-                    ForEach(foodInstances, id: \.id) { instance in
-                        Button {
-                            addFood(food, instance: instance)
-                        } label: {
-                            Text("\(instance.source): \(instance.remaining.formatted())")
-                        }
-                    }
-                    Button {
-                        addFood(food)
-                    } label: {
-                        Text("New Entry")
-                    }
-                } label: {
-                    foodListView(food)
-                }.buttonStyle(.plain)
-            }
-        }
-    }
-    
-    private func addBasicFoodButton(_ food: Food) -> some View {
-        Button {
-            addFood(food)
-        } label: {
-            foodListView(food)
-        }.buttonStyle(.plain)
-    }
-    
-    private func addFood(_ food: Food, instance: FoodInstance? = nil) {
-        var entry: LogEntryItem = .init()
-        entry.food = food
-        entry.meal = mealType
-        entry.date = date
-        entry.servingCost = instance?.costPerServing ?? food.bestStoreEntry?.costPerServing(food.servingSize) ?? .zero
-        entry.amount = recentFoodEntries.first(where: { $0.food == food })?.amount ?? food.servingSize.amount
-        entry.instance = instance
-        selection.append(entry)
-        editItem = entry.id
-    }
-    
-    private func foodListView(_ food: Food) -> some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(food.name)
-                    .bold()
-                if let brand = food.brand {
-                    Text(brand)
-                        .font(.subheadline)
-                        .italic()
-                }
-            }
-            Spacer()
-        }.contentShape(Rectangle())
-    }
-    
-    private func isFiltered(_ food: Food) -> Bool {
-        if searchText.isEmpty {
-            return true
-        }
-        if food.name.localizedCaseInsensitiveContains(searchText) {
-            return true
-        }
-        if let brand = food.brand, brand.localizedCaseInsensitiveContains(searchText) {
-            return true
-        }
-        if let category = food.category, category.localizedCaseInsensitiveContains(searchText) {
-            return true
-        }
-        return false
     }
     
     private func recipeListView() -> some View {
@@ -293,6 +193,122 @@ struct AddLogEntryView: View {
         }
         
         case Food, Recipe
+    }
+    
+    struct FoodListView: View {
+        @Query private var recentFoodEntries: [FoodLogEntry]
+        
+        let mealType: String
+        let foods: [Food]
+        let instances: [FoodInstance]
+        @Binding var searchText: String
+        @Binding var date: Date
+        @Binding var selection: [LogEntryItem]
+        @Binding var editItem: UUID?
+        
+        init(mealType: String, foods: [Food], instances: [FoodInstance], searchText: Binding<String>, date: Binding<Date>, selection: Binding<[LogEntryItem]>, editItem: Binding<UUID?>) {
+            self.mealType = mealType
+            self.foods = foods
+            self.instances = instances
+            self._searchText = searchText
+            self._date = date
+            self._selection = selection
+            self._editItem = editItem
+            self._recentFoodEntries = Query({
+                var descriptor = FetchDescriptor<FoodLogEntry>(
+                    predicate: #Predicate<FoodLogEntry> { entry in
+                        entry.meal == mealType
+                    },
+                    sortBy: [SortDescriptor(\.date, order: .reverse)]
+                )
+                descriptor.fetchLimit = 30
+                return descriptor
+            }())
+        }
+        
+        private func isFiltered(_ food: Food) -> Bool {
+            if searchText.isEmpty {
+                return true
+            }
+            if food.name.localizedCaseInsensitiveContains(searchText) {
+                return true
+            }
+            if let brand = food.brand, brand.localizedCaseInsensitiveContains(searchText) {
+                return true
+            }
+            if let category = food.category, category.localizedCaseInsensitiveContains(searchText) {
+                return true
+            }
+            return false
+        }
+        
+        var body: some View {
+            var foodList: [Food] {
+                if searchText.isEmpty {
+                    if recentFoodEntries.isEmpty {
+                        return foods
+                    } else {
+                        return recentFoodEntries.map({ $0.food }).uniqued()
+                    }
+                } else {
+                    return (recentFoodEntries.map({ $0.food }) + foods).uniqued().filter(isFiltered)
+                }
+            }
+            ForEach(foodList.prefix(30)) { food in
+                let foodInstances = instances.filter({ $0.food == food })
+                if foodInstances.isEmpty {
+                    Button {
+                        addFood(food)
+                    } label: {
+                        itemView(food)
+                    }.buttonStyle(.plain)
+                } else {
+                    Menu {
+                        ForEach(foodInstances, id: \.id) { instance in
+                            Button {
+                                addFood(food, instance: instance)
+                            } label: {
+                                Text("\(instance.source): \(instance.remaining.formatted())")
+                            }
+                        }
+                        Button {
+                            addFood(food)
+                        } label: {
+                            Text("New Entry")
+                        }
+                    } label: {
+                        itemView(food)
+                    }.buttonStyle(.plain)
+                }
+            }
+        }
+        
+        private func addFood(_ food: Food, instance: FoodInstance? = nil) {
+            var entry: LogEntryItem = .init()
+            entry.food = food
+            entry.date = date
+            entry.meal = mealType
+            entry.servingCost = instance?.costPerServing ?? food.bestStoreEntry?.costPerServing(food.servingSize) ?? .zero
+            entry.amount = recentFoodEntries.first(where: { $0.food == food })?.amount ?? food.servingSize.amount
+            entry.instance = instance
+            selection.append(entry)
+            editItem = entry.id
+        }
+        
+        private func itemView(_ food: Food) -> some View {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(food.name)
+                        .bold()
+                    if let brand = food.brand {
+                        Text(brand)
+                            .font(.subheadline)
+                            .italic()
+                    }
+                }
+                Spacer()
+            }.contentShape(Rectangle())
+        }
     }
     
     struct SaveAmountSheet: View {

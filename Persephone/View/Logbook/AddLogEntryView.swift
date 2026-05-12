@@ -21,7 +21,7 @@ struct AddLogEntryView: View {
     @State var mealType: String
     @State private var selection: [LogEntryItem]
     @State private var entryType: EntryType
-    @State private var editItem: PersistentIdentifier?
+    @State private var editItem: UUID?
     @State private var searchText: String
     
     init(date: Date, mealType: String) {
@@ -39,6 +39,9 @@ struct AddLogEntryView: View {
         }, sort: \.name)
         self._recentFoodEntries = Query({
             var descriptor = FetchDescriptor<FoodLogEntry>(
+                predicate: #Predicate<FoodLogEntry> { entry in
+                    entry.meal == mealType
+                },
                 sortBy: [SortDescriptor(\.date, order: .reverse)]
             )
             descriptor.fetchLimit = 30
@@ -51,9 +54,9 @@ struct AddLogEntryView: View {
         Form {
             Section {
                 if !selection.isEmpty {
-                    ForEach(selection, id: \.hashValue) { entry in
+                    ForEach(selection) { entry in
                         Button {
-                            editItem = entry.food?.id ?? entry.recipe?.id
+                            editItem = entry.id
                         } label: {
                             logEntryItemView(entry)
                                 .contentShape(Rectangle())
@@ -102,7 +105,7 @@ struct AddLogEntryView: View {
             .navigationBarBackButtonHidden()
             .searchable(text: $searchText)
             .sheet(isPresented: .isPresent($editItem), content: {
-                if let index = selection.firstIndex(where: { $0.food?.id == editItem || $0.recipe?.id == editItem }) {
+                if let index = selection.firstIndex(where: { $0.id == editItem }) {
                     SaveAmountSheet(item: $selection[index])
                 }
                 else {
@@ -193,11 +196,11 @@ struct AddLogEntryView: View {
         entry.food = food
         entry.meal = mealType
         entry.date = date
-        entry.servingCost = instance?.costPerServing ?? food.storeEntries.first(where: { $0.isAvailable })?.costPerServing(food.servingSize) ?? .zero
+        entry.servingCost = instance?.costPerServing ?? food.bestStoreEntry?.costPerServing(food.servingSize) ?? .zero
         entry.amount = recentFoodEntries.first(where: { $0.food == food })?.amount ?? food.servingSize.amount
         entry.instance = instance
         selection.append(entry)
-        editItem = food.id
+        editItem = entry.id
     }
     
     private func foodListView(_ food: Food) -> some View {
@@ -298,7 +301,6 @@ struct AddLogEntryView: View {
         
         @Query private var recentFoodEntries: [FoodLogEntry]
         
-        
         @Binding var item: LogEntryItem
         
         init(item: Binding<LogEntryItem>) {
@@ -338,7 +340,7 @@ struct AddLogEntryView: View {
             NavigationStack {
                 Form {
                     Section {
-                        ScaledAmountField(amount: $item.amount, units: computeUnits())
+                        ScaledAmountField(amount: $item.cookedAmount, units: computeUnits())
                     } header: {
                         if let food = item.food {
                             foodSummaryView(food)
@@ -419,7 +421,7 @@ struct AddLogEntryView: View {
                                 item.amount.value = amount.value
                             }
                         } label: {
-                            Text(amount.formatted(maxDigits: 1, includeSpace: true))
+                            Text((amount * ( 1)).formatted(maxDigits: 1))
                                 .bold()
                         }.buttonStyle(.glass)
                     }

@@ -100,6 +100,33 @@ struct FoodEditView: View {
                     .keyboardType(.decimalPad)
             }
         }
+        Section {
+            if item.amountModifier != nil {
+                Stepper(value: Binding<Double>(get: {
+                    item.amountModifier ?? 1.0
+                }, set: {
+                    item.amountModifier = $0
+                }), in: 0...10, step: 0.05) {
+                    HStack {
+                        Text("Modifier:")
+                        TextField("", value: $item.amountModifier, format: .percent.precision(.fractionLength(0)))
+                    }
+                }
+                Text("100g (raw) -> \((100 * item.amountModifier!).formatted(.number.precision(.fractionLength(0...3))))g (cooked)")
+            }
+        } header: {
+            Toggle("Cooked Modifier", isOn: Binding<Bool>(
+                get: {
+                    item.amountModifier != nil
+                }, set: {
+                    if $0 {
+                        item.amountModifier = 1.0
+                    } else {
+                        item.amountModifier = nil
+                    }
+                }
+            ))
+        }
     }
     
     @ViewBuilder

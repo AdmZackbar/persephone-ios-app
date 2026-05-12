@@ -8,7 +8,9 @@
 import Foundation
 import SwiftData
 
-struct LogEntryItem: Hashable {
+struct LogEntryItem: Identifiable, Hashable {
+    let id = UUID()
+    
     private var entry: LogEntry?
     var isEdit: Bool {
         entry != nil
@@ -32,6 +34,14 @@ struct LogEntryItem: Hashable {
     var date: Date
     var meal: String
     var amount: Amount
+    var cookedAmount: Amount {
+        get {
+            amount * (food?.amountModifier ?? 1)
+        }
+        set {
+            amount = newValue / (food?.amountModifier ?? 1)
+        }
+    }
     // Food
     var food: Food?
     var servingCost: Currency?

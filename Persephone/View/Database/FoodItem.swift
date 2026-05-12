@@ -17,10 +17,11 @@ struct FoodItem {
     var metaData: Food.MetaData
     var ingredients: FoodIngredients
     var servingSize: FoodSize
+    var amountModifier: Double?
     var storeEntries: [Food.StoreEntry]
     
     var isInvalid: Bool {
-        name.isEmpty || servingSize.str.isEmpty || servingSize.val <= 0
+        name.isEmpty || servingSize.str.isEmpty || servingSize.val <= 0 || (amountModifier != nil && amountModifier! <= 0.0)
     }
     
     var rating: RatingTier? {
@@ -41,6 +42,7 @@ struct FoodItem {
         self.metaData = entry?.metaData ?? .init()
         self.ingredients = entry?.ingredients ?? .init()
         self.servingSize = entry?.servingSize ?? .init()
+        self.amountModifier = entry?.amountModifier
         self.storeEntries = entry?.storeEntries ?? []
     }
     
@@ -50,10 +52,16 @@ struct FoodItem {
             entry.metaData = metaData
             entry.ingredients = ingredients
             entry.servingSize = servingSize
+            entry.amountModifier = amountModifier
             entry.storeEntries = storeEntries
             return nil
         }
-        entry = .init(name: name, metaData: metaData, ingredients: ingredients, servingSize: servingSize, storeEntries: storeEntries)
+        entry = .init(name: name,
+                      metaData: metaData,
+                      ingredients: ingredients,
+                      servingSize: servingSize,
+                      amountModifier: amountModifier,
+                      storeEntries: storeEntries)
         return entry
     }
 }

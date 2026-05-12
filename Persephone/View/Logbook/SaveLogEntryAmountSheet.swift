@@ -67,7 +67,7 @@ struct SaveLogEntryAmountSheet: View {
         NavigationStack {
             Form {
                 Section {
-                    ScaledAmountField(amount: $item.amount, units: computeUnits())
+                    ScaledAmountField(amount: $item.cookedAmount, units: computeUnits())
                 } header: {
                     if let food = item.food {
                         foodSummaryView(food)
@@ -166,7 +166,7 @@ struct SaveLogEntryAmountSheet: View {
                             item.amount.value = amount.value
                         }
                     } label: {
-                        Text(amount.formatted(maxDigits: 1, includeSpace: true))
+                        Text((amount * (item.food?.amountModifier ?? 1)).formatted(maxDigits: 1))
                             .bold()
                     }.buttonStyle(.glass)
                 }

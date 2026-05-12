@@ -18,6 +18,7 @@ extension SchemaV1 {
         var metaData: MetaData = MetaData()
         var ingredients: FoodIngredients = FoodIngredients()
         var servingSize: FoodSize = FoodSize()
+        var amountModifier: Double? = nil
         var storeEntries: [StoreEntry] = []
         
         @Relationship(deleteRule: .cascade, inverse: \FoodInstance.food)
@@ -31,11 +32,13 @@ extension SchemaV1 {
              metaData: MetaData = .init(),
              ingredients: FoodIngredients = .init(),
              servingSize: FoodSize = .init(),
+             amountModifier: Double? = nil,
              storeEntries: [StoreEntry] = []) {
             self.name = name
             self.metaData = metaData
             self.ingredients = ingredients
             self.servingSize = servingSize
+            self.amountModifier = amountModifier
             self.storeEntries = storeEntries
         }
         

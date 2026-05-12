@@ -188,6 +188,10 @@ extension FoodSize {
     static func * (lhs: FoodSize, rhs: Double) -> FoodSize {
         return .init(str: (lhs.amount * rhs).formatted(maxDigits: 12), val: lhs.val * rhs, isMass: lhs.isMass)
     }
+    
+    static func / (lhs: FoodSize, rhs: Double) -> FoodSize {
+        return .init(str: (lhs.amount / rhs).formatted(maxDigits: 12), val: lhs.val / rhs, isMass: lhs.isMass)
+    }
 }
 
 // Food

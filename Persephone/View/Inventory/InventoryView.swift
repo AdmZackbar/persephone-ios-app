@@ -31,6 +31,11 @@ struct InventoryView: View {
                             deleteButton(instance)
                         }
                         .contextMenu {
+                            Button {
+                                splitInstance(instance)
+                            } label: {
+                                Label("Split Item", systemImage: "arrow.trianglehead.branch")
+                            }.disabled(instance.total.amount.value.raw <= 1)
                             deleteButton(instance)
                         }
                 }
@@ -54,6 +59,19 @@ struct InventoryView: View {
                 }
                 .handleDestinations(navigationStore)
         }.environmentObject(navigationStore)
+    }
+    
+    private func splitInstance(_ instance: FoodInstance) {
+        // TODO only really works for int values
+        let originalMax = ceil(instance.total.amount.value.raw)
+        let totalNum = ceil(instance.remaining.amount.value.raw)
+        let remainder = instance.remainder < 1 ? totalNum - instance.remaining.amount.value.raw : 1
+        for i in 1...Int(totalNum) {
+            let remaining = i == Int(totalNum) ? remainder : 1.0
+            let newInstance = FoodInstance(food: instance.food, acquireDate: instance.acquireDate, source: instance.source, cost: instance.cost / originalMax, total: instance.total / originalMax, remainder: remaining)
+            modelContext.insert(newInstance)
+        }
+        modelContext.delete(instance)
     }
     
     private func deleteButton(_ instance: FoodInstance) -> some View {

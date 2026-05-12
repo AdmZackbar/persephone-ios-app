@@ -225,7 +225,22 @@ struct InventoryView: View {
         private func storeEntriesList() -> some View {
             ScrollView(.horizontal) {
                 HStack {
-                    ForEach(item.instance.food.storeEntries.filter({ $0.isAvailable }), id: \.hashValue) { storeEntry in
+                    Menu {
+                        Button("Override All '\(item.source)'") {
+                            item.instance.food.storeEntries.removeAll(where: { $0.store == item.source })
+                            item.instance.food.storeEntries.append(.init(store: item.source, cost: item.cost, amount: item.total))
+                        }
+                        Button("Add New Entry") {
+                            item.instance.food.storeEntries.append(.init(store: item.source, cost: item.cost, amount: item.total))
+                        }
+                    } label: {
+                        Label("Add", systemImage: "plus")
+                            .bold()
+                            .frame(width: 36, height: 36)
+                            .labelStyle(.iconOnly)
+                    }.buttonStyle(.glass)
+                        .disabled(item.source.isEmpty || item.cost.cents < 0 || item.total.str.isEmpty || item.total.val <= 0)
+                    ForEach(item.instance.food.storeEntries.filter({ $0.store == item.source && $0.isAvailable }), id: \.hashValue) { storeEntry in
                         Button {
                             item.total = storeEntry.amount
                             item.cost = storeEntry.cost

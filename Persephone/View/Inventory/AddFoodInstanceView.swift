@@ -17,7 +17,7 @@ struct AddFoodInstanceView: View {
     @State private var date: Date
     @State private var source: String
     @State private var selection: [FoodInstanceItem]
-    @State private var editItem: PersistentIdentifier?
+    @State private var editItem: UUID?
     @State private var searchText: String
     
     init() {
@@ -35,9 +35,9 @@ struct AddFoodInstanceView: View {
         Form {
             Section {
                 if !selection.isEmpty {
-                    ForEach(selection, id: \.hashValue) { item in
+                    ForEach(selection) { item in
                         Button {
-                            editItem = item.food.id
+                            editItem = item.id
                         } label: {
                             HStack(alignment: .top) {
                                 VStack(alignment: .leading) {
@@ -89,7 +89,7 @@ struct AddFoodInstanceView: View {
             .navigationBarBackButtonHidden()
             .searchable(text: $searchText)
             .sheet(isPresented: .isPresent($editItem), content: {
-                if let index = selection.firstIndex(where: { $0.food.id == editItem }) {
+                if let index = selection.firstIndex(where: { $0.id == editItem }) {
                     SetAmountSheet(item: $selection[index])
                 }
                 else {
@@ -121,7 +121,7 @@ struct AddFoodInstanceView: View {
                     return .init(food: food, date: date, source: source, amount: storeEntry?.amount ?? .init(), cost: storeEntry?.cost ?? .zero, remainder: 1.0)
                 }
                 selection.append(item)
-                editItem = food.id
+                editItem = item.id
             } label: {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading) {
@@ -306,7 +306,22 @@ struct AddFoodInstanceView: View {
         private func storeEntriesList() -> some View {
             ScrollView(.horizontal) {
                 HStack {
-                    ForEach(item.food.storeEntries.filter({ $0.isAvailable }), id: \.hashValue) { storeEntry in
+                    Menu {
+                        Button("Override All '\(item.source)'") {
+                            item.food.storeEntries.removeAll(where: { $0.store == item.source })
+                            item.food.storeEntries.append(.init(store: item.source, cost: item.cost, amount: item.amount))
+                        }
+                        Button("Add New Entry") {
+                            item.food.storeEntries.append(.init(store: item.source, cost: item.cost, amount: item.amount))
+                        }
+                    } label: {
+                        Label("Add", systemImage: "plus")
+                            .bold()
+                            .frame(width: 36, height: 36)
+                            .labelStyle(.iconOnly)
+                    }.buttonStyle(.glass)
+                        .disabled(item.source.isEmpty || item.cost.cents < 0 || item.amount.str.isEmpty || item.amount.val <= 0)
+                    ForEach(item.food.storeEntries.filter({ $0.store == item.source && $0.isAvailable }), id: \.hashValue) { storeEntry in
                         Button {
                             item.amount = storeEntry.amount
                             item.cost = storeEntry.cost
@@ -350,7 +365,9 @@ struct AddFoodInstanceView: View {
         }
     }
     
-    struct FoodInstanceItem: Hashable {
+    struct FoodInstanceItem: Identifiable, Hashable {
+        let id = UUID()
+        
         let food: Food
         var date: Date
         var source: String

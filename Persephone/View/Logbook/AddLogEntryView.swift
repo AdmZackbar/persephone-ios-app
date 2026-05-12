@@ -481,7 +481,7 @@ struct AddLogEntryView: View {
                 }
                 ScrollView(.horizontal) {
                     HStack {
-                        ForEach(food.storeEntries.filter({ $0.isAvailable }), id: \.hashValue) { storeEntry in
+                        ForEach(food.storeEntries, id: \.hashValue) { storeEntry in
                             Button {
                                 item.servingCost = storeEntry.costPerServing(food.servingSize)
                             } label: {

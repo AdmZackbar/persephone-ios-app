@@ -231,8 +231,7 @@ extension Food {
     
     var bestStoreEntry: StoreEntry? {
         get {
-            storeEntries.filter({ $0.isAvailable })
-                .min(by: { $0.costPerServing(servingSize) < $1.costPerServing(servingSize) })
+            storeEntries.min(by: { $0.costPerServing(servingSize) < $1.costPerServing(servingSize) })
         }
     }
     

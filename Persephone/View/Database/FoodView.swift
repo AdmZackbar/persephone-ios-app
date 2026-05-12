@@ -107,14 +107,6 @@ struct FoodView: View {
                 Text(storeEntry.cost.formatted())
                     .font(.subheadline)
                     .italic()
-                HStack(spacing: 4) {
-                    if !storeEntry.isAvailable {
-                        Text("Retired")
-                    }
-                    if storeEntry.isSale {
-                        Text("Sale")
-                    }
-                }.font(.caption)
                 Spacer()
             }
             Spacer()

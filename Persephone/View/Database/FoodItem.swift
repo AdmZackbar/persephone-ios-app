@@ -73,8 +73,6 @@ struct StoreEntryItem {
     var store: String
     var cost: Currency
     var amount: FoodSize
-    var isAvailable: Bool
-    var isSale: Bool
     
     var isInvalid: Bool {
         store.isEmpty || cost.cents <= 0 || amount.str.isEmpty || amount.val <= 0
@@ -86,8 +84,6 @@ struct StoreEntryItem {
         self.store = entry.wrappedValue.store
         self.cost = entry.wrappedValue.cost
         self.amount = entry.wrappedValue.amount
-        self.isAvailable = entry.wrappedValue.isAvailable
-        self.isSale = entry.wrappedValue.isSale
     }
     
     init() {
@@ -96,8 +92,6 @@ struct StoreEntryItem {
         self.store = ""
         self.cost = .zero
         self.amount = .init()
-        self.isAvailable = true
-        self.isSale = false
     }
     
     mutating func save() -> Food.StoreEntry? {
@@ -105,10 +99,8 @@ struct StoreEntryItem {
             entry.store = store
             entry.cost = cost
             entry.amount = amount
-            entry.isAvailable = isAvailable
-            entry.isSale = isSale
             return nil
         }
-        return .init(store: store, cost: cost, amount: amount, isAvailable: isAvailable, isSale: isSale)
+        return .init(store: store, cost: cost, amount: amount)
     }
 }

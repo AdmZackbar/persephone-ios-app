@@ -82,17 +82,15 @@ struct RecipeEntryIngredientSheet: View {
         }
     }
     
-    @ViewBuilder
     private func costView(_ food: Food) -> some View {
-        let storeEntries = food.storeEntries.filter({ $0.isAvailable })
         HStack {
-            if storeEntries.isEmpty {
+            if food.storeEntries.isEmpty {
                 Text("Serving Cost:")
             } else {
                 Menu {
-                    ForEach(storeEntries, id: \.hashValue) { storeEntry in
+                    ForEach(food.storeEntries, id: \.hashValue) { storeEntry in
                         let servingCost = storeEntry.costPerServing(food.servingSize)
-                        Button("\(storeEntry.store)\(storeEntry.isSale ? " (Sale)" : ""):\n\(storeEntry.amount.formatted()) \(servingCost.formatted())") {
+                        Button("\(storeEntry.store):\n\(storeEntry.amount.formatted()) \(servingCost.formatted())") {
                             item.servingCost = servingCost
                         }
                     }

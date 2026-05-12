@@ -38,11 +38,6 @@ struct StoreEntryEditSheet: View {
                         .autocorrectionDisabled()
                 }
                 CurrencyField(value: $item.cost)
-                HStack {
-                    Toggle("Available:", isOn: $item.isAvailable)
-                    Divider()
-                    Toggle("Sale:", isOn: $item.isSale)
-                }
                 Section("Total Amount") {
                     TextField("required", text: $item.amount.str)
                         .textInputAutocapitalization(.never)

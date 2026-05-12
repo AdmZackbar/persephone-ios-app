@@ -201,14 +201,6 @@ struct FoodEditView: View {
                     .font(.subheadline)
                 Text(entry.amount.formatted())
                     .font(.subheadline)
-                HStack(spacing: 4) {
-                    if !entry.isAvailable {
-                        Text("Retired")
-                    }
-                    if entry.isSale {
-                        Text("Sale")
-                    }
-                }.font(.caption)
             }
             Spacer()
         }

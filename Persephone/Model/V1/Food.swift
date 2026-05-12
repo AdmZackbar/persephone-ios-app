@@ -72,19 +72,13 @@ extension SchemaV1 {
             var store: String = ""
             var cost: Currency = Currency.zero
             var amount: FoodSize = FoodSize()
-            var isAvailable: Bool = true
-            var isSale: Bool = false
             
             init(store: String = "",
                  cost: Currency = .zero,
-                 amount: FoodSize = .init(),
-                 isAvailable: Bool = true,
-                 isSale: Bool = false) {
+                 amount: FoodSize = .init()) {
                 self.store = store
                 self.cost = cost
                 self.amount = amount
-                self.isAvailable = isAvailable
-                self.isSale = isSale
             }
         }
     }

@@ -240,7 +240,7 @@ struct InventoryView: View {
                             .labelStyle(.iconOnly)
                     }.buttonStyle(.glass)
                         .disabled(item.source.isEmpty || item.cost.cents < 0 || item.total.str.isEmpty || item.total.val <= 0)
-                    ForEach(item.instance.food.storeEntries.filter({ $0.store == item.source && $0.isAvailable }), id: \.hashValue) { storeEntry in
+                    ForEach(item.instance.food.storeEntries.filter({ $0.store == item.source }), id: \.hashValue) { storeEntry in
                         Button {
                             item.total = storeEntry.amount
                             item.cost = storeEntry.cost

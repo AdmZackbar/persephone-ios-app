@@ -321,7 +321,7 @@ struct AddFoodInstanceView: View {
                             .labelStyle(.iconOnly)
                     }.buttonStyle(.glass)
                         .disabled(item.source.isEmpty || item.cost.cents < 0 || item.amount.str.isEmpty || item.amount.val <= 0)
-                    ForEach(item.food.storeEntries.filter({ $0.store == item.source && $0.isAvailable }), id: \.hashValue) { storeEntry in
+                    ForEach(item.food.storeEntries.filter({ $0.store == item.source }), id: \.hashValue) { storeEntry in
                         Button {
                             item.amount = storeEntry.amount
                             item.cost = storeEntry.cost

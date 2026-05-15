@@ -92,8 +92,11 @@ struct AddFoodInstanceView: View {
                 if let index = selection.firstIndex(where: { $0.id == editItem }) {
                     SetAmountSheet(item: $selection[index])
                 }
-                else {
-                    Text("Error getting item")
+                else if !selection.isEmpty {
+                    // TODO figure out why this happens
+                    SetAmountSheet(item: $selection[selection.count - 1])
+                } else {
+                    Text("Error getting item: list is empty")
                 }
             })
             .toolbar(content: toolbarContent)
@@ -111,7 +114,7 @@ struct AddFoodInstanceView: View {
             }
             return foods.filter(isFiltered)
         }
-        ForEach(foodList.prefix(30)) { food in
+        List(foodList.prefix(30)) { food in
             Button {
                 var item: FoodInstanceItem {
                     // Try to get relevant store entry for item to prepopulate info

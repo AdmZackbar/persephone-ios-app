@@ -8,6 +8,20 @@
 import SwiftData
 import SwiftUI
 
+struct StoreDate: Hashable {
+    let store: String
+    let date: Date
+}
+
+extension StoreDate: Comparable {
+    static func < (lhs: StoreDate, rhs: StoreDate) -> Bool {
+        if (lhs.date != rhs.date) {
+            return lhs.date > rhs.date
+        }
+        return lhs.store < rhs.store
+    }
+}
+
 struct InventoryView: View {
     @StateObject private var navigationStore = NavigationStore()
     @Environment(\.modelContext) var modelContext
@@ -15,31 +29,37 @@ struct InventoryView: View {
     @Query(sort: \FoodInstance.acquireDate, order: .reverse)
     private var instances: [FoodInstance]
     
+    @State private var searchText: String = ""
     @State private var editItem: PersistentIdentifier?
+    @State private var showDeleteAll: Bool = false
     
     var body: some View {
         NavigationStack(path: $navigationStore.path) {
             Form {
-                ForEach(instances, id: \.id) { instance in
-                    Button {
-                        editItem = instance.id
-                    } label: {
-                        instanceListView(instance)
-                            .contentShape(Rectangle())
-                    }.buttonStyle(.plain)
-                        .swipeActions {
-                            deleteButton(instance)
+                let byStoreAndDate = Dictionary(grouping: instances.filter(isFiltered)) { instance in
+                    StoreDate(store: instance.source, date: Calendar.current.startOfDay(for: instance.acquireDate))
+                }
+                if byStoreAndDate.isEmpty {
+                    if searchText.isEmpty {
+                        Text("No items in inventory")
+                    } else {
+                        Text("No related items")
+                    }
+                } else {
+                    ForEach(byStoreAndDate.keys.sorted(), id: \.hashValue) { key in
+                        Section {
+                            instanceList(byStoreAndDate[key]!)
+                        } header: {
+                            HStack {
+                                Text(key.store)
+                                Spacer()
+                                Text(key.date.formatted(date: .abbreviated, time: .omitted))
+                            }
                         }
-                        .contextMenu {
-                            Button {
-                                splitInstance(instance)
-                            } label: {
-                                Label("Split Item", systemImage: "arrow.trianglehead.branch")
-                            }.disabled(instance.total.amount.value.raw <= 1)
-                            deleteButton(instance)
-                        }
+                    }
                 }
             }.navigationTitle("Inventory")
+                .searchable(text: $searchText)
                 .sheet(isPresented: .isPresent($editItem), content: {
                     if let index = instances.firstIndex(where: { $0.id == editItem }) {
                         SaveAmountSheet(item: .init(instance: instances[index]))
@@ -48,7 +68,24 @@ struct InventoryView: View {
                         Text("Error getting item")
                     }
                 })
+                .alert("Are you sure you want to delete all items in inventory?", isPresented: $showDeleteAll) {
+                    Button("Delete All", role: .destructive) {
+                        do {
+                            try modelContext.delete(model: FoodInstance.self)
+                            try modelContext.save()
+                        } catch {
+                            print("Failed to clear inventory data.")
+                        }
+                    }
+                }
                 .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(role: .destructive) {
+                            showDeleteAll = true
+                        } label: {
+                            Label("Clear Data", systemImage: "trash")
+                        }
+                    }
                     ToolbarItem(placement: .primaryAction) {
                         Button {
                             navigationStore.push(InventoryViewType.addFood)
@@ -59,6 +96,35 @@ struct InventoryView: View {
                 }
                 .handleDestinations(navigationStore)
         }.environmentObject(navigationStore)
+    }
+    
+    private func isFiltered(_ instance: FoodInstance) -> Bool {
+        if searchText.isEmpty {
+            return true
+        }
+        return instance.food.name.localizedCaseInsensitiveContains(searchText) || (instance.food.brand?.localizedCaseInsensitiveContains(searchText) ?? false) || instance.source.localizedCaseInsensitiveContains(searchText)
+    }
+    
+    private func instanceList(_ instances: [FoodInstance]) -> some View {
+        List(instances, id: \.id) { instance in
+            Button {
+                editItem = instance.id
+            } label: {
+                instanceListView(instance)
+                    .contentShape(Rectangle())
+            }.buttonStyle(.plain)
+                .swipeActions {
+                    deleteButton(instance)
+                }
+                .contextMenu {
+                    Button {
+                        splitInstance(instance)
+                    } label: {
+                        Label("Split Item", systemImage: "arrow.trianglehead.branch")
+                    }.disabled(instance.total.amount.value.raw <= 1)
+                    deleteButton(instance)
+                }
+        }
     }
     
     private func splitInstance(_ instance: FoodInstance) {

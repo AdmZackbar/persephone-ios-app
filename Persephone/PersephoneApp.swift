@@ -7,15 +7,13 @@
 
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 @main
 struct PersephoneApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema(CurrentSchema.models)
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    let sharedModelContainer: ModelContainer = {
         do {
-            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            return container
+            return try PersephoneStore.makeAppContainer()
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -24,6 +22,11 @@ struct PersephoneApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-        }.modelContainer(sharedModelContainer)
+                .onReceive(NotificationCenter.default.publisher(
+                    for: ModelContext.didSave, object: sharedModelContainer.mainContext)) { _ in
+                    WidgetCenter.shared.reloadTimelines(ofKind: PersephoneStore.daySummaryWidgetKind)
+                }
+        }
+        .modelContainer(sharedModelContainer)
     }
 }

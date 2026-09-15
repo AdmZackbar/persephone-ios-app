@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -46,6 +46,32 @@
 		E8A5F5142D3EC7AD00377624 /* RecipeEntryIngredientSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */; };
 		E8A5F5162D3EDD6C00377624 /* RecipeEntryPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */; };
 		E8AD4B692D35FEA300C1B30A /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD4B682D35FEA000C1B30A /* Colors.swift */; };
+		E8B7C8633059C4B0003272FF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8B7C8623059C4B0003272FF /* WidgetKit.framework */; };
+		E8B7C8653059C4B0003272FF /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8B7C8643059C4B0003272FF /* SwiftUI.framework */; };
+		E8B7C8723059C4B1003272FF /* PersephoneWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E8B7C8603059C4B0003272FF /* PersephoneWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E8B7C8793059C79E003272FF /* FoodLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88112D3B66F000861685 /* FoodLogEntry.swift */; };
+		E8B7C87A3059C79E003272FF /* Nutrients.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8828ED42C4F5871006C7CB3 /* Nutrients.swift */; };
+		E8B7C87B3059C79E003272FF /* RecipeLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E9AE342D3F5C7E00B2A193 /* RecipeLogEntry.swift */; };
+		E8B7C87C3059C79E003272FF /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2C452C400B0800D35BE7 /* Schema.swift */; };
+		E8B7C87D3059C79E003272FF /* ModelUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E867E6672D343FDA001917C0 /* ModelUtilities.swift */; };
+		E8B7C87E3059C79E003272FF /* Food.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88082D3B1E6600861685 /* Food.swift */; };
+		E8B7C87F3059C79E003272FF /* RecipeEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E885CC742D3E90460041364D /* RecipeEntry.swift */; };
+		E8B7C8803059C79E003272FF /* Units.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D33C4A2D3A8ED900EE8555 /* Units.swift */; };
+		E8B7C8813059C79E003272FF /* RatingTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D33C4C2D3A971800EE8555 /* RatingTier.swift */; };
+		E8B7C8823059C79E003272FF /* FoodInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87122FAEA187002CDEBB /* FoodInstance.swift */; };
+		E8B7C8833059C79E003272FF /* MainUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E7024E2D33FBA000FB7013 /* MainUtilities.swift */; };
+		E8B7C8843059C79E003272FF /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D33C4E2D3AA2A500EE8555 /* Currency.swift */; };
+		E8B7C8853059C79E003272FF /* Amount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D33C462D3A830F00EE8555 /* Amount.swift */; };
+		E8B7C8863059C7F2003272FF /* MacroBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A87062FAD9323002CDEBB /* MacroBarChart.swift */; };
+		E8B7C8873059C7F2003272FF /* MiniNutrientPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E80E2B502FABD124006FAC4A /* MiniNutrientPieChart.swift */; };
+		E8B7C8883059C7F2003272FF /* MockDataPreviewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */; };
+		E8B7C8893059C7F2003272FF /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD4B682D35FEA000C1B30A /* Colors.swift */; };
+		E8B7C88A3059C7F2003272FF /* MacroData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E89A870C2FAE2672002CDEBB /* MacroData.swift */; };
+		E8B7C88B3059C7F2003272FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E860ACE72C3EFBE8007E65DE /* Assets.xcassets */; };
+		E8B7C8953059C8E4003272FF /* PersephoneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B7C8943059C8E4003272FF /* PersephoneStore.swift */; };
+		E8B7C8963059C8E4003272FF /* PersephoneStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B7C8943059C8E4003272FF /* PersephoneStore.swift */; };
+		E8B7C8983059C8EB003272FF /* StoreRelocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B7C8973059C8EB003272FF /* StoreRelocator.swift */; };
+		E8B7C8993059C8EB003272FF /* StoreRelocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8B7C8973059C8EB003272FF /* StoreRelocator.swift */; };
 		E8D33C472D3A831800EE8555 /* Amount.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D33C462D3A830F00EE8555 /* Amount.swift */; };
 		E8D33C4B2D3A8EDD00EE8555 /* Units.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D33C4A2D3A8ED900EE8555 /* Units.swift */; };
 		E8D33C4D2D3A971D00EE8555 /* RatingTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D33C4C2D3A971800EE8555 /* RatingTier.swift */; };
@@ -91,7 +117,28 @@
 			remoteGlobalIDString = E860ACDD2C3EFBE5007E65DE;
 			remoteInfo = Persephone;
 		};
+		E8B7C8703059C4B1003272FF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E860ACD62C3EFBE5007E65DE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8B7C85F3059C4B0003272FF;
+			remoteInfo = PersephoneWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E8B7C8773059C4B1003272FF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E8B7C8723059C4B1003272FF /* PersephoneWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		E80E2B4D2FABC2B5006FAC4A /* LogWeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogWeekView.swift; sourceTree = "<group>"; };
@@ -141,6 +188,12 @@
 		E8A5F5132D3EC7A400377624 /* RecipeEntryIngredientSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryIngredientSheet.swift; sourceTree = "<group>"; };
 		E8A5F5152D3EDD6700377624 /* RecipeEntryPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEntryPreview.swift; sourceTree = "<group>"; };
 		E8AD4B682D35FEA000C1B30A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		E8B7C8603059C4B0003272FF /* PersephoneWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PersephoneWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8B7C8623059C4B0003272FF /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		E8B7C8643059C4B0003272FF /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		E8B7C8783059C5CE003272FF /* PersephoneWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PersephoneWidgetExtension.entitlements; sourceTree = "<group>"; };
+		E8B7C8943059C8E4003272FF /* PersephoneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneStore.swift; sourceTree = "<group>"; };
+		E8B7C8973059C8EB003272FF /* StoreRelocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreRelocator.swift; sourceTree = "<group>"; };
 		E8D33C462D3A830F00EE8555 /* Amount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Amount.swift; sourceTree = "<group>"; };
 		E8D33C4A2D3A8ED900EE8555 /* Units.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Units.swift; sourceTree = "<group>"; };
 		E8D33C4C2D3A971800EE8555 /* RatingTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingTier.swift; sourceTree = "<group>"; };
@@ -171,6 +224,20 @@
 		E8EB882C2D3D55BA00861685 /* FoodPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodPreview.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E8B7C8733059C4B1003272FF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E8B7C85F3059C4B0003272FF /* PersephoneWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E8B7C8663059C4B0003272FF /* PersephoneWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E8B7C8733059C4B1003272FF /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = PersephoneWidget; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		E860ACDB2C3EFBE5007E65DE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -190,6 +257,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8B7C85D3059C4B0003272FF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8B7C8653059C4B0003272FF /* SwiftUI.framework in Frameworks */,
+				E8B7C8633059C4B0003272FF /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +290,8 @@
 		E82CFBDD2C3F0E150055C6B2 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				E8B7C8943059C8E4003272FF /* PersephoneStore.swift */,
+				E8B7C8973059C8EB003272FF /* StoreRelocator.swift */,
 				E80E2C452C400B0800D35BE7 /* Schema.swift */,
 				E8D33C462D3A830F00EE8555 /* Amount.swift */,
 				E8D33C4A2D3A8ED900EE8555 /* Units.swift */,
@@ -254,12 +332,15 @@
 		E860ACD52C3EFBE5007E65DE = {
 			isa = PBXGroup;
 			children = (
+				E8B7C8783059C5CE003272FF /* PersephoneWidgetExtension.entitlements */,
 				E8828ECD2C4DC456006C7CB3 /* CHANGELOG.md */,
 				E8828ECC2C4DC43C006C7CB3 /* README.md */,
 				E87A69B92F9D256400F09356 /* .gitignore */,
 				E860ACE02C3EFBE5007E65DE /* Persephone */,
+				E8B7C8663059C4B0003272FF /* PersephoneWidget */,
 				E860ACF32C3EFBE9007E65DE /* PersephoneTests */,
 				E860ACFD2C3EFBE9007E65DE /* PersephoneUITests */,
+				E8B7C8613059C4B0003272FF /* Frameworks */,
 				E860ACDF2C3EFBE5007E65DE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -270,6 +351,7 @@
 				E860ACDE2C3EFBE5007E65DE /* Persephone.app */,
 				E860ACF02C3EFBE9007E65DE /* PersephoneTests.xctest */,
 				E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */,
+				E8B7C8603059C4B0003272FF /* PersephoneWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -354,6 +436,15 @@
 			path = Inventory;
 			sourceTree = "<group>";
 		};
+		E8B7C8613059C4B0003272FF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E8B7C8623059C4B0003272FF /* WidgetKit.framework */,
+				E8B7C8643059C4B0003272FF /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E8E702522D34089A00FB7013 /* Chart */ = {
 			isa = PBXGroup;
 			children = (
@@ -407,10 +498,12 @@
 				E860ACDA2C3EFBE5007E65DE /* Sources */,
 				E860ACDB2C3EFBE5007E65DE /* Frameworks */,
 				E860ACDC2C3EFBE5007E65DE /* Resources */,
+				E8B7C8773059C4B1003272FF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E8B7C8713059C4B1003272FF /* PBXTargetDependency */,
 			);
 			name = Persephone;
 			productName = Persephone;
@@ -453,6 +546,28 @@
 			productReference = E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		E8B7C85F3059C4B0003272FF /* PersephoneWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8B7C8743059C4B1003272FF /* Build configuration list for PBXNativeTarget "PersephoneWidgetExtension" */;
+			buildPhases = (
+				E8B7C85C3059C4B0003272FF /* Sources */,
+				E8B7C85D3059C4B0003272FF /* Frameworks */,
+				E8B7C85E3059C4B0003272FF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E8B7C8663059C4B0003272FF /* PersephoneWidget */,
+			);
+			name = PersephoneWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = PersephoneWidgetExtension;
+			productReference = E8B7C8603059C4B0003272FF /* PersephoneWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -460,7 +575,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					E860ACDD2C3EFBE5007E65DE = {
@@ -473,6 +588,9 @@
 					E860ACF92C3EFBE9007E65DE = {
 						CreatedOnToolsVersion = 15.4;
 						TestTargetID = E860ACDD2C3EFBE5007E65DE;
+					};
+					E8B7C85F3059C4B0003272FF = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -490,6 +608,7 @@
 			projectRoot = "";
 			targets = (
 				E860ACDD2C3EFBE5007E65DE /* Persephone */,
+				E8B7C85F3059C4B0003272FF /* PersephoneWidgetExtension */,
 				E860ACEF2C3EFBE9007E65DE /* PersephoneTests */,
 				E860ACF92C3EFBE9007E65DE /* PersephoneUITests */,
 			);
@@ -521,6 +640,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8B7C85E3059C4B0003272FF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8B7C88B3059C7F2003272FF /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -537,6 +664,7 @@
 				E80E2C462C400B0800D35BE7 /* Schema.swift in Sources */,
 				E8EB88242D3C265F00861685 /* ScaledAmountField.swift in Sources */,
 				E8EB88172D3B708700861685 /* LogFoodItemEntryPreview.swift in Sources */,
+				E8B7C8993059C8EB003272FF /* StoreRelocator.swift in Sources */,
 				E885CC782D3E9E810041364D /* RecipeEntryEditView.swift in Sources */,
 				E8E9AE392D4121C800B2A193 /* LogEntry.swift in Sources */,
 				E8828EE72C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift in Sources */,
@@ -546,6 +674,7 @@
 				E8828EE32C50F78D006C7CB3 /* FoodDatabaseEndpoint.swift in Sources */,
 				E8743BA52C5344D000E1B871 /* NutrientsView.swift in Sources */,
 				E8828EE52C50F85B006C7CB3 /* FoodDataCentralEndpoint.swift in Sources */,
+				E8B7C8953059C8E4003272FF /* PersephoneStore.swift in Sources */,
 				E8A5F5142D3EC7AD00377624 /* RecipeEntryIngredientSheet.swift in Sources */,
 				E885CC7E2D3EA8AE0041364D /* RecipeEntryItem.swift in Sources */,
 				E89A87032FAD20C8002CDEBB /* AddLogEntryView.swift in Sources */,
@@ -609,6 +738,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8B7C85C3059C4B0003272FF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8B7C8793059C79E003272FF /* FoodLogEntry.swift in Sources */,
+				E8B7C87A3059C79E003272FF /* Nutrients.swift in Sources */,
+				E8B7C87B3059C79E003272FF /* RecipeLogEntry.swift in Sources */,
+				E8B7C87C3059C79E003272FF /* Schema.swift in Sources */,
+				E8B7C87D3059C79E003272FF /* ModelUtilities.swift in Sources */,
+				E8B7C87E3059C79E003272FF /* Food.swift in Sources */,
+				E8B7C87F3059C79E003272FF /* RecipeEntry.swift in Sources */,
+				E8B7C8863059C7F2003272FF /* MacroBarChart.swift in Sources */,
+				E8B7C8873059C7F2003272FF /* MiniNutrientPieChart.swift in Sources */,
+				E8B7C8883059C7F2003272FF /* MockDataPreviewModifier.swift in Sources */,
+				E8B7C8983059C8EB003272FF /* StoreRelocator.swift in Sources */,
+				E8B7C8893059C7F2003272FF /* Colors.swift in Sources */,
+				E8B7C88A3059C7F2003272FF /* MacroData.swift in Sources */,
+				E8B7C8803059C79E003272FF /* Units.swift in Sources */,
+				E8B7C8963059C8E4003272FF /* PersephoneStore.swift in Sources */,
+				E8B7C8813059C79E003272FF /* RatingTier.swift in Sources */,
+				E8B7C8823059C79E003272FF /* FoodInstance.swift in Sources */,
+				E8B7C8833059C79E003272FF /* MainUtilities.swift in Sources */,
+				E8B7C8843059C79E003272FF /* Currency.swift in Sources */,
+				E8B7C8853059C79E003272FF /* Amount.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -621,6 +777,11 @@
 			isa = PBXTargetDependency;
 			target = E860ACDD2C3EFBE5007E65DE /* Persephone */;
 			targetProxy = E860ACFB2C3EFBE9007E65DE /* PBXContainerItemProxy */;
+		};
+		E8B7C8713059C4B1003272FF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8B7C85F3059C4B0003272FF /* PersephoneWidgetExtension */;
+			targetProxy = E8B7C8703059C4B1003272FF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -777,6 +938,7 @@
 				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -812,6 +974,7 @@
 				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -886,6 +1049,70 @@
 			};
 			name = Release;
 		};
+		E8B7C8753059C4B1003272FF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PersephoneWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PersephoneWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PersephoneWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone.PersephoneWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E8B7C8763059C4B1003272FF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PersephoneWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PersephoneWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PersephoneWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wassynger.Persephone.PersephoneWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -921,6 +1148,15 @@
 			buildConfigurations = (
 				E860AD0B2C3EFBE9007E65DE /* Debug */,
 				E860AD0C2C3EFBE9007E65DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8B7C8743059C4B1003272FF /* Build configuration list for PBXNativeTarget "PersephoneWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8B7C8753059C4B1003272FF /* Debug */,
+				E8B7C8763059C4B1003272FF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

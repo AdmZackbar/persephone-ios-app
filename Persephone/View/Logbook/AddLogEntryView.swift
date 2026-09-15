@@ -35,7 +35,7 @@ struct AddLogEntryView: View {
         }, sort: \.name)
         self._recipes = Query(filter: #Predicate<RecipeEntry> { recipe in
             !recipe.retired
-        }, sort: \.name)
+        }, sort: \.date, order: .reverse)
         self._instances = Query(sort: \.acquireDate)
     }
     
@@ -75,7 +75,7 @@ struct AddLogEntryView: View {
                 case .Food:
                     FoodListView(mealType: mealType, foods: foods, instances: instances, searchText: $searchText, date: $date, selection: $selection, editItem: $editItem)
                 case .Recipe:
-                    recipeListView()
+                    RecipeListView(mealType: mealType, recipes: recipes, searchText: $searchText, date: $date, selection: $selection, editItem: $editItem)
                 }
             } header: {
                 HStack {
@@ -126,21 +126,11 @@ struct AddLogEntryView: View {
                         .italic()
                 }
             }
-            let nutrients = (item.food?.ingredients.nutrients ?? item.recipe?.nutrients ?? [:]) * item.numServings
+            let nutrients = item.nutrients
             MiniNutrientPieChart(text: nutrients.calories.value.formatted(), nutrients: nutrients)
                 .frame(width: 56, height: 56)
                 .font(.caption)
                 .fontWeight(.bold)
-        }
-    }
-    
-    private func recipeListView() -> some View {
-        ForEach(recipes) { recipe in
-            Button {
-                // TODO
-            } label: {
-                Text(recipe.name)
-            }.buttonStyle(.plain)
         }
     }
     
@@ -285,6 +275,7 @@ struct AddLogEntryView: View {
         
         private func addFood(_ food: Food, instance: FoodInstance? = nil) {
             var entry: LogEntryItem = .init()
+            entry.type = .food
             entry.food = food
             entry.date = date
             entry.meal = mealType
@@ -305,6 +296,97 @@ struct AddLogEntryView: View {
                             .font(.subheadline)
                             .italic()
                     }
+                }
+                Spacer()
+            }.contentShape(Rectangle())
+        }
+    }
+    
+    struct RecipeListView: View {
+        @Query private var recentEntries: [RecipeLogEntry]
+        
+        let mealType: String
+        let recipes: [RecipeEntry]
+        @Binding var searchText: String
+        @Binding var date: Date
+        @Binding var selection: [LogEntryItem]
+        @Binding var editItem: UUID?
+        
+        init(mealType: String, recipes: [RecipeEntry], searchText: Binding<String>, date: Binding<Date>, selection: Binding<[LogEntryItem]>, editItem: Binding<UUID?>) {
+            self.mealType = mealType
+            self.recipes = recipes
+            self._searchText = searchText
+            self._date = date
+            self._selection = selection
+            self._editItem = editItem
+            self._recentEntries = Query({
+                var descriptor = FetchDescriptor<RecipeLogEntry>(
+                    predicate: #Predicate<RecipeLogEntry> { entry in
+                        if let recipe = entry.recipe {
+                            return !recipe.retired && entry.meal == mealType
+                        } else {
+                            return entry.meal == mealType
+                        }
+                    },
+                    sortBy: [SortDescriptor(\.date, order: .reverse)]
+                )
+                descriptor.fetchLimit = 30
+                return descriptor
+            }())
+        }
+        
+        private func isFiltered(_ recipe: RecipeEntry) -> Bool {
+            if searchText.isEmpty {
+                return true
+            }
+            if recipe.name.localizedCaseInsensitiveContains(searchText) {
+                return true
+            }
+            return false
+        }
+        
+        var body: some View {
+            var recipeList: [RecipeEntry] {
+                if searchText.isEmpty {
+                    if recentEntries.isEmpty {
+                        return recipes
+                    } else {
+                        return recentEntries.map({ $0.recipe }).uniqued()
+                    }
+                } else {
+                    return (recentEntries.map({ $0.recipe }) + recipes).uniqued().filter(isFiltered)
+                }
+            }
+            ForEach(recipeList.prefix(30)) { recipe in
+                Button {
+                    addRecipe(recipe)
+                } label: {
+                    itemView(recipe)
+                }.buttonStyle(.plain)
+            }
+        }
+        
+        private func addRecipe(_ recipe: RecipeEntry) {
+            var entry: LogEntryItem = .init()
+            entry.type = .recipe
+            entry.recipe = recipe
+            entry.date = date
+            entry.meal = mealType
+            entry.servingCost = recipe.servingCost ?? .zero
+            entry.amount = recipe.total.value
+            entry.instance = nil
+            selection.append(entry)
+            editItem = entry.id
+        }
+        
+        private func itemView(_ recipe: RecipeEntry) -> some View {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(recipe.name)
+                        .bold()
+                    Text(recipe.date.formatted(date: .abbreviated, time: .shortened))
+                        .font(.subheadline)
+                        .italic()
                 }
                 Spacer()
             }.contentShape(Rectangle())
@@ -418,11 +500,33 @@ struct AddLogEntryView: View {
             }.foregroundStyle(.primary)
         }
         
+        @ViewBuilder
         private func recipeSummaryView(_ recipe: RecipeEntry) -> some View {
-            // TODO
-            VStack {
-                Text("TODO")
-            }
+            let nutrients = recipe.servingNutrients * item.numServings
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .bottom) {
+                    VStack(alignment: .leading) {
+                        Text(recipe.date.formatted(date: .abbreviated, time: .shortened))
+                            .font(.subheadline)
+                            .italic()
+                        Text(recipe.name)
+                            .fontWeight(.bold)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing) {
+                        if let cost = item.servingCost {
+                            Text((cost * item.numServings).formatted())
+                                .font(.subheadline)
+                                .italic()
+                        }
+                        Text(nutrients.calories.formatted())
+                            .fontWeight(.bold)
+                    }
+                }
+                MacroBarChart(nutrients: nutrients, textFormat: .gram, textLayout: .center)
+                    .frame(height: 14)
+                    .font(.caption2)
+            }.foregroundStyle(.primary)
         }
         
         private func recentEntriesView() -> some View {

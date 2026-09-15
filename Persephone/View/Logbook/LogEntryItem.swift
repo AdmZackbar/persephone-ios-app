@@ -62,9 +62,9 @@ struct LogEntryItem: Identifiable, Hashable {
         case .recipe:
             if let recipe {
                 if let modifier = amount.unit?.modifier {
-                    return (amount.value.raw * modifier) / recipe.total.val
+                    return (amount.value.raw * modifier) * recipe.totalNumServings
                 }
-                return amount.value.raw
+                return amount.value.raw * recipe.totalNumServings
             }
         }
         return amount.value.raw
@@ -77,10 +77,23 @@ struct LogEntryItem: Identifiable, Hashable {
             }
         case .recipe:
             if let recipe {
-                return recipe.total * (numServings / recipe.totalNumServings)
+                return recipe.servingSize * numServings
             }
         }
         return nil
+    }
+    var nutrients: Nutrients {
+        switch type {
+        case .food:
+            if let food {
+                return food.ingredients.nutrients * numServings
+            }
+        case .recipe:
+            if let recipe {
+                return recipe.servingNutrients * numServings
+            }
+        }
+        return [:]
     }
     var remainingScale: Double? {
         if let recipe {
@@ -111,10 +124,10 @@ struct LogEntryItem: Identifiable, Hashable {
             self.type = .recipe
             self.date = recipe.date
             self.recipe = recipe.recipe
-            self.amount = recipe.amount
+            self.amount = recipe.recipe.servingSize.amount
             self.meal = recipe.meal
             self.food = nil
-            self.servingCost = nil
+            self.servingCost = recipe.recipe.servingCost
             self.instance = nil
         }
     }

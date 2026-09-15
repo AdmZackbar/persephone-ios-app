@@ -24,7 +24,7 @@ struct RecipeEntryPreview: View {
                     Text(entry.total.formatted())
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                    if let cost = entry.cost {
+                    if let cost = entry.totalCost {
                         Text(cost.formatted())
                             .font(.subheadline)
                             .italic()

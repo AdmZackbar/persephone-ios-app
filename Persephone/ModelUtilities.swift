@@ -339,17 +339,28 @@ extension RecipeEntry {
         self.ingredients.map({ $0.nutrients }).reduce([:], +)
     }
     
-    var cost: Currency? {
+    var servingNutrients: Nutrients {
+        nutrients / totalNumServings
+    }
+    
+    var totalCost: Currency? {
         let total = self.ingredients.filter({ $0.cost != nil }).map({ $0.cost! })
         return total.isEmpty ? nil : total.reduce(.zero, +)
+    }
+    
+    var servingCost: Currency? {
+        if let totalCost {
+            return totalCost / totalNumServings
+        }
+        return nil
     }
     
     var totalNumServings: Double {
         total.amount.value.raw
     }
     
-    var servingSize: Amount {
-        .init(value: .raw(1), unitStr: total.amount.unitStr)
+    var servingSize: FoodSize {
+        total / totalNumServings
     }
 }
 
@@ -378,24 +389,17 @@ extension RecipeEntryIngredient {
 }
 
 extension RecipeLogEntry {
-    var scale: Double {
-        if let modifier = amount.unit?.modifier {
-            return (amount.value.raw * modifier) / recipe.total.val
-        }
-        return amount.value.raw / recipe.totalNumServings
-    }
-    
     var size: FoodSize {
-        recipe.total * scale
+        recipe.servingSize * amount.value.raw
     }
     
     var nutrients: Nutrients {
-        recipe.nutrients * scale
+        recipe.servingNutrients * amount.value.raw
     }
     
     var cost: Currency? {
-        if let totalCost = recipe.cost {
-            totalCost * scale
+        if let cost = recipe.servingCost {
+            cost * amount.value.raw
         } else {
             nil
         }

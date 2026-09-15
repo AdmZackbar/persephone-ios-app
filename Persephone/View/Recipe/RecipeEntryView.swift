@@ -14,12 +14,11 @@ struct RecipeEntryView: View {
     
     var body: some View {
         Form {
-            let servingNutrients = entry.nutrients / entry.total.amount.value.raw
             Section {
                 HStack(alignment: .top) {
                     servingSizeView()
                     Spacer()
-                    NutrientPieChart(nutrients: servingNutrients)
+                    NutrientPieChart(nutrients: entry.servingNutrients)
                         .frame(width: 150, height: 120)
                 }
                 HStack {
@@ -50,7 +49,7 @@ struct RecipeEntryView: View {
                 ForEach(entry.ingredients, id: \.hashValue, content: RecipeEntryIngredientListEntryView.init)
             }
             Section("Per Serving") {
-                NutrientsView(nutrients: servingNutrients)
+                NutrientsView(nutrients: entry.servingNutrients)
             }
             if let logEntries = entry.logEntries, !logEntries.isEmpty {
                 Section("Log Entries") {
@@ -76,8 +75,8 @@ struct RecipeEntryView: View {
                     .bold()
                 Text((entry.total.value / entry.total.amount.value.raw).formatted())
                     .fontWeight(.semibold)
-                if let cost = entry.cost {
-                    Text((cost / entry.total.amount.value.raw).formatted())
+                if let cost = entry.servingCost {
+                    Text(cost.formatted())
                         .italic()
                 }
             }

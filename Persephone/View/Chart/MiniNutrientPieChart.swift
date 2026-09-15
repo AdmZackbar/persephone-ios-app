@@ -23,10 +23,9 @@ struct MiniNutrientPieChart: View {
                 angle: .value("Amount", d.calories),
                 innerRadius: .ratio(0.75),
                 angularInset: 1
-            ).cornerRadius(1)
+            ).cornerRadius(2)
                 .foregroundStyle(d.macro?.color ?? .gray)
         }.chartLegend(.hidden)
-            .padding(4)
             .chartBackground { chartProxy in
                 GeometryReader { geometry in
                     if !text.isEmpty, let anchor = chartProxy.plotFrame {

@@ -128,6 +128,7 @@ struct AddLogEntryView: View {
             }
             let nutrients = item.nutrients
             MiniNutrientPieChart(text: nutrients.calories.value.formatted(), nutrients: nutrients)
+                .padding(4)
                 .frame(width: 56, height: 56)
                 .font(.caption)
                 .fontWeight(.bold)

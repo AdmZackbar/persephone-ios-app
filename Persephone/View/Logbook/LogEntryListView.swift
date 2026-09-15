@@ -34,6 +34,7 @@ struct LogEntryListView: View {
                 }
             }
             MiniNutrientPieChart(text: entry.nutrients.calories.value.formatted(), nutrients: entry.nutrients)
+                .padding(4)
                 .frame(width: 64, height: 64)
                 .font(.subheadline)
                 .fontWeight(.bold)

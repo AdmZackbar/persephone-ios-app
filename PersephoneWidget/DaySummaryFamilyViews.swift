@@ -25,9 +25,17 @@ struct SmallDaySummaryView: View {
                 .font(.caption).fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            MiniNutrientPieChart(text: caloriesText(entry), nutrients: entry.nutrients)
-                .font(.headline).fontWeight(.bold)
-                .frame(width: 78, height: 78)
+            ZStack {
+                // Don't include widget background, unnecessary
+                MiniNutrientPieChart(nutrients: entry.nutrients)
+                VStack(spacing: -2) {
+                    Text(caloriesText(entry))
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .minimumScaleFactor(0.6)
+                    Text("Cal").font(.system(size: 10))
+                }
+            }
 
             HStack(spacing: 6) {
                 ForEach(Macro.allCases, id: \.rawValue) { macro in
@@ -83,14 +91,14 @@ struct CircularDaySummaryView: View {
 
     var body: some View {
         ZStack {
-            AccessoryWidgetBackground()
+            // Don't include widget background, unnecessary
             MiniNutrientPieChart(nutrients: entry.nutrients)
             VStack(spacing: -2) {
                 Text(caloriesText(entry))
-                    .font(.system(.headline, design: .rounded))
+                    .font(.system(size: 14, design: .rounded))
                     .fontWeight(.bold)
                     .minimumScaleFactor(0.6)
-                Text("Cal").font(.system(size: 8))
+                Text("Cal").font(.system(size: 7))
             }
         }
         .widgetAccentable()

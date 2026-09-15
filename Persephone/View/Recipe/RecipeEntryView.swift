@@ -127,6 +127,7 @@ struct RecipeEntryIngredientListEntryView: View {
                     }
                 }
                 MiniNutrientPieChart(text: ingredient.nutrients.calories.value.formatted(), nutrients: ingredient.nutrients)
+                    .padding(4)
                     .frame(width: 60, height: 60)
                     .font(.subheadline)
                     .fontWeight(.semibold)

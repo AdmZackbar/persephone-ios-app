@@ -22,6 +22,7 @@
 		E860ACF52C3EFBE9007E65DE /* PersephoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACF42C3EFBE9007E65DE /* PersephoneTests.swift */; };
 		E860ACFF2C3EFBE9007E65DE /* PersephoneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */; };
 		E860AD012C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */; };
+		E8677676305AF4FF003BD506 /* LogEntriesSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8677675305AF4F1003BD506 /* LogEntriesSummaryView.swift */; };
 		E867E6662D343B05001917C0 /* LogbookPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E867E6652D343AF8001917C0 /* LogbookPieChart.swift */; };
 		E867E6682D343FDD001917C0 /* ModelUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E867E6672D343FDA001917C0 /* ModelUtilities.swift */; };
 		E8743B9D2C51FB0E00E1B871 /* SheetCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8743B9C2C51FB0E00E1B871 /* SheetCoordinator.swift */; };
@@ -161,6 +162,7 @@
 		E860ACFA2C3EFBE9007E65DE /* PersephoneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PersephoneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E860ACFE2C3EFBE9007E65DE /* PersephoneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITests.swift; sourceTree = "<group>"; };
 		E860AD002C3EFBE9007E65DE /* PersephoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersephoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		E8677675305AF4F1003BD506 /* LogEntriesSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntriesSummaryView.swift; sourceTree = "<group>"; };
 		E867E6652D343AF8001917C0 /* LogbookPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogbookPieChart.swift; sourceTree = "<group>"; };
 		E867E6672D343FDA001917C0 /* ModelUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelUtilities.swift; sourceTree = "<group>"; };
 		E8743B9C2C51FB0E00E1B871 /* SheetCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetCoordinator.swift; sourceTree = "<group>"; };
@@ -475,6 +477,7 @@
 		E8EB880E2D3B661D00861685 /* Logbook */ = {
 			isa = PBXGroup;
 			children = (
+				E8677675305AF4F1003BD506 /* LogEntriesSummaryView.swift */,
 				E80E2B4D2FABC2B5006FAC4A /* LogWeekView.swift */,
 				E8E9AE382D4121C400B2A193 /* LogEntry.swift */,
 				E80E2B532FAC41CB006FAC4A /* LogEntryListView.swift */,
@@ -665,6 +668,7 @@
 				E8EB88242D3C265F00861685 /* ScaledAmountField.swift in Sources */,
 				E8EB88172D3B708700861685 /* LogFoodItemEntryPreview.swift in Sources */,
 				E8B7C8993059C8EB003272FF /* StoreRelocator.swift in Sources */,
+				E8677676305AF4FF003BD506 /* LogEntriesSummaryView.swift in Sources */,
 				E885CC782D3E9E810041364D /* RecipeEntryEditView.swift in Sources */,
 				E8E9AE392D4121C800B2A193 /* LogEntry.swift in Sources */,
 				E8828EE72C5169E2006C7CB3 /* OpenFoodFactsEndpoint.swift in Sources */,

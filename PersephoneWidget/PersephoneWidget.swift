@@ -25,9 +25,7 @@ struct DaySummaryWidgetView: View {
     let entry: DaySummaryEntry
 
     var body: some View {
-        content
-            // Required on iOS 17+; covers all four families in one place.
-            .containerBackground(for: .widget) { Color.background }
+        content.containerBackground(.clear, for: .widget)
     }
 
     @ViewBuilder private var content: some View {

@@ -50,36 +50,57 @@ struct SmallDaySummaryView: View {
 }
 
 struct MediumDaySummaryView: View {
+    @Environment(\.widgetRenderingMode) private var renderingMode
+    
     let entry: DaySummaryEntry
 
     var body: some View {
-        HStack(spacing: 14) {
-            MiniNutrientPieChart(text: caloriesText(entry), nutrients: entry.nutrients)
-                .font(.title3).fontWeight(.bold)
-                .frame(width: 84, height: 84)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Today")
-                    .font(.caption).fontWeight(.semibold)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .bottom) {
                 Text(entry.nutrients.calories.formatted())
-                    .font(.title2).fontWeight(.bold)
-
-                Grid(alignment: .leadingFirstTextBaseline, verticalSpacing: 1) {
+                    .font(.title2)
+                    .fontWeight(.bold)
+                Spacer()
+                Text(entry.totalCost.formatted())
+                    .fontWeight(.bold)
+            }
+            HStack {
+                Grid(alignment: .leadingFirstTextBaseline, horizontalSpacing: 24, verticalSpacing: 2) {
                     GridRow {
-                        ForEach(Macro.allCases, id: \.rawValue) { Text($0.name) }
+                        Text("Carbs")
+                        Text("Fat")
+                        Text("Protein")
                     }.fontWeight(.light)
                     GridRow {
-                        ForEach(Macro.allCases, id: \.rawValue) { macro in
-                            Text(grams(entry, macro)).foregroundStyle(macro.color)
-                        }
+                        Text(entry.nutrients.get(.TotalCarbs)?.formatted() ?? "0 g")
+                            .foregroundStyle(.carbs)
+                        Text(entry.nutrients.get(.TotalFat)?.formatted() ?? "0 g")
+                            .foregroundStyle(.fat)
+                        Text(entry.nutrients.get(.Protein)?.formatted() ?? "0 g")
+                            .foregroundStyle(.protein)
+                        
                     }.fontWeight(.semibold)
                 }
-                .font(.caption2)
-
-                MacroBarChart(nutrients: entry.nutrients,
-                              textFormat: .percent, textLayout: .center)
-                    .font(.system(size: 8))
-                    .frame(height: 11)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Sodium")
+                        .fontWeight(.light)
+                    Text(entry.nutrients.get(.Sodium)?.formatted() ?? "0 mg")
+                        .fontWeight(.semibold)
+                }
+            }
+            if renderingMode == .fullColor {
+                MacroBarChart(nutrients: entry.nutrients, textFormat: .percent, textLayout: .center)
+                    .font(.caption2)
+                    .frame(height: 12)
+                    .padding(.top, 4)
+            } else {
+                MacroBarChart(nutrients: entry.nutrients, textFormat: .percent, textLayout: .center)
+                    .font(.caption2)
+                    .frame(height: 12)
+                    .padding(.top, 4)
+                    .luminanceToAlpha()
+                    .widgetAccentable()
             }
         }
         .redacted(reason: entry.isDataAvailable ? [] : .placeholder)
@@ -110,9 +131,13 @@ struct RectangularDaySummaryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
-            Text("Today").font(.headline).widgetAccentable()
-            Text(entry.nutrients.calories.formatted())
-                .font(.body).fontWeight(.semibold)
+            HStack(alignment: .bottom) {
+                Text(entry.nutrients.calories.formatted())
+                    .font(.body)
+                Spacer()
+                Text(entry.totalCost.formatted())
+                    .font(.caption)
+            }.fontWeight(.semibold)
             Text(Macro.allCases.map { "\($0.name.prefix(1)) \(grams(entry, $0))" }
                     .joined(separator: " · "))
                 .font(.caption2)

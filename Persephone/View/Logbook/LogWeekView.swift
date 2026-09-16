@@ -142,7 +142,7 @@ private struct LogDayView: View {
             }.padding(.leading, 24)
                 .padding(.trailing, 12)
             Form {
-                summaryView(nutrients: nutrients)
+                LogEntriesSummaryView(entries: entryMap.values.flatMap { $0 })
                     .contentShape(Rectangle())
                     .onTapGesture {
                         showNutrientSheet.toggle()
@@ -187,40 +187,6 @@ private struct LogDayView: View {
                     Text("Error getting item")
                 }
             }
-    }
-    
-    private func summaryView(nutrients: Nutrients) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("\(nutrients.calories.value.formatted()) Calories")
-                .font(.title2)
-                .fontWeight(.bold)
-            Text(entryMap.values.map({ $0.cost ?? .zero }).reduce(.zero, +).formatted())
-                .fontWeight(.bold)
-            Spacer()
-            Grid(alignment: .leadingFirstTextBaseline, verticalSpacing: 2) {
-                GridRow {
-                    Text("Carbs")
-                    Text("Fat")
-                    Text("Protein")
-                    Text("Sodium")
-                }.fontWeight(.light)
-                // Used to expand grid to full width - don't show
-                Divider().hidden()
-                GridRow {
-                    Text(nutrients.get(.TotalCarbs)?.formatted() ?? "0 g")
-                        .foregroundStyle(.carbs)
-                    Text(nutrients.get(.TotalFat)?.formatted() ?? "0 g")
-                        .foregroundStyle(.fat)
-                    Text(nutrients.get(.Protein)?.formatted() ?? "0 g")
-                        .foregroundStyle(.protein)
-                    Text(nutrients.get(.Sodium)?.formatted() ?? "0 mg")
-                }.fontWeight(.semibold)
-            }
-            MacroBarChart(nutrients: nutrients, textFormat: .percent, textLayout: .center)
-                .font(.caption2)
-                .frame(height: 12)
-                .padding(.top, 4)
-        }
     }
     
     private func mealView(_ mealType: MealType, _ entries: [LogEntry]) -> some View {

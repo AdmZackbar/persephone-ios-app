@@ -15,6 +15,7 @@ struct DaySummaryEntry: TimelineEntry, Sendable {
     let dayStart: Date
     let nutrients: Nutrients
     let entryCount: Int
+    let totalCost: Currency
     /// false when the shared store can't be read (app has never migrated, or is missing).
     let isDataAvailable: Bool
 
@@ -22,7 +23,7 @@ struct DaySummaryEntry: TimelineEntry, Sendable {
 
     static func unavailable(date: Date = .now, calendar: Calendar = .current) -> Self {
         .init(date: date, dayStart: calendar.startOfDay(for: date),
-              nutrients: [:], entryCount: 0, isDataAvailable: false)
+              nutrients: [:], entryCount: 0, totalCost: .zero, isDataAvailable: false)
     }
 
     /// Gallery / preview content.
@@ -30,11 +31,11 @@ struct DaySummaryEntry: TimelineEntry, Sendable {
         .init(date: date, dayStart: calendar.startOfDay(for: date),
               nutrients: [.Energy: 1840, .TotalCarbs: 186, .TotalFat: 62,
                           .Protein: 132, .Sodium: 2310, .DietaryFiber: 24],
-              entryCount: 7, isDataAvailable: true)
+              entryCount: 7, totalCost: .usd(1451), isDataAvailable: true)
     }
 
     static func empty(date: Date = .now, calendar: Calendar = .current) -> Self {
         .init(date: date, dayStart: calendar.startOfDay(for: date),
-              nutrients: [:], entryCount: 0, isDataAvailable: true)
+              nutrients: [:], entryCount: 0, totalCost: .zero, isDataAvailable: true)
     }
 }

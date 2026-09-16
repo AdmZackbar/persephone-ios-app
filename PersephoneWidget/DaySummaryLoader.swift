@@ -56,6 +56,7 @@ struct DaySummaryLoader {
         context.autosaveEnabled = false // read-only; never mutate from the widget
 
         var total: Nutrients = [:]
+        var cost: Currency = .zero
         var count = 0
 
         do {
@@ -70,6 +71,7 @@ struct DaySummaryLoader {
                 // guard explicitly rather than crash-looping the widget.
                 guard entry.food != nil else { continue }
                 total = total + entry.nutrients
+                cost = cost + (entry.cost ?? .zero)
                 count += 1
             }
 
@@ -81,6 +83,7 @@ struct DaySummaryLoader {
             for entry in recipeEntries {
                 guard entry.recipe != nil else { continue }
                 total = total + entry.nutrients
+                cost = cost + (entry.cost ?? .zero)
                 count += 1
             }
         } catch {
@@ -89,7 +92,7 @@ struct DaySummaryLoader {
         }
 
         return DaySummaryEntry(date: referenceDate, dayStart: dayStart,
-                                nutrients: total, entryCount: count,
+                                nutrients: total, entryCount: count, totalCost: cost,
                                 isDataAvailable: true)
     }
 

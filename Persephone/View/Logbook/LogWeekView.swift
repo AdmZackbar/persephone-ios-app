@@ -24,7 +24,7 @@ struct LogWeekView: View {
     
     var body: some View {
         NavigationStack(path: $navigationStore.path) {
-            VStack(spacing: 24) {
+            VStack(spacing: 12) {
                 // Top view with all the days in the week
                 weekView()
                 // Filter entries for just the selected day
@@ -80,7 +80,7 @@ struct LogWeekView: View {
                     .fontWeight(d.day == date.day ? .bold : .regular)
                 let nutrients = computeDayNutrients(d)
                 MiniNutrientPieChart(text: d.day.formatted(), nutrients: nutrients)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 32, height: 32)
                     .font(.subheadline)
                     .fontWeight(d.day == date.day ? .bold : .regular)
                 Text(nutrients.calories.value.formatted())
@@ -116,12 +116,10 @@ private struct LogDayView: View {
                 Button {
                     editDate.toggle()
                 } label: {
-                    HStack {
-                        Text(date.formatted(date: .long, time: .omitted))
-                            .font(.title)
-                            .fontWeight(.bold)
-                        Image(systemName: "chevron.down")
-                    }.contentShape(Rectangle())
+                    Text(date.formatted(date: .long, time: .omitted))
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .contentShape(Rectangle())
                 }.buttonStyle(.plain)
                 Spacer()
                 Menu {

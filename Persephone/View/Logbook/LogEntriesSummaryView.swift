@@ -14,11 +14,12 @@ struct LogEntriesSummaryView: View {
         let nutrients = entries.map { $0.nutrients }.reduce([:], +)
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .bottom) {
-                Text("\(nutrients.calories.value.formatted()) Calories")
-                    .font(.title2)
+                Text(nutrients.calories.formatted())
+                    .font(.title)
                     .fontWeight(.bold)
                 Spacer()
                 Text(entries.map({ $0.cost ?? .zero }).reduce(.zero, +).formatted())
+                    .font(.title3)
                     .fontWeight(.bold)
             }
             HStack {
@@ -27,7 +28,8 @@ struct LogEntriesSummaryView: View {
                         Text("Carbs")
                         Text("Fat")
                         Text("Protein")
-                    }.fontWeight(.light)
+                    }.font(.subheadline)
+                        .fontWeight(.light)
                     GridRow {
                         Text(nutrients.get(.TotalCarbs)?.formatted() ?? "0 g")
                             .foregroundStyle(.carbs)
@@ -36,13 +38,16 @@ struct LogEntriesSummaryView: View {
                         Text(nutrients.get(.Protein)?.formatted() ?? "0 g")
                             .foregroundStyle(.protein)
                         
-                    }.fontWeight(.semibold)
+                    }.font(.title3)
+                        .fontWeight(.semibold)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("Sodium")
+                        .font(.subheadline)
                         .fontWeight(.light)
                     Text(nutrients.get(.Sodium)?.formatted() ?? "0 mg")
+                        .font(.title3)
                         .fontWeight(.semibold)
                 }
             }

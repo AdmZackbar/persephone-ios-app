@@ -99,7 +99,7 @@ struct SelectFoodSheet: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     @Previewable @State var selection: Food? = nil
     @Previewable @State var showing: Bool = false
     Form {

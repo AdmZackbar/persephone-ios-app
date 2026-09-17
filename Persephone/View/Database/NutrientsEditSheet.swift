@@ -150,6 +150,6 @@ struct NutrientsEditSheet: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     NutrientsEditSheet(nutrients: .constant([:]))
 }

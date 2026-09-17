@@ -70,7 +70,7 @@ struct NutrientsView: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     NavigationStack {
         Form {
             NutrientsView(nutrients: [

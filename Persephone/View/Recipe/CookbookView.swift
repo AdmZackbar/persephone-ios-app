@@ -163,6 +163,6 @@ enum CookbookViewType: Hashable {
     case editEntry(_ entry: RecipeEntry)
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     CookbookView()
 }

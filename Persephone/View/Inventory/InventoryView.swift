@@ -444,6 +444,6 @@ enum InventoryViewType: Hashable {
     case addFood
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     InventoryView()
 }

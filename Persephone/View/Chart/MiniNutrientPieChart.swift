@@ -37,7 +37,7 @@ struct MiniNutrientPieChart: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     VStack {
         MiniNutrientPieChart()
             .frame(width: 40, height: 40)

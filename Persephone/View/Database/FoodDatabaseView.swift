@@ -131,6 +131,6 @@ enum FoodViewType: Hashable {
     case editFood(_ food: Food)
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     FoodDatabaseView()
 }

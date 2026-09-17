@@ -254,7 +254,7 @@ struct SaveLogEntryAmountSheet: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     VStack {
         
     }.sheet(isPresented: .constant(true)) {

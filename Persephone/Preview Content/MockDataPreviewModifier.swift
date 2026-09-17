@@ -8,9 +8,6 @@
 import SwiftData
 import SwiftUI
 
-// Ideally this should reside in Preview Content, but
-// because the dead code stripper doesn't work with the
-// preview modifier, this has to stay in the main codebase...
 struct MockDataPreviewModifier: PreviewModifier {
     static func makeSharedContext() throws -> ModelContainer {
         let container = try ModelContainer(
@@ -22,29 +19,7 @@ struct MockDataPreviewModifier: PreviewModifier {
     }
     
     static func populateContainer(_ container: ModelContainer) {
-        let food = createTestFood()
-        container.mainContext.insert(food)
-        container.mainContext.insert(createTestRecipeEntry())
-        container.mainContext.insert(createTestFoodLogEntry())
-        let instance: FoodInstance = .init(food: food, acquireDate: .now.addDays(-1), source: "Costco", cost: .usd(1399), total: .init(str: "1 bag", val: 350), remainder: 0.5)
-        container.mainContext.insert(instance)
-        let groceryLists: [GroceryList] = [
-            .init(store: "Costco",
-                 items: [
-                    .init(name: "Chicken Thighs"),
-                    .init(name: "Coke Zero"),
-                    .init(name: "Lightly Breaded Chicken Chunks", checked: true),
-                    .init(name: "Frozen Green Beans"),
-                    .init(name: "Ice Cream"),
-                 ])
-        ]
-        groceryLists.forEach(container.mainContext.insert)
-//        insertTestMeals(container)
-//        container.mainContext.insert(createRecipe())
-    }
-    
-    static func createTestFood() -> Food {
-        let item = Food(
+        let food: Food = .init(
             name: "Test Food",
             metaData: .init(barcode: "0123456789", brand: "Some Brand", category: "Bread", notes: "Preparation: cook at 375 F for 12-14 minutes.", rating: 8),
             ingredients: .init(
@@ -71,7 +46,30 @@ struct MockDataPreviewModifier: PreviewModifier {
                 .init(store: "Store 2", cost: .usd(1099), amount: .init(str: "2 containers", val: 3200)),
                 .init(store: "Store 3", cost: .usd(1000), amount: .init(str: "1 lb", val: 500))
             ])
-        return item
+        container.mainContext.insert(food)
+        container.mainContext.insert(createTestRecipeEntry())
+        container.mainContext.insert(createTestFoodLogEntry())
+        let instance: FoodInstance = .init(food: food, acquireDate: .now.addDays(-1), source: "Costco", cost: .usd(1399), total: .init(str: "1 bag", val: 350), remainder: 0.5)
+        let groceryLists: [GroceryList] = [
+            .init(store: "Costco",
+                 items: [
+                    .init(name: "Chicken Thighs"),
+                    .init(name: "Coke Zero"),
+                    .init(name: "Lightly Breaded Chicken Chunks", checked: true),
+                    .init(name: "Frozen Green Beans"),
+                    .init(name: "Ice Cream"),
+                 ]),
+            .init(store: "Publix",
+                 items: [
+                    .init(name: "Brioche Buns"),
+                    .init(name: "Root Beer"),
+                    .init(name: "Cookies n' Cream Ice Cream"),
+                 ])
+        ]
+        groceryLists.forEach(container.mainContext.insert)
+        container.mainContext.insert(instance)
+//        insertTestMeals(container)
+//        container.mainContext.insert(createRecipe())
     }
     
     static func createTestRecipeEntry() -> RecipeEntry {
@@ -133,4 +131,8 @@ struct MockDataPreviewModifier: PreviewModifier {
     func body(content: Content, context: ModelContainer) -> some View {
         content.modelContainer(context)
     }
+}
+
+extension PreviewTrait where T == Preview.ViewTraits {
+    static var sampleData: Self { .modifier(MockDataPreviewModifier()) }
 }

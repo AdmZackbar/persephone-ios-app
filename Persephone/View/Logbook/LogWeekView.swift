@@ -300,6 +300,6 @@ extension Binding {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     LogWeekView()
 }

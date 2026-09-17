@@ -42,7 +42,7 @@ struct LogEntryListView: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     Form {
         LogEntryListView(entry: .food(.init(food: .init(name: "Test Food"))))
         LogEntryListView(entry: .food(.init(food: .init(name: "Top Sirloin Steak", metaData: .init(brand: "Publix")), amount: .init(value: .raw(300), unit: .gram), meal: "Breakfast")))

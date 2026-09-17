@@ -399,7 +399,7 @@ enum Stores: String, Identifiable, CaseIterable {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     @Previewable @StateObject var navigationStore = NavigationStore()
     NavigationStack(path: $navigationStore.path) {
         AddFoodInstanceView()

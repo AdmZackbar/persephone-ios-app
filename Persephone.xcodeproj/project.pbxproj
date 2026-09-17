@@ -101,6 +101,7 @@
 		E8EB88282D3D306C00861685 /* FoodItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB88272D3D306000861685 /* FoodItem.swift */; };
 		E8EB882B2D3D553D00861685 /* StoreEntryEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB882A2D3D553D00861685 /* StoreEntryEditSheet.swift */; };
 		E8EB882D2D3D55BF00861685 /* FoodPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EB882C2D3D55BA00861685 /* FoodPreview.swift */; };
+		E8F63F0A305C54DD00FB7AAB /* GroceryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81B1F282FB5888A0041BE55 /* GroceryList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -366,7 +367,6 @@
 				E8E7024C2D33F9CD00FB7013 /* NavigationStore.swift */,
 				E8E7024E2D33FBA000FB7013 /* MainUtilities.swift */,
 				E867E6672D343FDA001917C0 /* ModelUtilities.swift */,
-				E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */,
 				E82CFBDD2C3F0E150055C6B2 /* Model */,
 				E82CFBDE2C3F0E1F0055C6B2 /* View */,
 				E80E2C3E2C3F6C6700D35BE7 /* UI */,
@@ -383,6 +383,7 @@
 			isa = PBXGroup;
 			children = (
 				E860ACEA2C3EFBE8007E65DE /* Preview Assets.xcassets */,
+				E8E702572D340C1200FB7013 /* MockDataPreviewModifier.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -756,6 +757,7 @@
 				E8B7C8863059C7F2003272FF /* MacroBarChart.swift in Sources */,
 				E8B7C8873059C7F2003272FF /* MiniNutrientPieChart.swift in Sources */,
 				E8B7C8883059C7F2003272FF /* MockDataPreviewModifier.swift in Sources */,
+				E8F63F0A305C54DD00FB7AAB /* GroceryList.swift in Sources */,
 				E8B7C8983059C8EB003272FF /* StoreRelocator.swift in Sources */,
 				E8B7C8893059C7F2003272FF /* Colors.swift in Sources */,
 				E8B7C88A3059C7F2003272FF /* MacroData.swift in Sources */,

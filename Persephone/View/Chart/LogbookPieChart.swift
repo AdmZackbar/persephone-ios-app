@@ -61,7 +61,7 @@ struct LogbookPieChart: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     LogbookPieChart(nutrients: [
         .Energy: 120,
         .TotalCarbs: 14,

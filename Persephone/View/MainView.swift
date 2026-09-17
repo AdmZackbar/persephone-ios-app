@@ -36,6 +36,6 @@ struct MainView: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     MainView()
 }

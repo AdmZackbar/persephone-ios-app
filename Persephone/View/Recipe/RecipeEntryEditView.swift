@@ -131,7 +131,7 @@ struct RecipeEntryEditView: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     @Previewable @StateObject var navigationStore = NavigationStore()
     NavigationStack(path: $navigationStore.path) {
         RecipeEntryEditView()

@@ -9,13 +9,14 @@ import SwiftData
 import SwiftUI
 
 struct GroceryListView: View {
-    @Query var groceryLists: [GroceryList]
+    @Query(sort: \GroceryList.store) var groceryLists: [GroceryList]
     
     var body: some View {
-        ListViewImpl(groceryLists: groceryLists)
+        SubView(groceryLists: groceryLists)
     }
     
-    struct ListViewImpl: View {
+    struct SubView: View {
+        @Environment(\.modelContext) var modelContext
         @State var groceryLists: [GroceryList]
         
         var body: some View {
@@ -31,6 +32,8 @@ struct GroceryListView: View {
                         }
                     }
                 }
+            }.onChange(of: groceryLists) { oldValue, newValue in
+                try? modelContext.save()
             }
         }
     }
@@ -41,22 +44,15 @@ struct CustomCheckbox: View {
     
     var body: some View {
         Button(action: {
-            self.isOn.toggle()
+            withAnimation {
+                self.isOn.toggle()
+            }
         }) {
             Image(systemName: isOn ? "checkmark.square.fill" : "square")
         }
     }
 }
 
-#Preview {
-    GroceryListView.ListViewImpl(groceryLists: [
-        .init(store: "Costco",
-             items: [
-                .init(name: "Chicken Thighs"),
-                .init(name: "Coke Zero"),
-                .init(name: "Lightly Breaded Chicken Chunks", checked: true),
-                .init(name: "Frozen Green Beans"),
-                .init(name: "Ice Cream"),
-             ])
-    ])
+#Preview(traits: .sampleData) {
+    GroceryListView()
 }

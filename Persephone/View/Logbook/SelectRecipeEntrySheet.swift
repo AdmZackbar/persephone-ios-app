@@ -93,7 +93,7 @@ struct SelectRecipeEntrySheet: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     @Previewable @State var selection: RecipeEntry? = nil
     @Previewable @State var showing: Bool = false
     Form {

@@ -77,7 +77,7 @@ struct NutrientPieChart: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     NutrientPieChart(nutrients: [
         .Energy: 120,
         .TotalCarbs: 14,

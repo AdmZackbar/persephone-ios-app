@@ -224,7 +224,7 @@ private struct SelectFoodView: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     @Previewable @State var recipeItem: RecipeEntryItem = .init()
     RecipeEntryIngredientSheet(recipeItem: $recipeItem)
 }

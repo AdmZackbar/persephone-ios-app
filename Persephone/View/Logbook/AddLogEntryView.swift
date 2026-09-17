@@ -611,7 +611,7 @@ struct AddLogEntryView: View {
     }
 }
 
-#Preview(traits: .modifier(MockDataPreviewModifier())) {
+#Preview(traits: .sampleData) {
     @Previewable @StateObject var navigationStore = NavigationStore()
     NavigationStack(path: $navigationStore.path) {
         AddLogEntryView(date: .now, mealType: "Snacks")

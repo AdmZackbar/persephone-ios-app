@@ -26,7 +26,7 @@ extension SchemaV1 {
             var name: String
             var checked: Bool
             
-            init(name: String = "", checked: Bool = false) {
+            init(_ name: String = "", checked: Bool = false) {
                 self.name = name
                 self.checked = checked
             }

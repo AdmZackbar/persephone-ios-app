@@ -29,37 +29,16 @@ struct InventoryView: View {
     @Query(sort: \FoodInstance.acquireDate, order: .reverse)
     private var instances: [FoodInstance]
     
+    @State private var viewType: ViewType = .viewItems
     @State private var searchText: String = ""
     @State private var editItem: PersistentIdentifier?
     @State private var showDeleteAll: Bool = false
     
     var body: some View {
         NavigationStack(path: $navigationStore.path) {
-            Form {
-                let byStoreAndDate = Dictionary(grouping: instances.filter(isFiltered)) { instance in
-                    StoreDate(store: instance.source, date: Calendar.current.startOfDay(for: instance.acquireDate))
-                }
-                if byStoreAndDate.isEmpty {
-                    if searchText.isEmpty {
-                        Text("No items in inventory")
-                    } else {
-                        Text("No related items")
-                    }
-                } else {
-                    ForEach(byStoreAndDate.keys.sorted(), id: \.hashValue) { key in
-                        Section {
-                            instanceList(byStoreAndDate[key]!)
-                        } header: {
-                            HStack {
-                                Text(key.store)
-                                Spacer()
-                                Text(key.date.formatted(date: .abbreviated, time: .omitted))
-                            }
-                        }
-                    }
-                }
-            }.navigationTitle("Inventory")
-                .searchable(text: $searchText)
+            mainView()
+                .navigationTitle("Inventory")
+                .navigationBarTitleDisplayMode(.inline)
                 .sheet(isPresented: .isPresent($editItem), content: {
                     if let index = instances.firstIndex(where: { $0.id == editItem }) {
                         SaveAmountSheet(item: .init(instance: instances[index]))
@@ -79,6 +58,13 @@ struct InventoryView: View {
                     }
                 }
                 .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Picker("View Type", selection: $viewType) {
+                            ForEach(ViewType.allCases, id: \.text) { type in
+                                Text(type.text).tag(type)
+                            }
+                        }.pickerStyle(.segmented)
+                    }
                     ToolbarItem(placement: .cancellationAction) {
                         Button(role: .destructive) {
                             showDeleteAll = true
@@ -87,15 +73,63 @@ struct InventoryView: View {
                         }
                     }
                     ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            navigationStore.push(InventoryViewType.addFood)
+                        Menu {
+                            Button {
+                                navigationStore.push(InventoryViewType.addFood)
+                            } label: {
+                                Label("Add Item", systemImage: "carrot")
+                            }
+                            Button {
+                                modelContext.insert(GroceryList())
+                            } label: {
+                                Label("Add Grocery List", systemImage: "list.clipboard")
+                            }
                         } label: {
-                            Label("Add Food", systemImage: "plus")
+                            Label("Add", systemImage: "plus")
                         }
                     }
                 }
                 .handleDestinations(navigationStore)
         }.environmentObject(navigationStore)
+    }
+    
+    @ViewBuilder
+    func mainView() -> some View {
+        switch viewType {
+        case .viewItems:
+            currentItemsView()
+                .searchable(text: $searchText)
+        case .viewGroceryLists:
+            GroceryListView()
+        }
+    }
+    
+    @ViewBuilder
+    func currentItemsView() -> some View {
+        Form {
+            let byStoreAndDate = Dictionary(grouping: instances.filter(isFiltered)) { instance in
+                StoreDate(store: instance.source, date: Calendar.current.startOfDay(for: instance.acquireDate))
+            }
+            if byStoreAndDate.isEmpty {
+                if searchText.isEmpty {
+                    ContentUnavailableView("No items in inventory", systemImage: "list.clipboard")
+                } else {
+                    ContentUnavailableView("No related items", systemImage: "list.clipboard")
+                }
+            } else {
+                ForEach(byStoreAndDate.keys.sorted(), id: \.hashValue) { key in
+                    Section {
+                        instanceList(byStoreAndDate[key]!)
+                    } header: {
+                        HStack {
+                            Text(key.store)
+                            Spacer()
+                            Text(key.date.formatted(date: .abbreviated, time: .omitted))
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private func isFiltered(_ instance: FoodInstance) -> Bool {
@@ -173,6 +207,19 @@ struct InventoryView: View {
                 Text(instance.remainder.formatted(.percent.precision(.fractionLength(0))))
                     .font(.subheadline)
             }.gaugeStyle(.accessoryCircularCapacity)
+        }
+    }
+    
+    enum ViewType: CaseIterable {
+        case viewItems, viewGroceryLists
+        
+        var text: String {
+            switch self {
+            case .viewItems:
+                return "Current Items"
+            case .viewGroceryLists:
+                return "Grocery Lists"
+            }
         }
     }
     

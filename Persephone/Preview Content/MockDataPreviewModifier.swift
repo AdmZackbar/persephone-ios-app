@@ -53,17 +53,21 @@ struct MockDataPreviewModifier: PreviewModifier {
         let groceryLists: [GroceryList] = [
             .init(store: "Costco",
                  items: [
-                    .init(name: "Chicken Thighs"),
-                    .init(name: "Coke Zero"),
-                    .init(name: "Lightly Breaded Chicken Chunks", checked: true),
-                    .init(name: "Frozen Green Beans"),
-                    .init(name: "Ice Cream"),
+                    .init("Chicken Thighs"),
+                    .init("Coke Zero"),
+                    .init("Lightly Breaded Chicken Chunks", checked: true),
+                    .init("Frozen Green Beans"),
+                    .init("Ice Cream"),
                  ]),
             .init(store: "Publix",
                  items: [
-                    .init(name: "Brioche Buns"),
-                    .init(name: "Root Beer"),
-                    .init(name: "Cookies n' Cream Ice Cream"),
+                    .init("Brioche Buns"),
+                    .init("Root Beer"),
+                    .init("Cookies n' Cream Ice Cream"),
+                 ]),
+            .init(store: "Trader Joe's",
+                 items: [
+                    .init("Grapes")
                  ])
         ]
         groceryLists.forEach(container.mainContext.insert)

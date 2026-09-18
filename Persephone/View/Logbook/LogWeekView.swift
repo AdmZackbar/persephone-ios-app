@@ -105,52 +105,35 @@ private struct LogDayView: View {
     let entryMap: [String : [LogEntry]]
     
     @Binding var date: Date
-    @State private var editDate: Bool = false
-    @State private var showNutrientSheet = false
+    @State private var editDate = false
+    @State private var showNutrients: Nutrients? = nil
     @State private var editItem: PersistentIdentifier? = nil
-    
+    @State private var healthKitErrorMessage: String? = nil
+    @State private var showHealthKitSuccess = false
+
     var body: some View {
-        let nutrients = entryMap.values.map({ $0.nutrients }).reduce([:], +)
-        VStack {
-            HStack {
-                Button {
-                    editDate.toggle()
-                } label: {
-                    Text(date.formatted(date: .long, time: .omitted))
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .contentShape(Rectangle())
-                }.buttonStyle(.plain)
-                Spacer()
-                Menu {
-                    ForEach(MealType.allCases) { mealType in
-                        Button {
-                            navigationStore.push(LogViewType.add(date: date.atCurrentTime(), mealType: mealType.rawValue))
-                        } label: {
-                            Label(mealType.rawValue, systemImage: mealType.getIconName())
-                        }
+        ZStack(alignment: .bottomTrailing) {
+            VStack {
+                headerView()
+                entriesView()
+            }
+            Menu {
+                ForEach(MealType.allCases) { mealType in
+                    Button {
+                        navigationStore.push(LogViewType.add(date: date.atCurrentTime(), mealType: mealType.rawValue))
+                    } label: {
+                        Label(mealType.rawValue, systemImage: mealType.getIconName())
                     }
-                } label: {
-                    Image(systemName: "plus")
-                        .frame(width: 30, height: 30)
-                        .bold()
-                }.buttonStyle(.glassProminent)
-                    .clipShape(Circle())
-                    .glassEffect(in: Circle())
-            }.padding(.leading, 24)
-                .padding(.trailing, 12)
-            Form {
-                LogEntriesSummaryView(entries: entryMap.values.flatMap { $0 })
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        showNutrientSheet.toggle()
-                    }
-                ForEach(MealType.allCases.filter({ entryMap[$0.rawValue] != nil })) { mealType in
-                    mealView(mealType, entryMap[mealType.rawValue]!)
                 }
-            }.scrollContentBackground(.hidden)
-                // Remove hidden margin above form
-                .contentMargins(.top, 0, for: .scrollContent)
+            } label: {
+                Image(systemName: "plus")
+                    .frame(width: 42, height: 42)
+                    .font(.title2)
+                    .bold()
+            }.buttonStyle(.glass)
+                .clipShape(Circle())
+                .glassEffect(in: Circle())
+                .padding(16)
         }.background(Color(uiColor: UIColor.systemGroupedBackground))
             .sheet(isPresented: $editDate) {
                 DatePicker("", selection: $date, displayedComponents: .date)
@@ -158,12 +141,8 @@ private struct LogDayView: View {
                     .presentationDetents([.height(380)])
                     .padding([.leading, .trailing], 16)
             }
-            .sheet(isPresented: $showNutrientSheet) {
-                NutrientsView(nutrients: nutrients)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        showNutrientSheet.toggle()
-                    }
+            .sheet(isPresented: .isPresent($showNutrients)) {
+                NutrientsView(nutrients: showNutrients ?? [:])
                     .padding(.top, 16)
                     .padding([.leading, .trailing], 32)
                     .presentationDetents([.height(500)])
@@ -185,8 +164,99 @@ private struct LogDayView: View {
                     Text("Error getting item")
                 }
             }
+            .alert("Couldn't Sync to Health", isPresented: .isPresent($healthKitErrorMessage)) {
+                Button("OK") { }
+            } message: {
+                Text(healthKitErrorMessage ?? "")
+            }
+            .overlay(alignment: .top) {
+                if showHealthKitSuccess {
+                    Label("Health Synced", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(.green, in: Capsule())
+                        .padding(.top, 8)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
     }
     
+    @ViewBuilder
+    func headerView() -> some View {
+        HStack {
+            Button {
+                editDate.toggle()
+            } label: {
+                Text(date.formatted(date: .long, time: .omitted))
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .contentShape(Rectangle())
+            }.buttonStyle(.plain)
+            Spacer()
+            Menu {
+                Button {
+                    syncToHealthKit(entryMap.values.map { $0.nutrients }.reduce([:], +))
+                } label: {
+                    Label("Save Log", systemImage: "square.and.arrow.down")
+                }
+                Button(role: .destructive) {
+                    // Override with empty data, effectively clearing existing data
+                    syncToHealthKit([:])
+                } label: {
+                    Label("Delete Log", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "heart.text.square")
+                    .frame(width: 30, height: 30)
+                    .bold()
+            }.buttonStyle(.glass)
+                .clipShape(Circle())
+                .glassEffect(in: Circle())
+        }.padding(.leading, 24)
+            .padding(.trailing, 12)
+    }
+    
+    @ViewBuilder
+    func entriesView() -> some View {
+        Form {
+            LogEntriesSummaryView(entries: entryMap.values.flatMap { $0 })
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    showNutrients = entryMap.values.map { $0.nutrients }.reduce([:], +)
+                }
+            ForEach(MealType.allCases.filter({ entryMap[$0.rawValue] != nil })) { mealType in
+                mealView(mealType, entryMap[mealType.rawValue]!)
+            }
+        }.scrollContentBackground(.hidden)
+            // Remove hidden margin above form
+            .contentMargins(.top, 0, for: .scrollContent)
+    }
+
+    private func syncToHealthKit(_ nutrients: Nutrients) {
+        guard HealthKitManager.isAvailable else {
+            healthKitErrorMessage = "Health data isn't available on this device."
+            return
+        }
+        Task {
+            do {
+                try await HealthKitManager.shared.requestAuthorization()
+                try await HealthKitManager.shared.save(nutrients: nutrients, for: date)
+                withAnimation {
+                    showHealthKitSuccess = true
+                }
+                try? await Task.sleep(for: .seconds(2))
+                withAnimation {
+                    showHealthKitSuccess = false
+                }
+            } catch {
+                healthKitErrorMessage = error.localizedDescription
+            }
+        }
+    }
+
     private func mealView(_ mealType: MealType, _ entries: [LogEntry]) -> some View {
         Section {
             ForEach(entries, id: \.hashValue) { entry in
@@ -213,13 +283,16 @@ private struct LogDayView: View {
             let nutrients = entries.map({ $0.nutrients }).reduce([:], +)
             VStack(spacing: 8) {
                 HStack(alignment: .bottom) {
-                    Label(mealType.rawValue, systemImage: mealType.getIconName())
-                        .labelReservedIconWidth(12)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                    Button {
+                        showNutrients = nutrients
+                    } label: {
+                        Label(mealType.rawValue, systemImage: mealType.getIconName())
+                            .font(.title2)
+                            .fontWeight(.bold)
+                    }
                     Spacer()
                     Button {
-                        // TODO
+                        showNutrients = nutrients
                     } label: {
                         Text(nutrients.calories.formatted())
                             .font(.subheadline)

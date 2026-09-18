@@ -23,18 +23,20 @@ struct MacroBarChart: View {
     
     var body: some View {
         Chart(data) { d in
-            BarMark(
-                x: .value("Size", d.calories)
-            ).cornerRadius(8)
-                .foregroundStyle(d.macro?.color ?? .gray)
-                .annotation(position: textLayout.position, alignment: .center, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
-                    if let text = format(d) {
-                        Text(text)
-                            .fontWeight(.bold)
-                            .foregroundStyle(textLayout.getColor(d))
-                            .padding(textLayout.paddingSide, -6)
+            if d.calories > 0 {
+                BarMark(
+                    x: .value("Size", d.calories)
+                ).cornerRadius(8)
+                    .foregroundStyle(d.macro?.color ?? .gray)
+                    .annotation(position: textLayout.position, alignment: .center, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                        if let text = format(d) {
+                            Text(text)
+                                .fontWeight(.bold)
+                                .foregroundStyle(textLayout.getColor(d))
+                                .padding(textLayout.paddingSide, -3)
+                        }
                     }
-                }
+            }
         }.chartXAxis(.hidden)
             .chartYAxis(.hidden)
             .chartLegend(.hidden)
